@@ -3,15 +3,23 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import AppShell from "./components/AppShell";
-import OrderList from "./pages/OrderList";
-import OrderDetail from "./pages/OrderDetail";
-import DeliveryReception from "./pages/DeliveryReception";
-import Documents from "./pages/Documents";
-import Success from "./pages/Success";
+import { useCartSync } from "@/hooks/useCartSync";
+import Home from "./pages/Home";
+import ProductDetailPage from "./pages/ProductDetailPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
+
+function AppContent() {
+  useCartSync();
+  return (
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/product/:handle" element={<ProductDetailPage />} />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
+}
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -19,16 +27,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route element={<AppShell />}>
-            <Route path="/" element={<OrderList />} />
-            <Route path="/order/:id" element={<OrderDetail />} />
-            <Route path="/reception" element={<DeliveryReception />} />
-            <Route path="/documents" element={<Documents />} />
-          </Route>
-          <Route path="/success" element={<Success />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <AppContent />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
