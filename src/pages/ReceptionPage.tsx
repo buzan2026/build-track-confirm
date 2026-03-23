@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { orders } from "@/data/demoOrders";
+import { useOrderStore } from "@/stores/orderStore";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
@@ -8,10 +8,13 @@ import { ArrowLeft, Check } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 export default function ReceptionPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const orders = useOrderStore((s) => s.orders);
+  const markDelivered = useOrderStore((s) => s.markDelivered);
   const order = orders.find((o) => o.id === id);
 
 
