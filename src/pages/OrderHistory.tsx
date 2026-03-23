@@ -31,6 +31,7 @@ const steps = [
 
 export default function OrderHistory() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-background">
