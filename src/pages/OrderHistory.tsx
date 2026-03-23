@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Package, ChevronRight, Truck, Check, Clock, XCircle, ClipboardCheck, X } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { orders, Order } from "@/data/demoOrders";
+import { Order } from "@/data/demoOrders";
+import { useOrderStore } from "@/stores/orderStore";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -30,7 +31,9 @@ const steps = [
 ];
 
 export default function OrderHistory() {
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const orders = useOrderStore((s) => s.orders);
+  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+  const selectedOrder = orders.find((o) => o.id === selectedOrderId) ?? null;
   const navigate = useNavigate();
 
   return (
@@ -77,7 +80,7 @@ export default function OrderHistory() {
                 return (
                   <tr
                     key={order.id}
-                    onClick={() => setSelectedOrder(order)}
+                    onClick={() => setSelectedOrderId(order.id)}
                     className={cn(
                       "transition-colors cursor-pointer",
                       isSelected ? "bg-primary/10" : "hover:bg-muted/30"
@@ -124,7 +127,7 @@ export default function OrderHistory() {
       <Footer />
 
       {/* Order Detail Side Panel */}
-      <Sheet open={!!selectedOrder} onOpenChange={(open) => !open && setSelectedOrder(null)}>
+      <Sheet open={!!selectedOrder} onOpenChange={(open) => !open && setSelectedOrderId(null)}>
         <SheetContent side="right" className="w-[40vw] min-w-[420px] max-w-[600px] p-0 flex flex-col sm:max-w-none">
           {selectedOrder && (() => {
             const cfg = statusConfig[selectedOrder.status];
@@ -229,8 +232,8 @@ export default function OrderHistory() {
 
                 {/* Sticky footer */}
                 <div className="border-t border-border px-6 py-4 flex gap-3">
-                  <Button className="flex-1" onClick={() => { setSelectedOrder(null); navigate(`/orders/${selectedOrder.id}/reception`); }}>Confirmer la réception</Button>
-                  <Button variant="outline" className="flex-1" onClick={() => { setSelectedOrder(null); navigate(`/orders/${selectedOrder.id}/documents`); }}>Voir les documents</Button>
+                  <Button className="flex-1" onClick={() => { setSelectedOrderId(null); navigate(`/orders/${selectedOrder.id}/reception`); }}>Confirmer la réception</Button>
+                  <Button variant="outline" className="flex-1" onClick={() => { setSelectedOrderId(null); navigate(`/orders/${selectedOrder.id}/documents`); }}>Voir les documents</Button>
                 </div>
               </>
             );
