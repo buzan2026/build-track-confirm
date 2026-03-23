@@ -107,3 +107,18 @@ export const orders: Order[] = [
     ],
   },
 ];
+
+export const documents = {
+  invoices: [
+    { name: "Facture F-2026-0847", date: "2026-03-18", amount: 2847.60, orderId: "CMD-2026-0847" },
+    { name: "Facture F-2026-0852", date: "2026-03-20", amount: 1523.40, orderId: "CMD-2026-0852" },
+    { name: "Facture F-2026-0839", date: "2026-03-12", amount: 4210.00, orderId: "CMD-2026-0839" },
+    { name: "Facture F-2026-0798", date: "2026-02-28", amount: 3190.00, orderId: "CMD-2026-0798" },
+    { name: "Facture F-2026-0774", date: "2026-02-20", amount: 1654.80, orderId: "CMD-2026-0774" },
+  ],
+  deliverySlips: [
+    { name: "BL-2026-0839", date: "2026-03-15", orderId: "CMD-2026-0839" },
+    { name: "BL-2026-0798", date: "2026-03-02", orderId: "CMD-2026-0798" },
+    { name: "BL-2026-0774", date: "2026-02-24", orderId: "CMD-2026-0774" },
+  ],
+};

@@ -21,7 +21,9 @@ function AppContent() {
       <Route path="/" element={<Home />} />
       <Route path="/product/:handle" element={<ProductDetailPage />} />
       <Route path="/orders" element={<OrderHistory />} />
-      
+      <Route path="/orders/success" element={<ReceptionSuccess />} />
+      <Route path="/orders/:id/reception" element={<ReceptionPage />} />
+      <Route path="/orders/:id/documents" element={<DocumentsPage />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

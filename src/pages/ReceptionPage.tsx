@@ -14,6 +14,7 @@ export default function ReceptionPage() {
   const navigate = useNavigate();
   const order = orders.find((o) => o.id === id);
 
+
   const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({});
   const [notes, setNotes] = useState("");
   const [showSignPad, setShowSignPad] = useState(false);

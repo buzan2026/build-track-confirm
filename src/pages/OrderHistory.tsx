@@ -229,8 +229,8 @@ export default function OrderHistory() {
 
                 {/* Sticky footer */}
                 <div className="border-t border-border px-6 py-4 flex gap-3">
-                  <Button className="flex-1">Confirmer la réception</Button>
-                  <Button variant="outline" className="flex-1">Voir les documents</Button>
+                  <Button className="flex-1" onClick={() => { setSelectedOrder(null); navigate(`/orders/${selectedOrder.id}/reception`); }}>Confirmer la réception</Button>
+                  <Button variant="outline" className="flex-1" onClick={() => { setSelectedOrder(null); navigate(`/orders/${selectedOrder.id}/documents`); }}>Voir les documents</Button>
                 </div>
               </>
             );
