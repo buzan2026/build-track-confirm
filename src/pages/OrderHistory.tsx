@@ -31,7 +31,9 @@ const steps = [
 ];
 
 export default function OrderHistory() {
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const orders = useOrderStore((s) => s.orders);
+  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+  const selectedOrder = orders.find((o) => o.id === selectedOrderId) ?? null;
   const navigate = useNavigate();
 
   return (
