@@ -162,17 +162,19 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Open Sans', system-ui, sans-serif;
-    font-size: var(--text-base);
-    line-height: 21px;
+    font-family: var(--font-body);
+    font-size: var(--font-size-m);
+    font-weight: var(--font-weight-regular);
+    line-height: var(--line-height-m);
   }
 
   h1, h2 {
-    font-family: 'Montserrat', system-ui, sans-serif;
+    font-family: var(--font-heading);
+    font-weight: var(--font-weight-bold);
   }
 
   h3, h4, h5, h6 {
-    font-family: 'Open Sans', system-ui, sans-serif;
-    font-weight: 600;
+    font-family: var(--font-body);
+    font-weight: var(--font-weight-semibold);
   }
 }
