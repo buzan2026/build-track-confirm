@@ -1,9 +1,10 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Package, Eye, FileText, Truck, Check, Clock, XCircle } from "lucide-react";
+import { ArrowLeft, Package, ChevronRight, Truck, Check, Clock, XCircle } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { orders } from "@/data/demoOrders";
 
 const statusConfig: Record<string, { label: string; variant: "default" | "success" | "warning" | "destructive" | "secondary"; icon: typeof Check }> = {
   delivered: { label: "Livrée", variant: "success", icon: Check },
@@ -12,64 +13,9 @@ const statusConfig: Record<string, { label: string; variant: "default" | "succes
   cancelled: { label: "Annulée", variant: "destructive", icon: XCircle },
 };
 
-const orders = [
-  {
-    id: "CMD-2026-0847",
-    date: "2026-03-18",
-    supplier: "Rexel France",
-    total: 2847.6,
-    status: "confirmed",
-    items: 4,
-    expectedDelivery: "2026-03-25",
-  },
-  {
-    id: "CMD-2026-0852",
-    date: "2026-03-20",
-    supplier: "Sonepar Électrique",
-    total: 1523.4,
-    status: "processing",
-    items: 4,
-    expectedDelivery: "2026-03-28",
-  },
-  {
-    id: "CMD-2026-0839",
-    date: "2026-03-12",
-    supplier: "Legrand Distribution",
-    total: 4210.0,
-    status: "delivered",
-    items: 3,
-    expectedDelivery: "2026-03-22",
-  },
-  {
-    id: "CMD-2026-0821",
-    date: "2026-03-05",
-    supplier: "Schneider Electric Pro",
-    total: 876.3,
-    status: "cancelled",
-    items: 1,
-    expectedDelivery: "—",
-  },
-  {
-    id: "CMD-2026-0798",
-    date: "2026-02-28",
-    supplier: "Rexel France",
-    total: 3190.0,
-    status: "delivered",
-    items: 6,
-    expectedDelivery: "2026-03-05",
-  },
-  {
-    id: "CMD-2026-0774",
-    date: "2026-02-20",
-    supplier: "Hager Distribution",
-    total: 1654.8,
-    status: "delivered",
-    items: 5,
-    expectedDelivery: "2026-02-27",
-  },
-];
-
 export default function OrderHistory() {
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -111,7 +57,11 @@ export default function OrderHistory() {
                 const cfg = statusConfig[order.status];
                 const StatusIcon = cfg.icon;
                 return (
-                  <tr key={order.id} className="hover:bg-muted/30 transition-colors">
+                  <tr
+                    key={order.id}
+                    onClick={() => navigate(`/orders/${order.id}`)}
+                    className="hover:bg-muted/30 transition-colors cursor-pointer"
+                  >
                     <td className="px-5 py-4">
                       <span className="font-semibold text-sm text-card-foreground">{order.id}</span>
                     </td>
@@ -121,7 +71,7 @@ export default function OrderHistory() {
                     <td className="px-5 py-4 text-sm text-card-foreground">{order.supplier}</td>
                     <td className="px-5 py-4">
                       <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                        <Package className="h-3.5 w-3.5" /> {order.items}
+                        <Package className="h-3.5 w-3.5" /> {order.items.length}
                       </span>
                     </td>
                     <td className="px-5 py-4 text-sm text-muted-foreground">
@@ -139,14 +89,7 @@ export default function OrderHistory() {
                       </span>
                     </td>
                     <td className="px-5 py-4 text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        <Button variant="ghost" size="icon" className="h-8 w-8" title="Voir le détail">
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8" title="Documents">
-                          <FileText className="h-4 w-4" />
-                        </Button>
-                      </div>
+                      <ChevronRight className="h-4 w-4 text-muted-foreground" />
                     </td>
                   </tr>
                 );
@@ -155,7 +98,7 @@ export default function OrderHistory() {
           </table>
         </div>
 
-        <p className="text-xs text-muted-foreground mt-4 text-center">Données de démonstration — 6 commandes affichées</p>
+        <p className="text-xs text-muted-foreground mt-4 text-center">Données de démonstration — {orders.length} commandes affichées</p>
       </div>
       <Footer />
     </div>
