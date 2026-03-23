@@ -7,7 +7,7 @@ import { useCartSync } from "@/hooks/useCartSync";
 import Home from "./pages/Home";
 import ProductDetailPage from "./pages/ProductDetailPage";
 import OrderHistory from "./pages/OrderHistory";
-import OrderDetailPage from "./pages/OrderDetailPage";
+
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -19,7 +19,7 @@ function AppContent() {
       <Route path="/" element={<Home />} />
       <Route path="/product/:handle" element={<ProductDetailPage />} />
       <Route path="/orders" element={<OrderHistory />} />
-      <Route path="/orders/:id" element={<OrderDetailPage />} />
+      
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
