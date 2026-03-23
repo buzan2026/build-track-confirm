@@ -2,54 +2,107 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@400;600;700&display=swap');
 
 @layer base {
   :root {
-    --background: 210 15% 97%;
-    --foreground: 220 20% 12%;
+    /* Core palette — mapped from Rexel design tokens (global.json) */
+    --background: 210 14% 97%;
+    --foreground: 210 14% 22%;
 
     --card: 0 0% 100%;
-    --card-foreground: 220 20% 12%;
+    --card-foreground: 210 14% 22%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 20% 12%;
+    --popover-foreground: 210 14% 22%;
 
-    --primary: 200 75% 35%;
+    /* Bootstrap.$Blue #0072ce */
+    --primary: 208 100% 40%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 12% 93%;
-    --secondary-foreground: 220 20% 20%;
+    --secondary: 210 10% 93%;
+    --secondary-foreground: 210 14% 22%;
 
-    --muted: 210 10% 92%;
-    --muted-foreground: 215 10% 48%;
+    /* Bootstrap.$Gray #6c757d */
+    --muted: 210 7% 90%;
+    --muted-foreground: 210 7% 46%;
 
-    --accent: 200 60% 94%;
-    --accent-foreground: 200 75% 28%;
+    /* Alerts.Information */
+    --accent: 192 52% 91%;
+    --accent-foreground: 192 45% 30%;
 
-    --destructive: 0 70% 55%;
+    /* Bootstrap.$Red #c8102e */
+    --destructive: 352 83% 42%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 152 55% 42%;
+    /* Bootstrap.$Success / Actions.Already-bought #16704a */
+    --success: 152 65% 26%;
     --success-foreground: 0 0% 100%;
 
-    --warning: 38 90% 55%;
-    --warning-foreground: 38 90% 15%;
+    /* Bootstrap.$Orange / Actions.New #ee7900 */
+    --warning: 30 100% 47%;
+    --warning-foreground: 30 90% 15%;
 
-    --border: 214 18% 88%;
-    --input: 214 18% 88%;
-    --ring: 200 75% 35%;
+    /* Bootstrap.$Favorited #ffc107 */
+    --favorited: 45 100% 51%;
 
-    --radius: 0.5rem;
+    /* Borders — neutral gray */
+    --border: 210 14% 87%;
+    --input: 210 14% 87%;
+    --ring: 208 100% 40%;
 
+    /* Border radius from tokens: Small = 3px */
+    --radius: 0.375rem;
+    --radius-sm: 3px;
+
+    /* Elevations */
+    --shadow-1: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --shadow-2: 0 5px 8px rgba(0, 0, 0, 0.1);
+    --shadow-3: 0 9px 10px rgba(0, 0, 0, 0.1);
+    --shadow-4: 0 20px 30px rgba(0, 0, 0, 0.1);
+    --shadow-5: 0 30px 30px rgba(0, 0, 0, 0.1);
+
+    /* Alert semantic colors */
+    --alert-info-text: 189 41% 19%;
+    --alert-info-bg: 193 50% 91%;
+    --alert-info-border: 189 51% 83%;
+    --alert-success-text: 152 65% 26%;
+    --alert-success-bg: 134 41% 91%;
+    --alert-success-border: 134 38% 82%;
+    --alert-warning-text: 45 93% 20%;
+    --alert-warning-bg: 45 100% 90%;
+    --alert-warning-border: 44 100% 80%;
+    --alert-error-text: 352 66% 28%;
+    --alert-error-bg: 354 78% 91%;
+    --alert-error-border: 354 67% 87%;
+
+    /* Sidebar */
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 200 75% 35%;
+    --sidebar-primary: 208 100% 40%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 210 12% 93%;
-    --sidebar-accent-foreground: 220 20% 20%;
-    --sidebar-border: 214 18% 88%;
-    --sidebar-ring: 200 75% 35%;
+    --sidebar-accent: 210 10% 93%;
+    --sidebar-accent-foreground: 210 14% 22%;
+    --sidebar-border: 210 14% 87%;
+    --sidebar-ring: 208 100% 40%;
+
+    /* Spacing scale (from tokens: sides-1=4px, sides-2=8px, etc.) */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 16px;
+    --space-4: 24px;
+    --space-5: 32px;
+    --space-6: 40px;
+    --space-7: 48px;
+    --space-8: 56px;
+
+    /* Font sizes from tokens */
+    --text-xs: 11px;
+    --text-sm: 12px;
+    --text-base: 14px;
+    --text-lg: 16px;
+    --text-xl: 18px;
+    --text-2xl: 24px;
   }
 }
 
@@ -59,6 +112,18 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans antialiased;
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Open Sans', system-ui, sans-serif;
+    font-size: var(--text-base);
+    line-height: 21px;
+  }
+
+  h1, h2 {
+    font-family: 'Montserrat', system-ui, sans-serif;
+  }
+
+  h3, h4, h5, h6 {
+    font-family: 'Open Sans', system-ui, sans-serif;
+    font-weight: 600;
   }
 }
