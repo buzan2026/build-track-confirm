@@ -80,7 +80,7 @@ export default function OrderHistory() {
                 return (
                   <tr
                     key={order.id}
-                    onClick={() => setSelectedOrder(order)}
+                    onClick={() => setSelectedOrderId(order.id)}
                     className={cn(
                       "transition-colors cursor-pointer",
                       isSelected ? "bg-primary/10" : "hover:bg-muted/30"
