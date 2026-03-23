@@ -10,7 +10,7 @@ export default function Footer() {
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
                 <Zap className="h-4 w-4 text-primary-foreground" />
               </div>
-              <span className="font-display text-lg font-bold text-foreground">ElecDistrib</span>
+              <span className="font-display text-lg font-bold text-foreground tracking-tight">ElecDistrib</span>
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed">
               Votre partenaire matériel électrique professionnel. Livraison express sur chantier partout en France.

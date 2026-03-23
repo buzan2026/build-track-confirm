@@ -68,7 +68,7 @@ export default function ProductGrid() {
           const img = product.node.images.edges[0]?.node;
           const price = product.node.priceRange.minVariantPrice;
           return (
-            <div key={product.node.id} className="group rounded-lg border border-border bg-card overflow-hidden transition-shadow hover:shadow-md">
+            <div key={product.node.id} className="group rounded-sm border border-border bg-card overflow-hidden transition-shadow hover:shadow-elevation-2">
               <Link to={`/product/${product.node.handle}`} className="block">
                 <div className="aspect-square bg-muted overflow-hidden">
                   {img ? (

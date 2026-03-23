@@ -14,8 +14,16 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['"Inter"', 'system-ui', 'sans-serif'],
-        display: ['"Space Grotesk"', 'system-ui', 'sans-serif'],
+        sans: ['"Open Sans"', 'system-ui', 'sans-serif'],
+        display: ['"Montserrat"', 'system-ui', 'sans-serif'],
+      },
+      fontSize: {
+        xs: ["var(--text-xs)", { lineHeight: "18px" }],
+        sm: ["var(--text-sm)", { lineHeight: "18px" }],
+        base: ["var(--text-base)", { lineHeight: "21px" }],
+        lg: ["var(--text-lg)", { lineHeight: "24px" }],
+        xl: ["var(--text-xl)", { lineHeight: "27px" }],
+        "2xl": ["var(--text-2xl)", { lineHeight: "36px" }],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -73,7 +81,24 @@ export default {
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        sm: "var(--radius-sm)",
+      },
+      boxShadow: {
+        "elevation-1": "var(--shadow-1)",
+        "elevation-2": "var(--shadow-2)",
+        "elevation-3": "var(--shadow-3)",
+        "elevation-4": "var(--shadow-4)",
+        "elevation-5": "var(--shadow-5)",
+      },
+      spacing: {
+        "token-1": "var(--space-1)",
+        "token-2": "var(--space-2)",
+        "token-3": "var(--space-3)",
+        "token-4": "var(--space-4)",
+        "token-5": "var(--space-5)",
+        "token-6": "var(--space-6)",
+        "token-7": "var(--space-7)",
+        "token-8": "var(--space-8)",
       },
       keyframes: {
         "accordion-down": {

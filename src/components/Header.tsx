@@ -29,7 +29,7 @@ export default function Header() {
             <Zap className="h-5 w-5 text-primary-foreground" />
           </div>
           <div>
-            <span className="font-display text-xl font-bold text-foreground">ElecDistrib</span>
+            <span className="font-display text-xl font-bold text-foreground tracking-tight">ElecDistrib</span>
             <span className="block text-[10px] leading-none text-muted-foreground tracking-wide">MATÉRIEL ÉLECTRIQUE PRO</span>
           </div>
         </Link>

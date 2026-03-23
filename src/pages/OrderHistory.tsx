@@ -58,7 +58,7 @@ export default function OrderHistory() {
           </div>
         </div>
 
-        <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
+        <div className="rounded-sm border border-border bg-card shadow-elevation-1 overflow-hidden">
           <table className="w-full">
             <thead>
               <tr className="border-b border-border bg-muted/50">
