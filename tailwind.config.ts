@@ -18,12 +18,12 @@ export default {
         display: ['"Montserrat"', 'system-ui', 'sans-serif'],
       },
       fontSize: {
-        xs: ["var(--text-xs)", { lineHeight: "18px" }],
-        sm: ["var(--text-sm)", { lineHeight: "18px" }],
-        base: ["var(--text-base)", { lineHeight: "21px" }],
-        lg: ["var(--text-lg)", { lineHeight: "24px" }],
-        xl: ["var(--text-xl)", { lineHeight: "27px" }],
-        "2xl": ["var(--text-2xl)", { lineHeight: "36px" }],
+        xs: ["var(--font-size-xs)", { lineHeight: "var(--line-height-xs)" }],
+        sm: ["var(--font-size-s)", { lineHeight: "var(--line-height-s)" }],
+        base: ["var(--font-size-m)", { lineHeight: "var(--line-height-m)" }],
+        lg: ["var(--font-size-l)", { lineHeight: "var(--line-height-l)" }],
+        xl: ["var(--font-size-xl)", { lineHeight: "var(--line-height-l)" }],
+        "2xl": ["var(--font-size-xxl)", { lineHeight: "var(--line-height-xs)" }],
       },
       colors: {
         border: "hsl(var(--border))",
