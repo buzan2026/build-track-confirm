@@ -7,7 +7,7 @@ import { useCartSync } from "@/hooks/useCartSync";
 import Home from "./pages/Home";
 import ProductDetailPage from "./pages/ProductDetailPage";
 import OrderHistory from "./pages/OrderHistory";
-import OrderDetailPage from "./pages/OrderDetailPage";
+
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
