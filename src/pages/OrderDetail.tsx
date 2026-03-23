@@ -46,7 +46,7 @@ export default function OrderDetail() {
                 )}>
                   <step.icon className="h-4 w-4" />
                 </div>
-                <span className={cn("text-[10px] text-center leading-tight", done ? "text-foreground font-medium" : "text-muted-foreground")}>
+                <span className={cn("text-[length:var(--font-size-xs)] text-center leading-tight", done ? "text-foreground font-medium" : "text-muted-foreground")}>
                   {step.label}
                 </span>
               </div>
@@ -54,7 +54,7 @@ export default function OrderDetail() {
           })}
         </div>
         {/* Connector lines */}
-        <div className="mt-[-30px] mb-6 flex px-[18px]">
+        <div className="mt-[var(--spacing-neg-30)] mb-6 flex px-[var(--spacing-2-25)]">
           {[0, 1, 2].map((i) => (
             <div key={i} className={cn("h-0.5 flex-1 mx-1", i < order.deliveryStep ? "bg-primary" : "bg-muted")} />
           ))}

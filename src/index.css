@@ -1,3 +1,93 @@
+:root {
+  /* === SPACING === */
+  --spacing-1: 4px;
+  --spacing-2: 8px;
+  --spacing-3: 16px;
+  --spacing-4: 24px;
+  --spacing-5: 32px;
+  --spacing-6: 40px;
+  --spacing-7: 48px;
+  --spacing-8: 56px;
+  --spacing-9: 64px;
+  --spacing-10: 80px;
+  --spacing-11: 96px;
+  --spacing-12: 120px;
+
+  /* === BORDER RADIUS === */
+  --border-radius-sm: 3px;
+
+  /* === COLORS: BRAND === */
+  --color-primary: #0072ce;
+  --color-primary-hover: #005ba3;
+  --color-white: #ffffff;
+  --color-gray: #6c757d;
+  --color-gray-dark: #343a40;
+  --color-orange: #ee7900;
+  --color-teal: #20c997;
+
+  /* === COLORS: SEMANTIC === */
+  --color-success: #16704a;
+  --color-error: #c8102e;
+  --color-warning: #ee7900;
+  --color-info: #0072ce;
+
+  /* === COLORS: ALERTS === */
+  --color-alert-info-text: #0c5460;
+  --color-alert-info-bg: #d1ecf1;
+  --color-alert-info-border: #bee5eb;
+  --color-alert-success-text: #16704a;
+  --color-alert-success-bg: #d4edda;
+  --color-alert-success-border: #c3e6cb;
+  --color-alert-warning-text: #856404;
+  --color-alert-warning-bg: #fff3cd;
+  --color-alert-warning-border: #ffeeba;
+  --color-alert-error-text: #721c24;
+  --color-alert-error-bg: #f8d7da;
+  --color-alert-error-border: #f5c6cb;
+
+  /* === ELEVATIONS === */
+  --shadow-1: 0 2px 4px 0 rgba(0,0,0,0.10);
+  --shadow-2: 0 4px 8px 0 rgba(0,0,0,0.10);
+  --shadow-3: 0 10px 20px 0 rgba(0,0,0,0.10);
+  --shadow-4: 0 20px 30px 0 rgba(0,0,0,0.10);
+  --shadow-5: 0 30px 30px 0 rgba(0,0,0,0.10);
+
+  /* === TYPOGRAPHY === */
+  --font-heading: "Montserrat", sans-serif;
+  --font-body: "Open Sans", sans-serif;
+  --font-size-xs: 11px;
+  --font-size-s: 12px;
+  --font-size-m: 14px;
+  --font-size-l: 16px;
+  --font-size-xl: 18px;
+  --font-size-xxl: 24px;
+  --font-weight-regular: 400;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* === EXTENSIONS === */
+  --spacing-2-25: 18px;
+  --spacing-neg-3: -3px;
+  --spacing-neg-30: -30px;
+  --size-sheet-width: 40vw;
+  --size-sheet-min: 420px;
+  --size-sheet-max: 600px;
+  --size-toast-max: 420px;
+  --size-logo-height: 6em;
+  --size-logo-padding: 1.5em;
+  --size-px: 1px;
+  --size-2px: 2px;
+  --size-menu-min: 8rem;
+  --size-menu-min-lg: 12rem;
+  --size-command-max-h: 300px;
+  --size-handle-width: 100px;
+  --size-border-dashed: 1.5px;
+  --radius-2: 2px;
+  --radius-drawer: 10px;
+  --shadow-logo-vite: drop-shadow(0 0 2em #646cffaa);
+  --shadow-logo-react: drop-shadow(0 0 2em #61dafbaa);
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

@@ -128,7 +128,7 @@ export default function OrderHistory() {
 
       {/* Order Detail Side Panel */}
       <Sheet open={!!selectedOrder} onOpenChange={(open) => !open && setSelectedOrderId(null)}>
-        <SheetContent side="right" className="w-[40vw] min-w-[420px] max-w-[600px] p-0 flex flex-col sm:max-w-none">
+        <SheetContent side="right" className="w-[var(--size-sheet-width)] min-w-[var(--size-sheet-min)] max-w-[var(--size-sheet-max)] p-0 flex flex-col sm:max-w-none">
           {selectedOrder && (() => {
             const cfg = statusConfig[selectedOrder.status];
             return (
@@ -156,7 +156,7 @@ export default function OrderHistory() {
                   <div className="rounded-xl border border-border bg-muted/30 p-5">
                     <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-4">Suivi livraison</p>
                     <div className="flex items-start justify-between relative">
-                      <div className="absolute top-[18px] left-[36px] right-[36px] flex">
+                      <div className="absolute top-[var(--spacing-2-25)] left-[calc(var(--spacing-4)+var(--spacing-2)+var(--spacing-1))] right-[calc(var(--spacing-4)+var(--spacing-2)+var(--spacing-1))] flex">
                         {[0, 1, 2].map((i) => (
                           <div key={i} className={cn("h-0.5 flex-1", i < selectedOrder.deliveryStep ? "bg-primary" : "bg-border")} />
                         ))}

@@ -71,7 +71,7 @@ export default function OrderDetailPage() {
           <h2 className="text-sm font-semibold text-foreground mb-5">Suivi de livraison</h2>
           <div className="flex items-start justify-between relative">
             {/* Connector lines behind icons */}
-            <div className="absolute top-[18px] left-[36px] right-[36px] flex">
+            <div className="absolute top-[var(--spacing-2-25)] left-[calc(var(--spacing-4)+var(--spacing-2)+var(--spacing-1))] right-[calc(var(--spacing-4)+var(--spacing-2)+var(--spacing-1))] flex">
               {[0, 1, 2].map((i) => (
                 <div key={i} className={cn("h-0.5 flex-1", i < order.deliveryStep ? "bg-primary" : "bg-muted")} />
               ))}

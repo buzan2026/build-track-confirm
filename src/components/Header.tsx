@@ -30,7 +30,7 @@ export default function Header() {
           </div>
           <div>
             <span className="font-display text-xl font-bold text-foreground tracking-tight">ElecDistrib</span>
-            <span className="block text-[10px] leading-none text-muted-foreground tracking-wide">MATÉRIEL ÉLECTRIQUE PRO</span>
+            <span className="block text-[length:var(--font-size-xs)] leading-none text-muted-foreground tracking-wide">MATÉRIEL ÉLECTRIQUE PRO</span>
           </div>
         </Link>
 
