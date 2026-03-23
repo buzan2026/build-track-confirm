@@ -171,12 +171,11 @@ export default function ReceptionPage() {
         )}
 
         <Button className="w-full" disabled={!signed || !allChecked} onClick={() => {
-          navigate("/orders/success", {
-            state: {
-              orderNumber: order.id,
-              receptionDate: new Date().toLocaleDateString("fr-FR"),
-              signedBy: "Technicien terrain",
-            },
+          markDelivered(order.id);
+          navigate("/orders");
+          toast.success(`Réception confirmée — ${order.id}`, {
+            duration: 4000,
+            position: "top-right",
           });
         }}>
           Valider la réception
