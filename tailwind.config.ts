@@ -81,7 +81,7 @@ export default {
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
-        sm: "var(--radius-sm)",
+        sm: "var(--border-radius-sm)",
       },
       boxShadow: {
         "elevation-1": "var(--shadow-1)",
