@@ -14,11 +14,17 @@ export default {
     },
     extend: {
       fontFamily: {
+        heading: ["var(--font-heading)"],
+        body: ["var(--font-body)"],
         sans: ['"Open Sans"', 'system-ui', 'sans-serif'],
         display: ['"Montserrat"', 'system-ui', 'sans-serif'],
       },
       fontSize: {
         xs: ["var(--font-size-xs)", { lineHeight: "var(--line-height-xs)" }],
+        s: ["var(--font-size-s)", { lineHeight: "var(--line-height-s)" }],
+        m: ["var(--font-size-m)", { lineHeight: "var(--line-height-m)" }],
+        l: ["var(--font-size-l)", { lineHeight: "var(--line-height-l)" }],
+        xxl: ["var(--font-size-xxl)", { lineHeight: "var(--line-height-xs)" }],
         sm: ["var(--font-size-s)", { lineHeight: "var(--line-height-s)" }],
         base: ["var(--font-size-m)", { lineHeight: "var(--line-height-m)" }],
         lg: ["var(--font-size-l)", { lineHeight: "var(--line-height-l)" }],
@@ -32,8 +38,55 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "hsl(var(--primary))",
+          DEFAULT: "hsl(var(--primary) / <alpha-value>)",
           foreground: "hsl(var(--primary-foreground))",
+        },
+        success: {
+          DEFAULT: "var(--color-success)",
+          foreground: "hsl(var(--success-foreground))",
+        },
+        error: "var(--color-error)",
+        warning: {
+          DEFAULT: "var(--color-warning)",
+          foreground: "hsl(var(--warning-foreground))",
+        },
+        info: "var(--color-info)",
+        gray: "var(--color-gray)",
+        orange: "var(--color-orange)",
+        teal: "var(--color-teal)",
+        alert: {
+          info: {
+            text: "var(--color-alert-info-text)",
+            bg: "var(--color-alert-info-bg)",
+            border: "var(--color-alert-info-border)",
+          },
+          success: {
+            text: "var(--color-alert-success-text)",
+            bg: "var(--color-alert-success-bg)",
+            border: "var(--color-alert-success-border)",
+          },
+          warning: {
+            text: "var(--color-alert-warning-text)",
+            bg: "var(--color-alert-warning-bg)",
+            border: "var(--color-alert-warning-border)",
+          },
+          error: {
+            text: "var(--color-alert-error-text)",
+            bg: "var(--color-alert-error-bg)",
+            border: "var(--color-alert-error-border)",
+          },
+        },
+        segment: {
+          1: "var(--color-segment-1)",
+          2: "var(--color-segment-2)",
+          3: "var(--color-segment-3)",
+          4: "var(--color-segment-4)",
+          5: "var(--color-segment-5)",
+        },
+        stat: {
+          basic: "var(--color-stat-basic)",
+          gain: "var(--color-stat-gain)",
+          loss: "var(--color-stat-loss)",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
@@ -51,14 +104,8 @@ export default {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
         },
-        success: {
-          DEFAULT: "hsl(var(--success))",
-          foreground: "hsl(var(--success-foreground))",
-        },
-        warning: {
-          DEFAULT: "hsl(var(--warning))",
-          foreground: "hsl(var(--warning-foreground))",
-        },
+        successState: "hsl(var(--success))",
+        warningState: "hsl(var(--warning))",
         popover: {
           DEFAULT: "hsl(var(--popover))",
           foreground: "hsl(var(--popover-foreground))",
@@ -84,6 +131,11 @@ export default {
         sm: "var(--border-radius-sm)",
       },
       boxShadow: {
+        "1": "var(--shadow-1)",
+        "2": "var(--shadow-2)",
+        "3": "var(--shadow-3)",
+        "4": "var(--shadow-4)",
+        "5": "var(--shadow-5)",
         "elevation-1": "var(--shadow-1)",
         "elevation-2": "var(--shadow-2)",
         "elevation-3": "var(--shadow-3)",
