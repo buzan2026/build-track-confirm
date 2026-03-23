@@ -96,7 +96,7 @@ export default function ReceptionPage() {
         </div>
 
         {/* Checklist */}
-        <div className="rounded-xl border border-border bg-card p-5 shadow-sm mb-6">
+        <div className="rounded-sm border border-border bg-card p-5 shadow-elevation-1 mb-6">
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-4">
             Articles à réceptionner ({order.items.length})
           </p>
