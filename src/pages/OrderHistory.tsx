@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import { orders, Order } from "@/data/demoOrders";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Sheet,
   SheetContent,
