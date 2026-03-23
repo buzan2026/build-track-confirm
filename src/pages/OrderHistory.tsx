@@ -127,7 +127,7 @@ export default function OrderHistory() {
       <Footer />
 
       {/* Order Detail Side Panel */}
-      <Sheet open={!!selectedOrder} onOpenChange={(open) => !open && setSelectedOrder(null)}>
+      <Sheet open={!!selectedOrder} onOpenChange={(open) => !open && setSelectedOrderId(null)}>
         <SheetContent side="right" className="w-[40vw] min-w-[420px] max-w-[600px] p-0 flex flex-col sm:max-w-none">
           {selectedOrder && (() => {
             const cfg = statusConfig[selectedOrder.status];
