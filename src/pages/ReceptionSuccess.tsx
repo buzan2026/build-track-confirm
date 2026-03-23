@@ -19,7 +19,7 @@ export default function ReceptionSuccess() {
         <h1 className="mb-2 text-2xl font-bold text-foreground">Réception confirmée</h1>
         <p className="mb-6 text-sm text-muted-foreground">La livraison a été enregistrée avec succès.</p>
 
-        <div className="mb-8 w-full max-w-sm rounded-xl border border-border bg-card p-5 shadow-sm text-left space-y-3">
+        <div className="mb-8 w-full max-w-sm rounded-sm border border-border bg-card p-5 shadow-elevation-1 text-left space-y-3">
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground">Commande</span>
             <span className="font-medium text-card-foreground">{data?.orderNumber ?? "—"}</span>

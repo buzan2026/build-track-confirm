@@ -8,7 +8,7 @@ export default function HeroSection() {
       <div className="bg-foreground">
         <div className="container py-16">
           <div className="max-w-2xl">
-            <h1 className="font-display text-4xl font-bold tracking-tight text-primary-foreground mb-4">
+            <h1 className="font-display text-2xl md:text-4xl font-bold tracking-tight text-primary-foreground mb-4">
               Matériel électrique professionnel, livré sur chantier
             </h1>
             <p className="text-lg text-primary-foreground/70 mb-8 leading-relaxed">

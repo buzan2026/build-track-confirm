@@ -82,7 +82,7 @@ export default function DocumentsPage() {
           <div className="space-y-3">
             {slips.length === 0 && <p className="text-sm text-muted-foreground text-center py-8">Aucun bon de livraison disponible.</p>}
             {slips.map((doc, i) => (
-              <div key={i} className="flex items-center gap-4 rounded-xl border border-border bg-card p-4 shadow-sm">
+              <div key={i} className="flex items-center gap-4 rounded-sm border border-border bg-card p-4 shadow-elevation-1">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
                   <FileText className="h-5 w-5 text-primary" />
                 </div>
