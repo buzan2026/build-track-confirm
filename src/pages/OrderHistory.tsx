@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import { orders, Order } from "@/data/demoOrders";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Sheet,
   SheetContent,
@@ -30,6 +31,7 @@ const steps = [
 
 export default function OrderHistory() {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-background">
@@ -227,8 +229,8 @@ export default function OrderHistory() {
 
                 {/* Sticky footer */}
                 <div className="border-t border-border px-6 py-4 flex gap-3">
-                  <Button className="flex-1">Confirmer la réception</Button>
-                  <Button variant="outline" className="flex-1">Voir les documents</Button>
+                  <Button className="flex-1" onClick={() => { setSelectedOrder(null); navigate(`/orders/${selectedOrder.id}/reception`); }}>Confirmer la réception</Button>
+                  <Button variant="outline" className="flex-1" onClick={() => { setSelectedOrder(null); navigate(`/orders/${selectedOrder.id}/documents`); }}>Voir les documents</Button>
                 </div>
               </>
             );
