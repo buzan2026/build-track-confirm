@@ -50,6 +50,16 @@ export const orders: Order[] = [
       { name: "Prise Mosaic 2P+T", reference: "MOS-2PT-BLC", quantity: 50, unitPrice: 7.80 },
       { name: "Plaque Céliane Titane", reference: "CEL-PL-TIT", quantity: 50, unitPrice: 11.50 },
     ],
+  },
+  {
+    id: "CMD-2026-0841", date: "2026-03-15", supplier: "Rexel France", total: 4780.00, status: "partial", deliveryStep: 2, expectedDelivery: "2026-03-22",
+    items: [
+      { name: "Armoire électrique 800x600", reference: "ARM-800-600", quantity: 2, unitPrice: 890.00, deliveredQty: 2 },
+      { name: "Câble H07VK 6mm² Bleu", reference: "H07VK-6-BL", quantity: 300, unitPrice: 2.20, deliveredQty: 200 },
+      { name: "Câble H07VK 6mm² Vert/Jaune", reference: "H07VK-6-VJ", quantity: 300, unitPrice: 2.20, deliveredQty: 200 },
+      { name: "Rail DIN Omega", reference: "RAIL-DIN-2M", quantity: 20, unitPrice: 8.50, deliveredQty: 20 },
+      { name: "Embout de câblage 6mm²", reference: "EMB-6-ISOL", quantity: 500, unitPrice: 0.12, deliveredQty: 0 },
+    ],
     shipments: [
       {
         id: "ENV-0841-1", date: "2026-03-16", status: "delivered",
@@ -68,16 +78,6 @@ export const orders: Order[] = [
           { reference: "EMB-6-ISOL", quantity: 500 },
         ],
       },
-    ],
-  },
-  {
-    id: "CMD-2026-0841", date: "2026-03-15", supplier: "Rexel France", total: 4780.00, status: "partial", deliveryStep: 2, expectedDelivery: "2026-03-22",
-    items: [
-      { name: "Armoire électrique 800x600", reference: "ARM-800-600", quantity: 2, unitPrice: 890.00, deliveredQty: 2 },
-      { name: "Câble H07VK 6mm² Bleu", reference: "H07VK-6-BL", quantity: 300, unitPrice: 2.20, deliveredQty: 200 },
-      { name: "Câble H07VK 6mm² Vert/Jaune", reference: "H07VK-6-VJ", quantity: 300, unitPrice: 2.20, deliveredQty: 200 },
-      { name: "Rail DIN Omega", reference: "RAIL-DIN-2M", quantity: 20, unitPrice: 8.50, deliveredQty: 20 },
-      { name: "Embout de câblage 6mm²", reference: "EMB-6-ISOL", quantity: 500, unitPrice: 0.12, deliveredQty: 0 },
     ],
   },
   {
