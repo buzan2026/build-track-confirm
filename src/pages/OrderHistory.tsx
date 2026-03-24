@@ -484,9 +484,9 @@ export default function OrderHistory() {
                     <Button
                       variant="secondary"
                       className="flex-1 h-[48px] px-[40px] py-0"
-                      onClick={() => toast.message("Signalement envoyé à l'équipe support.")}
+                      onClick={() => toast.success(`Demande de retour initiée pour ${selectedOrder.id}`)}
                     >
-                      Signaler un problème
+                      Demander un retour
                     </Button>
                     <Button
                       variant="primary"
@@ -546,8 +546,7 @@ export default function OrderHistory() {
                   </div>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-[var(--color-text-primary)]">{selectedOrder.supplier}</p>
-                  <p className="text-xs text-[var(--color-text-secondary)]">Commandée le {new Date(selectedOrder.date).toLocaleDateString("fr-FR")}</p>
+                  <p className="text-sm text-[var(--color-text-secondary)]">Commandée le {new Date(selectedOrder.date).toLocaleDateString("fr-FR")}</p>
                 </div>
                 {panelSection === "detail" ? (() => {
                   const isPartial = selectedOrder.status === "partial";
