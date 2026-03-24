@@ -608,7 +608,8 @@ export default function OrderHistory() {
                       </div>
                     </div>
                   </>
-                ) : null}
+                  );
+                })() : null}
 
                 {panelSection === "documents" ? (
                   <div className="space-y-5">
