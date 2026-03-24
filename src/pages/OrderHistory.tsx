@@ -34,12 +34,6 @@ const statusConfig: Record<string, { label: string; badgeType: BadgeType; badgeC
     badgeClassName: "bg-[var(--color-primary)] border-transparent text-[var(--color-white)] text-[12px] leading-[16px]",
     icon: Truck,
   },
-  processing: {
-    label: "En cours",
-    badgeType: "priceFlag",
-    badgeClassName: "bg-[var(--color-orange)] border-transparent text-[var(--color-white)] text-[12px] leading-[16px]",
-    icon: Clock,
-  },
   cancelled: {
     label: "Annulée",
     badgeType: "offer",
