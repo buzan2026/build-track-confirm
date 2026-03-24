@@ -695,6 +695,7 @@ export default function OrderHistory() {
                     </div>
                   </div>
                 </div>
+                )}
               </div>
             </SidePanel>
           </div>
