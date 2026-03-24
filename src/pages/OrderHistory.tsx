@@ -9,7 +9,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/Pagination";
-import { Package, ChevronRight, Truck, Check, XCircle, ClipboardCheck, Download, ArrowUpDown, ArrowUp, ArrowDown, Search, X, CalendarIcon, RefreshCw, Phone, User } from "lucide-react";
+import { Package, ChevronRight, Truck, Check, XCircle, ClipboardCheck, Download, ArrowUpDown, ArrowUp, ArrowDown, Search, X, CalendarIcon, RefreshCw, Phone, User, AlertTriangle } from "lucide-react";
 import { documents } from "@/data/demoOrders";
 import { useOrderStore } from "@/stores/orderStore";
 import { cn } from "@/lib/utils";
@@ -33,6 +33,12 @@ const statusConfig: Record<string, { label: string; badgeType: BadgeType; badgeC
     badgeType: "alreadyBought",
     badgeClassName: "bg-transparent border-[var(--color-primary)] text-[var(--color-primary)] text-[12px] leading-[16px]",
     icon: Truck,
+  },
+  partial: {
+    label: "Partielle",
+    badgeType: "priceFlag",
+    badgeClassName: "bg-[var(--color-orange)] border-transparent text-[var(--color-white)] text-[12px] leading-[16px]",
+    icon: AlertTriangle,
   },
   cancelled: {
     label: "Annulée",
@@ -97,14 +103,14 @@ export default function OrderHistory() {
 
   const selectedOrder = orders.find((o) => o.id === selectedOrderId) ?? null;
 
-  const statusOrder: Record<string, number> = { confirmed: 0, delivered: 1, cancelled: 2 };
+  const statusOrder: Record<string, number> = { confirmed: 0, partial: 1, delivered: 2, cancelled: 3 };
 
   const filteredOrders = useMemo(() => {
     const q = searchQuery.toLowerCase().trim();
     return orders
       .filter((order) => {
-        if (activeFilter === "En cours") return order.status === "confirmed";
-        if (activeFilter === "Reste à livrer") return order.status === "confirmed" || order.status === "delivered";
+        if (activeFilter === "En cours") return order.status === "confirmed" || order.status === "partial";
+        if (activeFilter === "Reste à livrer") return order.status === "confirmed" || order.status === "partial";
         if (activeFilter === "Livrées") return order.status === "delivered";
         return true;
       })
