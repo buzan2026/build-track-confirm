@@ -196,9 +196,10 @@ export default function OrderHistory() {
           </div>
         </div>
 
-        {/* Search bar + date presets */}
-        <div className="mb-4 flex flex-wrap items-center gap-3">
-          <div className="relative flex-1 min-w-[240px] max-w-md">
+        {/* Search bar + date presets + datepicker — justified row */}
+        <div className="mb-4 flex items-center gap-4">
+          {/* Search */}
+          <div className="relative flex-1 min-w-0">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--color-text-secondary)]" />
             <input
               type="text"
@@ -217,7 +218,11 @@ export default function OrderHistory() {
             )}
           </div>
 
-          <div className="flex items-center gap-2">
+          {/* Separator */}
+          <div className="h-6 w-px bg-[var(--color-border-subtle)] shrink-0" />
+
+          {/* Date presets */}
+          <div className="flex items-center gap-1.5 shrink-0">
             <button
               onClick={() => { setActiveDatePreset(null); setDateFrom(undefined); setDateTo(undefined); }}
               className={cn(
@@ -243,7 +248,13 @@ export default function OrderHistory() {
                 {p.label}
               </button>
             ))}
+          </div>
 
+          {/* Separator */}
+          <div className="h-6 w-px bg-[var(--color-border-subtle)] shrink-0" />
+
+          {/* Date pickers */}
+          <div className="flex items-center gap-1.5 shrink-0">
             <Popover>
               <PopoverTrigger asChild>
                 <button className={cn(
@@ -289,7 +300,6 @@ export default function OrderHistory() {
                 />
               </PopoverContent>
             </Popover>
-
           </div>
         </div>
 
