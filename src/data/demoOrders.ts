@@ -3,6 +3,7 @@ export interface OrderItem {
   reference: string;
   quantity: number;
   unitPrice: number;
+  deliveredQty?: number; // for partial deliveries
 }
 
 export interface Order {
