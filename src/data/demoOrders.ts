@@ -46,11 +46,11 @@ export const orders: Order[] = [
   {
     id: "CMD-2026-0841", date: "2026-03-15", supplier: "Rexel France", total: 4780.00, status: "partial", deliveryStep: 2, expectedDelivery: "2026-03-22",
     items: [
-      { name: "Armoire électrique 800x600", reference: "ARM-800-600", quantity: 2, unitPrice: 890.00 },
-      { name: "Câble H07VK 6mm² Bleu", reference: "H07VK-6-BL", quantity: 300, unitPrice: 2.20 },
-      { name: "Câble H07VK 6mm² Vert/Jaune", reference: "H07VK-6-VJ", quantity: 300, unitPrice: 2.20 },
-      { name: "Rail DIN Omega", reference: "RAIL-DIN-2M", quantity: 20, unitPrice: 8.50 },
-      { name: "Embout de câblage 6mm²", reference: "EMB-6-ISOL", quantity: 500, unitPrice: 0.12 },
+      { name: "Armoire électrique 800x600", reference: "ARM-800-600", quantity: 2, unitPrice: 890.00, deliveredQty: 2 },
+      { name: "Câble H07VK 6mm² Bleu", reference: "H07VK-6-BL", quantity: 300, unitPrice: 2.20, deliveredQty: 200 },
+      { name: "Câble H07VK 6mm² Vert/Jaune", reference: "H07VK-6-VJ", quantity: 300, unitPrice: 2.20, deliveredQty: 200 },
+      { name: "Rail DIN Omega", reference: "RAIL-DIN-2M", quantity: 20, unitPrice: 8.50, deliveredQty: 20 },
+      { name: "Embout de câblage 6mm²", reference: "EMB-6-ISOL", quantity: 500, unitPrice: 0.12, deliveredQty: 0 },
     ],
   },
   {
@@ -64,10 +64,10 @@ export const orders: Order[] = [
   {
     id: "CMD-2026-0835", date: "2026-03-10", supplier: "Schneider Electric Pro", total: 3245.80, status: "partial", deliveryStep: 2, expectedDelivery: "2026-03-18",
     items: [
-      { name: "Disjoncteur iC60N 32A", reference: "IC60N-32A-3P", quantity: 6, unitPrice: 145.00 },
-      { name: "Bloc Vigi iC60 30mA", reference: "VIGI-IC60-30", quantity: 6, unitPrice: 98.00 },
-      { name: "Contacteur iCT 40A", reference: "ICT-40A-2NO", quantity: 4, unitPrice: 125.50 },
-      { name: "Minuterie MINs", reference: "MINS-16A", quantity: 3, unitPrice: 67.00 },
+      { name: "Disjoncteur iC60N 32A", reference: "IC60N-32A-3P", quantity: 6, unitPrice: 145.00, deliveredQty: 6 },
+      { name: "Bloc Vigi iC60 30mA", reference: "VIGI-IC60-30", quantity: 6, unitPrice: 98.00, deliveredQty: 4 },
+      { name: "Contacteur iCT 40A", reference: "ICT-40A-2NO", quantity: 4, unitPrice: 125.50, deliveredQty: 0 },
+      { name: "Minuterie MINs", reference: "MINS-16A", quantity: 3, unitPrice: 67.00, deliveredQty: 3 },
     ],
   },
   {
@@ -121,9 +121,9 @@ export const orders: Order[] = [
   {
     id: "CMD-2026-0790", date: "2026-02-25", supplier: "Schneider Electric Pro", total: 5420.00, status: "partial", deliveryStep: 2, expectedDelivery: "2026-03-04",
     items: [
-      { name: "Onduleur APC 3000VA", reference: "APC-SMT3000", quantity: 2, unitPrice: 1850.00 },
-      { name: "Batterie APC RBC", reference: "APC-RBC33", quantity: 4, unitPrice: 215.00 },
-      { name: "PDU rackable 16A", reference: "PDU-16A-8P", quantity: 2, unitPrice: 145.00 },
+      { name: "Onduleur APC 3000VA", reference: "APC-SMT3000", quantity: 2, unitPrice: 1850.00, deliveredQty: 1 },
+      { name: "Batterie APC RBC", reference: "APC-RBC33", quantity: 4, unitPrice: 215.00, deliveredQty: 4 },
+      { name: "PDU rackable 16A", reference: "PDU-16A-8P", quantity: 2, unitPrice: 145.00, deliveredQty: 0 },
     ],
   },
   {
