@@ -226,8 +226,8 @@
 
 /* Sonner toast fade-out animation */
 [data-sonner-toast][data-removed="true"] {
-  animation: fade-out 0.3s ease-out forwards !important;
-  opacity: 0;
+  opacity: 0 !important;
+  transition: opacity 0.3s ease-out !important;
 }
 @tailwind components;
 @tailwind utilities;
