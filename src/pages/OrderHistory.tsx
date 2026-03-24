@@ -56,12 +56,36 @@ export default function OrderHistory() {
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
   const [activeFilter, setActiveFilter] = useState<"Toutes" | "En cours" | "Livrées">("Toutes");
   const [panelSection, setPanelSection] = useState<"detail" | "documents" | "reception">("detail");
+  const [sortKey, setSortKey] = useState<"id" | "date" | "items" | "delivery" | "status" | "total">("date");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
+
+  const toggleSort = (key: typeof sortKey) => {
+    if (sortKey === key) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    else { setSortKey(key); setSortDir("asc"); }
+  };
+
   const selectedOrder = orders.find((o) => o.id === selectedOrderId) ?? null;
-  const filteredOrders = orders.filter((order) => {
-    if (activeFilter === "En cours") return order.status === "processing" || order.status === "confirmed";
-    if (activeFilter === "Livrées") return order.status === "delivered";
-    return true;
-  });
+
+  const statusOrder: Record<string, number> = { processing: 0, confirmed: 1, delivered: 2, cancelled: 3 };
+
+  const filteredOrders = orders
+    .filter((order) => {
+      if (activeFilter === "En cours") return order.status === "processing" || order.status === "confirmed";
+      if (activeFilter === "Livrées") return order.status === "delivered";
+      return true;
+    })
+    .sort((a, b) => {
+      let cmp = 0;
+      switch (sortKey) {
+        case "id": cmp = a.id.localeCompare(b.id); break;
+        case "date": cmp = new Date(a.date).getTime() - new Date(b.date).getTime(); break;
+        case "items": cmp = a.items.length - b.items.length; break;
+        case "delivery": cmp = (a.expectedDelivery === "—" ? 0 : new Date(a.expectedDelivery).getTime()) - (b.expectedDelivery === "—" ? 0 : new Date(b.expectedDelivery).getTime()); break;
+        case "status": cmp = (statusOrder[a.status] ?? 0) - (statusOrder[b.status] ?? 0); break;
+        case "total": cmp = a.total - b.total; break;
+      }
+      return sortDir === "asc" ? cmp : -cmp;
+    });
   const orderInvoices = selectedOrder ? documents.invoices.filter((d) => d.orderId === selectedOrder.id) : [];
   const orderSlips = selectedOrder ? documents.deliverySlips.filter((d) => d.orderId === selectedOrder.id) : [];
   const panelTabs = [
