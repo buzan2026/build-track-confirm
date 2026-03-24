@@ -181,8 +181,18 @@ export default function OrderHistory() {
       </div>
 
       {selectedOrder ? (
-        <div className="fixed inset-0 z-50 flex justify-end bg-[var(--color-neutral-black)]/40" role="dialog" aria-modal="true">
-          <div className="h-full w-full max-w-[var(--size-sheet-max)]">
+        <div
+          className="fixed inset-0 z-50 flex justify-end bg-black/40 animate-fade-in"
+          role="dialog"
+          aria-modal="true"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setSelectedOrderId(null);
+              setPanelSection("detail");
+            }
+          }}
+        >
+          <div className="h-full w-full max-w-[var(--size-sheet-max)] animate-slide-in-right shadow-[var(--shadow-5)]">
             <SidePanel
               title={selectedOrder.id}
               onClose={() => {
@@ -242,7 +252,7 @@ export default function OrderHistory() {
               <div className="space-y-6 pb-[var(--spacing-3)]">
                 <div className="space-y-[var(--spacing-3)]">
                   <div
-                    className="inline-flex overflow-hidden rounded-[var(--border-radius-sm)] border border-[var(--color-border-strong)] bg-[var(--color-bg-layer-02)]"
+                    className="flex w-full overflow-hidden rounded-[var(--border-radius-sm)] border border-[var(--color-border-strong)] bg-[var(--color-bg-layer-02)]"
                     role="tablist"
                     aria-label="Sections du panneau"
                   >
@@ -252,7 +262,7 @@ export default function OrderHistory() {
                         size="small"
                         variant={panelSection === tab.key ? "primary" : "secondary"}
                         className={cn(
-                          "rounded-none border-0",
+                          "flex-1 rounded-none border-0",
                           idx < panelTabs.length - 1 && "border-r border-[var(--color-border-strong)]",
                           panelSection === tab.key
                             ? "bg-[var(--color-primary)] text-[var(--color-white)]"
