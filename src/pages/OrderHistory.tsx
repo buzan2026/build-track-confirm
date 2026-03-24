@@ -336,7 +336,7 @@ export default function OrderHistory() {
               </tr>
             </thead>
             <tbody className="divide-y divide-[var(--color-border-subtle)]">
-              {filteredOrders.map((order) => {
+              {filteredOrders.slice(0, visibleCount).map((order) => {
                 const cfg = statusConfig[order.status];
                 const isSelected = selectedOrder?.id === order.id;
                 return (
