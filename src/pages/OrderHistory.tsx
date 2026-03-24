@@ -1,14 +1,6 @@
 import { Badge, type BadgeType } from "@/components/Badge";
 import { Button } from "@/components/Button";
 import { Sidepanel as SidePanel } from "@/components/Sidepanel";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/Pagination";
 import { Package, ChevronRight, Truck, Check, XCircle, ClipboardCheck, Download, ArrowUpDown, ArrowUp, ArrowDown, Search, X, CalendarIcon, RefreshCw, Phone, User, AlertTriangle } from "lucide-react";
 import { documents } from "@/data/demoOrders";
 import { useOrderStore } from "@/stores/orderStore";
