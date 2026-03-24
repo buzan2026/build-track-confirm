@@ -63,34 +63,84 @@ export default function OrderHistory() {
   const [panelSection, setPanelSection] = useState<"detail" | "documents" | "reception">("detail");
   const [sortKey, setSortKey] = useState<"id" | "date" | "items" | "delivery" | "status" | "total">("date");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
+  const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
+  const [activeDatePreset, setActiveDatePreset] = useState<string | null>(null);
+
+  const datePresets = [
+    { label: "30 jours", getValue: () => subDays(new Date(), 30) },
+    { label: "3 mois", getValue: () => subMonths(new Date(), 3) },
+    { label: "6 mois", getValue: () => subMonths(new Date(), 6) },
+    { label: "1 an", getValue: () => subYears(new Date(), 1) },
+  ];
 
   const toggleSort = (key: typeof sortKey) => {
     if (sortKey === key) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
     else { setSortKey(key); setSortDir("asc"); }
   };
 
+  const applyPreset = (label: string, from: Date) => {
+    if (activeDatePreset === label) {
+      setActiveDatePreset(null);
+      setDateFrom(undefined);
+      setDateTo(undefined);
+    } else {
+      setActiveDatePreset(label);
+      setDateFrom(startOfDay(from));
+      setDateTo(undefined);
+    }
+  };
+
+  const clearFilters = () => {
+    setSearchQuery("");
+    setDateFrom(undefined);
+    setDateTo(undefined);
+    setActiveDatePreset(null);
+  };
+
+  const hasActiveFilters = searchQuery || dateFrom || dateTo;
+
   const selectedOrder = orders.find((o) => o.id === selectedOrderId) ?? null;
 
   const statusOrder: Record<string, number> = { processing: 0, confirmed: 1, delivered: 2, cancelled: 3 };
 
-  const filteredOrders = orders
-    .filter((order) => {
-      if (activeFilter === "En cours") return order.status === "processing" || order.status === "confirmed";
-      if (activeFilter === "Livrées") return order.status === "delivered";
-      return true;
-    })
-    .sort((a, b) => {
-      let cmp = 0;
-      switch (sortKey) {
-        case "id": cmp = a.id.localeCompare(b.id); break;
-        case "date": cmp = new Date(a.date).getTime() - new Date(b.date).getTime(); break;
-        case "items": cmp = a.items.length - b.items.length; break;
-        case "delivery": cmp = (a.expectedDelivery === "—" ? 0 : new Date(a.expectedDelivery).getTime()) - (b.expectedDelivery === "—" ? 0 : new Date(b.expectedDelivery).getTime()); break;
-        case "status": cmp = (statusOrder[a.status] ?? 0) - (statusOrder[b.status] ?? 0); break;
-        case "total": cmp = a.total - b.total; break;
-      }
-      return sortDir === "asc" ? cmp : -cmp;
-    });
+  const filteredOrders = useMemo(() => {
+    const q = searchQuery.toLowerCase().trim();
+    return orders
+      .filter((order) => {
+        if (activeFilter === "En cours") return order.status === "processing" || order.status === "confirmed";
+        if (activeFilter === "Livrées") return order.status === "delivered";
+        return true;
+      })
+      .filter((order) => {
+        if (!q) return true;
+        return (
+          order.id.toLowerCase().includes(q) ||
+          order.supplier.toLowerCase().includes(q) ||
+          order.items.some((item) => item.name.toLowerCase().includes(q) || item.reference.toLowerCase().includes(q))
+        );
+      })
+      .filter((order) => {
+        const d = new Date(order.date);
+        if (dateFrom && d < startOfDay(dateFrom)) return false;
+        if (dateTo && d > new Date(dateTo.getTime() + 86400000)) return false;
+        return true;
+      })
+      .sort((a, b) => {
+        let cmp = 0;
+        switch (sortKey) {
+          case "id": cmp = a.id.localeCompare(b.id); break;
+          case "date": cmp = new Date(a.date).getTime() - new Date(b.date).getTime(); break;
+          case "items": cmp = a.items.length - b.items.length; break;
+          case "delivery": cmp = (a.expectedDelivery === "—" ? 0 : new Date(a.expectedDelivery).getTime()) - (b.expectedDelivery === "—" ? 0 : new Date(b.expectedDelivery).getTime()); break;
+          case "status": cmp = (statusOrder[a.status] ?? 0) - (statusOrder[b.status] ?? 0); break;
+          case "total": cmp = a.total - b.total; break;
+        }
+        return sortDir === "asc" ? cmp : -cmp;
+      });
+  }, [orders, activeFilter, searchQuery, dateFrom, dateTo, sortKey, sortDir]);
+
   const orderInvoices = selectedOrder ? documents.invoices.filter((d) => d.orderId === selectedOrder.id) : [];
   const orderSlips = selectedOrder ? documents.deliverySlips.filter((d) => d.orderId === selectedOrder.id) : [];
   const panelTabs = [
