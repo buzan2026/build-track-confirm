@@ -1,8 +1,8 @@
 import { Badge, type BadgeType } from "@/components/Badge";
 import { Button } from "@/components/Button";
 import { Sidepanel as SidePanel } from "@/components/Sidepanel";
-import { Package, ChevronRight, Truck, Check, XCircle, ClipboardCheck, Download, ArrowUpDown, ArrowUp, ArrowDown, Search, X, CalendarIcon, RefreshCw, Phone, User, AlertTriangle } from "lucide-react";
-import { documents } from "@/data/demoOrders";
+import { Package, ChevronRight, Truck, Check, XCircle, ClipboardCheck, Download, ArrowUpDown, ArrowUp, ArrowDown, Search, X, CalendarIcon, RefreshCw, Phone, User, AlertTriangle, PackageCheck, Clock } from "lucide-react";
+import { documents, type Shipment } from "@/data/demoOrders";
 import { useOrderStore } from "@/stores/orderStore";
 import { cn } from "@/lib/utils";
 import { useState, useMemo, useCallback, useRef, useEffect } from "react";
@@ -542,60 +542,92 @@ export default function OrderHistory() {
                       </div>
                     </div>
 
-                    <div>
-                      <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">
-                        Articles commandés ({selectedOrder.items.length})
-                      </p>
-                      <div className="space-y-0 overflow-hidden rounded-lg border border-[var(--color-border-subtle)]">
-                        {selectedOrder.items.map((item, i) => {
-                          const delivered = item.deliveredQty ?? 0;
-                          const remaining = item.quantity - delivered;
-                          const pct = item.quantity > 0 ? Math.round((delivered / item.quantity) * 100) : 0;
-                          const fullyDelivered = remaining === 0;
-                          return (
-                            <div key={i} className={cn("px-3 py-3", i > 0 && "border-t border-[var(--color-border-subtle)]")}>
-                              <div className="flex items-start justify-between gap-2">
-                                <div className="min-w-0 flex-1">
-                                  <p className="text-sm font-medium text-[var(--color-text-primary)] truncate">{item.name}</p>
-                                  <p className="text-xs text-[var(--color-text-secondary)]">{item.reference} · {item.unitPrice.toFixed(2)} €/u</p>
-                                </div>
-                                <p className="text-sm font-semibold text-[var(--color-text-primary)] whitespace-nowrap">
-                                  {(item.quantity * item.unitPrice).toLocaleString("fr-FR", { style: "currency", currency: "EUR" })}
-                                </p>
-                              </div>
-                              {isPartial ? (
-                                <div className="mt-2">
-                                  <div className="flex items-center justify-between text-xs mb-1">
-                                    <span className={cn(fullyDelivered ? "text-[var(--color-success)]" : "text-[var(--color-text-secondary)]")}>
-                                      {fullyDelivered ? `✓ ${delivered}/${item.quantity} livrés` : `${delivered}/${item.quantity} livrés`}
+                    {/* Articles grouped by shipment for partial orders, flat list otherwise */}
+                    {(() => {
+                      const shipments = selectedOrder.shipments;
+                      const itemsByRef = Object.fromEntries(selectedOrder.items.map(it => [it.reference, it]));
+
+                      const shipmentStatusConfig: Record<string, { label: string; icon: typeof Check; color: string }> = {
+                        delivered: { label: "Livré", icon: PackageCheck, color: "text-[var(--color-success)]" },
+                        in_transit: { label: "En transit", icon: Truck, color: "text-[var(--color-primary)]" },
+                        pending: { label: "En attente", icon: Clock, color: "text-[var(--color-orange)]" },
+                      };
+
+                      const renderItem = (item: typeof selectedOrder.items[0], qty: number) => (
+                        <div className="flex items-center justify-between gap-2 py-2 px-3">
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-medium text-[var(--color-text-primary)] truncate">{item.name}</p>
+                            <p className="text-xs text-[var(--color-text-secondary)]">{item.reference}</p>
+                          </div>
+                          <div className="flex items-center gap-3 shrink-0">
+                            <span className="text-sm font-semibold text-[var(--color-text-primary)]">×{qty}</span>
+                            <span className="text-xs text-[var(--color-text-secondary)] w-16 text-right">
+                              {(qty * item.unitPrice).toLocaleString("fr-FR", { style: "currency", currency: "EUR" })}
+                            </span>
+                          </div>
+                        </div>
+                      );
+
+                      if (isPartial && shipments && shipments.length > 0) {
+                        return (
+                          <div className="space-y-4">
+                            <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">
+                              Envois ({shipments.length})
+                            </p>
+                            {shipments.map((shipment) => {
+                              const sc = shipmentStatusConfig[shipment.status] || shipmentStatusConfig.pending;
+                              const ShipIcon = sc.icon;
+                              return (
+                                <div key={shipment.id} className="overflow-hidden rounded-lg border border-[var(--color-border-subtle)]">
+                                  <div className="flex items-center gap-2 bg-[var(--color-bg-layer-01)] px-3 py-2.5 border-b border-[var(--color-border-subtle)]">
+                                    <ShipIcon size={14} className={sc.color} />
+                                    <span className={cn("text-xs font-semibold", sc.color)}>{sc.label}</span>
+                                    <span className="text-xs text-[var(--color-text-secondary)]">— {shipment.id}</span>
+                                    <span className="ml-auto text-xs text-[var(--color-text-secondary)]">
+                                      {format(new Date(shipment.date), "d MMM yyyy", { locale: fr })}
                                     </span>
-                                    {!fullyDelivered && remaining > 0 && (
-                                      <span className="font-medium text-[var(--color-orange)]">
-                                        {remaining} restant{remaining > 1 ? "s" : ""}
-                                      </span>
-                                    )}
                                   </div>
-                                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-[var(--color-border-subtle)]">
-                                    <div
-                                      className={cn("h-full rounded-full transition-all", fullyDelivered ? "bg-[var(--color-success)]" : "bg-[var(--color-orange)]")}
-                                      style={{ width: `${pct}%` }}
-                                    />
+                                  <div className="divide-y divide-[var(--color-border-subtle)]">
+                                    {shipment.items.map((si_item, ii) => {
+                                      const fullItem = itemsByRef[si_item.reference];
+                                      if (!fullItem) return null;
+                                      return <div key={ii}>{renderItem(fullItem, si_item.quantity)}</div>;
+                                    })}
                                   </div>
                                 </div>
-                              ) : (
-                                <p className="mt-1 text-xs text-[var(--color-text-secondary)]">Qté : {item.quantity}</p>
-                              )}
+                              );
+                            })}
+                            <div className="flex items-center justify-between px-1 pt-1">
+                              <span className="text-sm font-semibold text-[var(--color-text-primary)]">Total HT</span>
+                              <span className="text-lg font-bold text-[var(--color-text-primary)]">
+                                {selectedOrder.total.toLocaleString("fr-FR", { style: "currency", currency: "EUR" })}
+                              </span>
                             </div>
-                          );
-                        })}
-                      </div>
-                      <div className="mt-3 flex items-center justify-between px-1">
-                        <span className="text-sm font-semibold text-[var(--color-text-primary)]">Total HT</span>
-                        <span className="text-lg font-bold text-[var(--color-text-primary)]">
-                          {selectedOrder.total.toLocaleString("fr-FR", { style: "currency", currency: "EUR" })}
-                        </span>
-                      </div>
-                    </div>
+                          </div>
+                        );
+                      }
+
+                      return (
+                        <div>
+                          <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">
+                            Articles commandés ({selectedOrder.items.length})
+                          </p>
+                          <div className="overflow-hidden rounded-lg border border-[var(--color-border-subtle)] divide-y divide-[var(--color-border-subtle)]">
+                            {selectedOrder.items.map((item, i) => (
+                              <div key={i}>
+                                {renderItem(item, item.quantity)}
+                              </div>
+                            ))}
+                          </div>
+                          <div className="mt-3 flex items-center justify-between px-1">
+                            <span className="text-sm font-semibold text-[var(--color-text-primary)]">Total HT</span>
+                            <span className="text-lg font-bold text-[var(--color-text-primary)]">
+                              {selectedOrder.total.toLocaleString("fr-FR", { style: "currency", currency: "EUR" })}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })()}
                   </>
                   );
                 })() : null}

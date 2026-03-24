@@ -6,6 +6,13 @@ export interface OrderItem {
   deliveredQty?: number; // for partial deliveries
 }
 
+export interface Shipment {
+  id: string;
+  date: string; // ship date or delivery date
+  status: "pending" | "in_transit" | "delivered";
+  items: { reference: string; quantity: number }[];
+}
+
 export interface Order {
   id: string;
   date: string;
@@ -15,6 +22,7 @@ export interface Order {
   items: OrderItem[];
   expectedDelivery: string;
   deliveryStep: number; // 0-3
+  shipments?: Shipment[];
 }
 
 export const orders: Order[] = [
@@ -52,6 +60,25 @@ export const orders: Order[] = [
       { name: "Rail DIN Omega", reference: "RAIL-DIN-2M", quantity: 20, unitPrice: 8.50, deliveredQty: 20 },
       { name: "Embout de câblage 6mm²", reference: "EMB-6-ISOL", quantity: 500, unitPrice: 0.12, deliveredQty: 0 },
     ],
+    shipments: [
+      {
+        id: "ENV-0841-1", date: "2026-03-16", status: "delivered",
+        items: [
+          { reference: "ARM-800-600", quantity: 2 },
+          { reference: "H07VK-6-BL", quantity: 200 },
+          { reference: "H07VK-6-VJ", quantity: 200 },
+          { reference: "RAIL-DIN-2M", quantity: 20 },
+        ],
+      },
+      {
+        id: "ENV-0841-2", date: "2026-03-22", status: "pending",
+        items: [
+          { reference: "H07VK-6-BL", quantity: 100 },
+          { reference: "H07VK-6-VJ", quantity: 100 },
+          { reference: "EMB-6-ISOL", quantity: 500 },
+        ],
+      },
+    ],
   },
   {
     id: "CMD-2026-0839", date: "2026-03-12", supplier: "Legrand Distribution", total: 4210.00, status: "delivered", deliveryStep: 3, expectedDelivery: "2026-03-22",
@@ -68,6 +95,23 @@ export const orders: Order[] = [
       { name: "Bloc Vigi iC60 30mA", reference: "VIGI-IC60-30", quantity: 6, unitPrice: 98.00, deliveredQty: 4 },
       { name: "Contacteur iCT 40A", reference: "ICT-40A-2NO", quantity: 4, unitPrice: 125.50, deliveredQty: 0 },
       { name: "Minuterie MINs", reference: "MINS-16A", quantity: 3, unitPrice: 67.00, deliveredQty: 3 },
+    ],
+    shipments: [
+      {
+        id: "ENV-0835-1", date: "2026-03-12", status: "delivered",
+        items: [
+          { reference: "IC60N-32A-3P", quantity: 6 },
+          { reference: "VIGI-IC60-30", quantity: 4 },
+          { reference: "MINS-16A", quantity: 3 },
+        ],
+      },
+      {
+        id: "ENV-0835-2", date: "2026-03-18", status: "in_transit",
+        items: [
+          { reference: "VIGI-IC60-30", quantity: 2 },
+          { reference: "ICT-40A-2NO", quantity: 4 },
+        ],
+      },
     ],
   },
   {
@@ -124,6 +168,22 @@ export const orders: Order[] = [
       { name: "Onduleur APC 3000VA", reference: "APC-SMT3000", quantity: 2, unitPrice: 1850.00, deliveredQty: 1 },
       { name: "Batterie APC RBC", reference: "APC-RBC33", quantity: 4, unitPrice: 215.00, deliveredQty: 4 },
       { name: "PDU rackable 16A", reference: "PDU-16A-8P", quantity: 2, unitPrice: 145.00, deliveredQty: 0 },
+    ],
+    shipments: [
+      {
+        id: "ENV-0790-1", date: "2026-02-27", status: "delivered",
+        items: [
+          { reference: "APC-SMT3000", quantity: 1 },
+          { reference: "APC-RBC33", quantity: 4 },
+        ],
+      },
+      {
+        id: "ENV-0790-2", date: "2026-03-04", status: "pending",
+        items: [
+          { reference: "APC-SMT3000", quantity: 1 },
+          { reference: "PDU-16A-8P", quantity: 2 },
+        ],
+      },
     ],
   },
   {
