@@ -9,12 +9,17 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/Pagination";
-import { Package, ChevronRight, Truck, Check, Clock, XCircle, ClipboardCheck, Download, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { Package, ChevronRight, Truck, Check, Clock, XCircle, ClipboardCheck, Download, ArrowUpDown, ArrowUp, ArrowDown, Search, X, CalendarIcon } from "lucide-react";
 import { documents } from "@/data/demoOrders";
 import { useOrderStore } from "@/stores/orderStore";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { toast } from "sonner";
+import { subDays, subMonths, subYears, isAfter, startOfDay } from "date-fns";
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 const statusConfig: Record<string, { label: string; badgeType: BadgeType; badgeClassName: string; icon: typeof Check }> = {
   delivered: {
