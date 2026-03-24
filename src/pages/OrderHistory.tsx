@@ -97,13 +97,13 @@ export default function OrderHistory() {
 
   const selectedOrder = orders.find((o) => o.id === selectedOrderId) ?? null;
 
-  const statusOrder: Record<string, number> = { processing: 0, confirmed: 1, delivered: 2, cancelled: 3 };
+  const statusOrder: Record<string, number> = { confirmed: 0, delivered: 1, cancelled: 2 };
 
   const filteredOrders = useMemo(() => {
     const q = searchQuery.toLowerCase().trim();
     return orders
       .filter((order) => {
-        if (activeFilter === "En cours") return order.status === "processing" || order.status === "confirmed";
+        if (activeFilter === "En cours") return order.status === "confirmed";
         if (activeFilter === "Livrées") return order.status === "delivered";
         return true;
       })

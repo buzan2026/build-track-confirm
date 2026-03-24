@@ -9,7 +9,7 @@ import { orders } from "@/data/demoOrders";
 const statusConfig: Record<string, { label: string; variant: "default" | "success" | "warning" | "destructive" }> = {
   delivered: { label: "Livrée", variant: "success" },
   confirmed: { label: "Confirmée", variant: "default" },
-  processing: { label: "En cours", variant: "warning" },
+  
   cancelled: { label: "Annulée", variant: "destructive" },
 };
 
