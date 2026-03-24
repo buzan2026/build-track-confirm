@@ -19,12 +19,12 @@ export const buttonVariants = cva(
         default: [
           "bg-[var(--color-primary)] text-[var(--color-white)] border border-transparent",
           "hover:bg-[var(--color-primary-hover)] focus-visible:bg-[var(--color-primary-hover)]",
-          "disabled:bg-[var(--color-border-subtle)] disabled:text-[var(--color-text-secondary)]",
+          "disabled:bg-[var(--color-border-subtle)] disabled:text-[var(--color-text-primary)]",
         ].join(" "),
         primary: [
           "bg-[var(--color-primary)] text-[var(--color-white)] border border-transparent",
           "hover:bg-[var(--color-primary-hover)] focus-visible:bg-[var(--color-primary-hover)]",
-          "disabled:bg-[var(--color-border-subtle)] disabled:text-[var(--color-text-secondary)]",
+          "disabled:bg-[var(--color-border-subtle)] disabled:text-[var(--color-text-primary)]",
         ].join(" "),
         outline: [
           "bg-[var(--color-bg-layer-01)] text-[var(--color-primary)]",
@@ -33,15 +33,15 @@ export const buttonVariants = cva(
           "disabled:border-[var(--color-border-subtle)] disabled:text-[var(--color-text-secondary)]",
         ].join(" "),
         secondary: [
-          "bg-[var(--color-bg-layer-01)] text-[var(--color-primary)]",
+          "bg-[var(--color-white)] !text-[var(--color-primary)]",
           "border border-[var(--color-primary)]",
           "hover:bg-[var(--color-bg-layer-02)] focus-visible:bg-[var(--color-bg-layer-02)]",
-          "disabled:border-[var(--color-border-subtle)] disabled:text-[var(--color-text-secondary)]",
+          "disabled:border-[var(--color-border-subtle)] disabled:text-[var(--color-text-primary)]",
         ].join(" "),
         ghost: [
           "bg-transparent text-[var(--color-primary)] border border-transparent",
           "hover:bg-[var(--color-bg-layer-01)] focus-visible:bg-[var(--color-bg-layer-01)]",
-          "disabled:text-[var(--color-text-secondary)]",
+          "disabled:text-[var(--color-text-primary)]",
         ].join(" "),
         link: [
           "bg-transparent border border-transparent text-[var(--color-text-link)]",
@@ -49,24 +49,24 @@ export const buttonVariants = cva(
           "px-0 min-w-0 h-auto",
         ].join(" "),
         tertiary: [
-          "bg-[var(--color-bg-layer-01)] text-[var(--color-primary)] border border-transparent",
+          "bg-[var(--color-white)] !text-[var(--color-primary)] border border-transparent",
           "hover:bg-[var(--color-bg-layer-02)] focus-visible:bg-[var(--color-bg-layer-02)]",
-          "disabled:text-[var(--color-text-secondary)]",
+          "disabled:text-[var(--color-text-primary)]",
         ].join(" "),
         onSurface: [
           "bg-[var(--color-bg-layer-01)] text-[var(--color-primary)] border border-transparent",
           "hover:bg-[var(--color-bg-layer-02)] focus-visible:bg-[var(--color-bg-layer-02)]",
-          "disabled:text-[var(--color-text-secondary)]",
+          "disabled:text-[var(--color-text-primary)]",
         ].join(" "),
         danger: [
           "bg-[var(--color-error)] text-[var(--color-white)] border border-transparent",
           "hover:bg-[var(--color-error)] focus-visible:bg-[var(--color-error)]",
-          "disabled:bg-[var(--color-border-subtle)] disabled:text-[var(--color-text-secondary)]",
+          "disabled:bg-[var(--color-border-subtle)] disabled:text-[var(--color-text-primary)]",
         ].join(" "),
         destructive: [
           "bg-[var(--color-error)] text-[var(--color-white)] border border-transparent",
           "hover:bg-[var(--color-error)] focus-visible:bg-[var(--color-error)]",
-          "disabled:bg-[var(--color-border-subtle)] disabled:text-[var(--color-text-secondary)]",
+          "disabled:bg-[var(--color-border-subtle)] disabled:text-[var(--color-text-primary)]",
         ].join(" "),
       },
       size: {
@@ -92,11 +92,11 @@ export const buttonVariants = cva(
         ].join(" "),
         medium: [
           "h-[var(--spacing-6)] min-w-[var(--spacing-6)]",
-          "px-[var(--spacing-5)] text-[var(--font-size-s)] leading-[var(--line-height-s)]",
+          "px-[var(--spacing-5)] text-[14px] leading-[var(--line-height-s)]",
         ].join(" "),
         small: [
           "h-[var(--spacing-5)] min-w-[var(--spacing-5)]",
-          "px-[var(--spacing-4)] text-[var(--font-size-s)] leading-[var(--line-height-s)]",
+          "px-[var(--spacing-4)] text-[14px] leading-[var(--line-height-s)]",
         ].join(" "),
       },
       state: {
@@ -131,6 +131,11 @@ export const buttonVariants = cva(
         state: ["hover", "focus"],
         className: "bg-[var(--color-error)]",
       },
+      {
+        variant: ["default", "primary", "outline", "secondary", "ghost", "link", "tertiary", "onSurface", "danger", "destructive"],
+        state: "loading",
+        className: "text-[var(--color-text-primary)]",
+      },
     ],
   },
 );
@@ -148,14 +153,15 @@ export interface ButtonProps
 
 function LoadingIcon() {
   return (
-    <span
+    <svg
       aria-hidden="true"
-      className={[
-        "inline-block h-[var(--spacing-3)] w-[var(--spacing-3)]",
-        "animate-spin rounded-full border-[var(--size-2px)]",
-        "border-current border-t-transparent",
-      ].join(" ")}
-    />
+      viewBox="0 0 24 24"
+      className="h-[var(--spacing-3)] w-[var(--spacing-3)] shrink-0 animate-spin text-current"
+      fill="none"
+    >
+      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" opacity="0.25" />
+      <path d="M12 3a9 9 0 019 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
   );
 }
 
@@ -196,6 +202,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const isDisabled = disabled || loading;
     const leading = success ? <SuccessIcon /> : loading ? <LoadingIcon /> : icon;
     const trailing = !success && !loading ? icon : null;
+    const forceLeadingState = success || loading;
     const Comp = asChild ? Slot : "button";
 
     if (asChild) {
@@ -218,9 +225,9 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         className={cn(buttonVariants({ variant, size, state: computedState }), className)}
         {...props}
       >
-        {leading && iconPosition === "leading" ? leading : null}
+        {leading && (forceLeadingState || iconPosition === "leading") ? leading : null}
         <span>{children}</span>
-        {trailing && iconPosition === "trailing" ? trailing : null}
+        {trailing && !forceLeadingState && iconPosition === "trailing" ? trailing : null}
       </button>
     );
   },

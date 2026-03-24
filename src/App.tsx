@@ -10,6 +10,7 @@ import OrderHistory from "./pages/OrderHistory";
 import ReceptionPage from "./pages/ReceptionPage";
 import DocumentsPage from "./pages/DocumentsPage";
 import ReceptionSuccess from "./pages/ReceptionSuccess";
+import StyleGuide from "./pages/StyleGuide";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,6 +25,7 @@ function AppContent() {
       <Route path="/orders/success" element={<ReceptionSuccess />} />
       <Route path="/orders/:id/reception" element={<ReceptionPage />} />
       <Route path="/orders/:id/documents" element={<DocumentsPage />} />
+      <Route path="/style-guide" element={<StyleGuide />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

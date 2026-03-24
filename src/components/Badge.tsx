@@ -27,7 +27,7 @@ const baseClass = [
   "inline-flex items-center",
   "rounded-[var(--border-radius-sm)] border",
   "px-[var(--spacing-2)] py-[var(--spacing-1)]",
-  "text-[var(--font-size-xs)] leading-[var(--line-height-xs)]",
+  "text-[12px] leading-[var(--line-height-xs)]",
   "font-[var(--font-body)] font-[var(--font-weight-semibold)]",
 ].join(" ");
 
