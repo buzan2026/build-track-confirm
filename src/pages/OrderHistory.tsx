@@ -776,7 +776,7 @@ export default function OrderHistory() {
                       <User className="h-4 w-4" />
                     </div>
                     <div className="min-w-0 space-y-1">
-                      <p className="text-sm font-medium text-[var(--color-text-primary)]">Marc Lefebvre — Agence Paris-Est</p>
+                      <p className="text-sm font-medium text-[var(--color-text-primary)]">Gisèle Michu — Agence Paris-Est</p>
                       <div className="flex items-center gap-3">
                         <a href="tel:0123456789" className="inline-flex items-center gap-1 text-xs text-[var(--color-primary)] hover:underline">
                           <Phone className="h-3 w-3" /> 01 23 45 67 89
