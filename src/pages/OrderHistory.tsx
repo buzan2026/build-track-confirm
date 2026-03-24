@@ -9,7 +9,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/Pagination";
-import { Package, ChevronRight, Truck, Check, XCircle, ClipboardCheck, Download, ArrowUpDown, ArrowUp, ArrowDown, Search, X, CalendarIcon } from "lucide-react";
+import { Package, ChevronRight, Truck, Check, XCircle, ClipboardCheck, Download, ArrowUpDown, ArrowUp, ArrowDown, Search, X, CalendarIcon, RefreshCw, Phone, User } from "lucide-react";
 import { documents } from "@/data/demoOrders";
 import { useOrderStore } from "@/stores/orderStore";
 import { cn } from "@/lib/utils";
@@ -53,7 +53,7 @@ export default function OrderHistory() {
   const orders = useOrderStore((s) => s.orders);
   const markDelivered = useOrderStore((s) => s.markDelivered);
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
-  const [activeFilter, setActiveFilter] = useState<"Toutes" | "En cours" | "Livrées">("Toutes");
+  const [activeFilter, setActiveFilter] = useState<"Toutes" | "En cours" | "Reste à livrer" | "Livrées">("En cours");
   const [panelSection, setPanelSection] = useState<"detail" | "documents" | "reception">("detail");
   const [sortKey, setSortKey] = useState<"id" | "date" | "items" | "delivery" | "status" | "total">("date");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
@@ -104,6 +104,7 @@ export default function OrderHistory() {
     return orders
       .filter((order) => {
         if (activeFilter === "En cours") return order.status === "confirmed";
+        if (activeFilter === "Reste à livrer") return order.status === "confirmed" || order.status === "delivered";
         if (activeFilter === "Livrées") return order.status === "delivered";
         return true;
       })
@@ -156,7 +157,7 @@ export default function OrderHistory() {
             role="tablist"
             aria-label="Filtre des commandes"
           >
-            {(["Toutes", "En cours", "Livrées"] as const).map((f, idx, arr) => (
+            {(["En cours", "Reste à livrer", "Livrées", "Toutes"] as const).map((f, idx, arr) => (
               <Button
                 key={f}
                 variant={f === activeFilter ? "primary" : "secondary"}
@@ -320,7 +321,7 @@ export default function OrderHistory() {
                       setSelectedOrderId(order.id);
                       setPanelSection("detail");
                     }}
-                    className={cn("cursor-pointer transition-colors", isSelected ? "bg-[var(--color-alert-info-bg)]" : "hover:bg-[var(--color-bg-layer-01)]")}
+                    className={cn("group cursor-pointer transition-colors", isSelected ? "bg-[var(--color-alert-info-bg)]" : "hover:bg-[var(--color-bg-layer-01)]")}
                   >
                     <td className="px-5 py-4">
                       <span className="text-sm font-semibold text-[var(--color-text-primary)]">{order.id}</span>
@@ -343,7 +344,38 @@ export default function OrderHistory() {
                       </span>
                     </td>
                     <td className="px-5 py-4 text-right">
-                      <ChevronRight className="h-4 w-4 text-[var(--color-text-secondary)]" />
+                      <div className="flex items-center justify-end gap-2">
+                        {order.status === "delivered" && (
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <button
+                                onClick={(e) => e.stopPropagation()}
+                                className="rounded-[var(--border-radius-sm)] p-1.5 text-[var(--color-text-secondary)] opacity-0 transition-all hover:bg-[var(--color-bg-layer-02)] hover:text-[var(--color-primary)] group-hover:opacity-100"
+                                title="Recommander"
+                              >
+                                <RefreshCw className="h-4 w-4" />
+                              </button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-3" align="end" onClick={(e) => e.stopPropagation()}>
+                              <p className="mb-2 text-sm text-[var(--color-text-primary)]">
+                                Ajouter les {order.items.length} articles au panier ?
+                              </p>
+                              <div className="flex gap-2">
+                                <Button variant="secondary" size="small" onClick={(e) => { e.stopPropagation(); }}>
+                                  Annuler
+                                </Button>
+                                <Button variant="primary" size="small" className="text-[var(--color-white)]" onClick={(e) => {
+                                  e.stopPropagation();
+                                  toast.success(`${order.items.length} articles ajoutés au panier`);
+                                }}>
+                                  Confirmer
+                                </Button>
+                              </div>
+                            </PopoverContent>
+                          </Popover>
+                        )}
+                        <ChevronRight className="h-4 w-4 text-[var(--color-text-secondary)]" />
+                      </div>
                     </td>
                   </tr>
                 );
@@ -610,6 +642,22 @@ export default function OrderHistory() {
                     </div>
                   </div>
                 ) : null}
+
+                {/* Contact Rexel */}
+                <div className="mt-auto sticky bottom-0 rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-01)] p-4">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-secondary)] mb-2">Votre contact Rexel</p>
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary)] text-[var(--color-white)]">
+                      <User className="h-4 w-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-[var(--color-text-primary)]">Marc Lefebvre — Agence Paris-Est</p>
+                      <a href="tel:0123456789" className="inline-flex items-center gap-1 text-xs text-[var(--color-primary)] hover:underline">
+                        <Phone className="h-3 w-3" /> 01 23 45 67 89
+                      </a>
+                    </div>
+                  </div>
+                </div>
               </div>
             </SidePanel>
           </div>
