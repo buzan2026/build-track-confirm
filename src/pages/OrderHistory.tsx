@@ -206,6 +206,17 @@ export default function OrderHistory() {
           </div>
 
           <div className="flex items-center gap-2">
+            <button
+              onClick={() => { setActiveDatePreset(null); setDateFrom(undefined); setDateTo(undefined); }}
+              className={cn(
+                "h-10 rounded-[var(--border-radius-sm)] border px-3 text-xs font-medium transition-colors",
+                !activeDatePreset && !dateFrom && !dateTo
+                  ? "border-[var(--color-primary)] bg-[var(--color-primary)] text-[var(--color-white)]"
+                  : "border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-02)] text-[var(--color-text-secondary)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]",
+              )}
+            >
+              All
+            </button>
             {datePresets.map((p) => (
               <button
                 key={p.label}
