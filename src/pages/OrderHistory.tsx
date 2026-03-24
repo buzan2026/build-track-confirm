@@ -524,7 +524,9 @@ export default function OrderHistory() {
                   <p className="text-sm font-medium text-[var(--color-text-primary)]">{selectedOrder.supplier}</p>
                   <p className="text-xs text-[var(--color-text-secondary)]">Commandée le {new Date(selectedOrder.date).toLocaleDateString("fr-FR")}</p>
                 </div>
-                {panelSection === "detail" ? (
+                {panelSection === "detail" ? (() => {
+                  const isPartial = selectedOrder.status === "partial";
+                  return (
                   <>
                     <div className="rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-01)] p-5">
                       <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">Suivi livraison</p>
