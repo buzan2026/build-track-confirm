@@ -61,6 +61,7 @@ export default function OrderHistory() {
     setTimeout(() => {
       setSelectedOrderId(null);
       setPanelSection("detail");
+      setCheckedItems({});
       setIsClosing(false);
     }, 250);
   }, []);
