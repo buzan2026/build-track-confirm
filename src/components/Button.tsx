@@ -198,8 +198,20 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const trailing = !success && !loading ? icon : null;
     const Comp = asChild ? Slot : "button";
 
+    if (asChild) {
+      return (
+        <Slot
+          ref={ref}
+          className={cn(buttonVariants({ variant, size, state: computedState }), className)}
+          {...props}
+        >
+          {children}
+        </Slot>
+      );
+    }
+
     return (
-      <Comp
+      <button
         ref={ref}
         type={type}
         disabled={isDisabled}
@@ -209,7 +221,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {leading && iconPosition === "leading" ? leading : null}
         <span>{children}</span>
         {trailing && iconPosition === "trailing" ? trailing : null}
-      </Comp>
+      </button>
     );
   },
 );

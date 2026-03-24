@@ -95,14 +95,14 @@ const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(
     const left =
       iconLeft === true ? (
         <TextureIcon className={iconVariants({ size })} />
-      ) : iconLeft && iconLeft !== false ? (
+      ) : iconLeft ? (
         iconLeft
       ) : null;
 
     const right =
       iconRight === true ? (
         <TextureIcon className={iconVariants({ size })} />
-      ) : iconRight && iconRight !== false ? (
+      ) : iconRight ? (
         iconRight
       ) : null;
 
