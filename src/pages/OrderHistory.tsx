@@ -450,7 +450,7 @@ export default function OrderHistory() {
         >
           <div className={cn("h-full w-full max-w-[var(--size-sheet-max)] shadow-[var(--shadow-5)]", isClosing ? "animate-slide-out-right" : "animate-slide-in-right")}>
             <SidePanel
-              title={selectedOrder.id}
+              title=""
               onClose={closePanel}
               className="h-full"
               footer={
@@ -512,6 +512,15 @@ export default function OrderHistory() {
             >
               <div className="space-y-6 pb-[var(--spacing-3)]">
                 <div className="space-y-[var(--spacing-3)]">
+                  {/* Order title + status badge */}
+                  <div className="flex items-center justify-between gap-2">
+                    <h2 className="font-[var(--font-heading)] text-[var(--font-size-l)] font-[var(--font-weight-semibold)] text-[var(--color-text-primary)]">
+                      {selectedOrder.id}
+                    </h2>
+                    <Badge type={statusConfig[selectedOrder.status].badgeType} className={statusConfig[selectedOrder.status].badgeClassName}>
+                      {statusConfig[selectedOrder.status].label}
+                    </Badge>
+                  </div>
                   <div
                     className="flex w-full overflow-hidden rounded-[var(--border-radius-sm)] border border-[var(--color-border-strong)] bg-[var(--color-bg-layer-02)]"
                     role="tablist"
