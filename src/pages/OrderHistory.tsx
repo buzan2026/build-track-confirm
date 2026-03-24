@@ -455,13 +455,6 @@ export default function OrderHistory() {
                 panelSection === "detail" ? (
                   <>
                     <Button
-                      variant="tertiary"
-                      className="flex-1 h-[48px] px-[40px] py-0"
-                      onClick={() => toast.message("Un conseiller va vous contacter.")}
-                    >
-                      Besoin d'aide ?
-                    </Button>
-                    <Button
                       variant="secondary"
                       className="flex-1 h-[48px] px-[40px] py-0"
                       onClick={() => toast.success(`Demande de retour initiée pour ${selectedOrder.id}`)}
