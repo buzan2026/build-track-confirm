@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { Badge, type BadgeType } from "@/components/Badge";
 import { Button } from "@/components/Button";
-import { SidePanel } from "@/components/SidePanel";
+import { Sidepanel as SidePanel } from "@/components/Sidepanel";
 import {
   Pagination,
   PaginationContent,
