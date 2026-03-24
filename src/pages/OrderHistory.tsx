@@ -25,13 +25,13 @@ const statusConfig: Record<string, { label: string; badgeType: BadgeType; badgeC
   delivered: {
     label: "Livrée",
     badgeType: "inStock",
-    badgeClassName: "bg-transparent border-[var(--color-success)] text-[var(--color-success)] text-[12px] leading-[16px]",
+    badgeClassName: "bg-[var(--color-success)] border-transparent text-[var(--color-white)] text-[12px] leading-[16px]",
     icon: Check,
   },
   confirmed: {
     label: "Confirmée",
     badgeType: "alreadyBought",
-    badgeClassName: "bg-[var(--color-primary)] border-transparent text-[var(--color-white)] text-[12px] leading-[16px]",
+    badgeClassName: "bg-transparent border-[var(--color-primary)] text-[var(--color-primary)] text-[12px] leading-[16px]",
     icon: Truck,
   },
   cancelled: {
