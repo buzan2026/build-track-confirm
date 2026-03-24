@@ -51,8 +51,18 @@ export default function OrderHistory() {
   const orders = useOrderStore((s) => s.orders);
   const markDelivered = useOrderStore((s) => s.markDelivered);
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+  const [isClosing, setIsClosing] = useState(false);
   const [activeFilter, setActiveFilter] = useState<"Toutes" | "En cours" | "Livrées">("En cours");
   const [panelSection, setPanelSection] = useState<"detail" | "documents" | "reception">("detail");
+
+  const closePanel = useCallback(() => {
+    setIsClosing(true);
+    setTimeout(() => {
+      setSelectedOrderId(null);
+      setPanelSection("detail");
+      setIsClosing(false);
+    }, 250);
+  }, []);
   const [sortKey, setSortKey] = useState<"id" | "date" | "items" | "delivery" | "status" | "total">("date");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   const [searchQuery, setSearchQuery] = useState("");
