@@ -491,12 +491,20 @@ export default function OrderHistory() {
                     <Button
                       variant="primary"
                       className="flex-1 h-[48px] px-[40px] py-0 text-[var(--color-white)]"
+                      disabled={!selectedOrder.items.some(it => checkedItems[it.reference])}
                       onClick={() => {
-                        markDelivered(selectedOrder.id);
-                        toast.success(`Réception validée pour ${selectedOrder.id}`);
+                        const allChecked = selectedOrder.items.every(it => checkedItems[it.reference]);
+                        if (allChecked) {
+                          markDelivered(selectedOrder.id);
+                          toast.success(`Réception complète validée pour ${selectedOrder.id}`);
+                        } else {
+                          toast.success(`Réception partielle validée pour ${selectedOrder.id}`);
+                        }
+                        setCheckedItems({});
+                        setPanelSection("detail");
                       }}
                     >
-                      Valider la réception
+                      Valider la réception ({selectedOrder.items.filter(it => checkedItems[it.reference]).length}/{selectedOrder.items.length})
                     </Button>
                   </>
                 )
