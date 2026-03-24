@@ -99,6 +99,25 @@ export default function OrderHistory() {
     setActiveDatePreset(null);
   };
 
+  const BATCH = 10;
+  const [visibleCount, setVisibleCount] = useState(BATCH);
+  const sentinelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setVisibleCount(BATCH);
+  }, [activeFilter, searchQuery, dateFrom, dateTo]);
+
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) setVisibleCount((v) => v + BATCH); },
+      { rootMargin: "200px" },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  });
+
   const hasActiveFilters = searchQuery || dateFrom || dateTo;
 
   const selectedOrder = orders.find((o) => o.id === selectedOrderId) ?? null;
