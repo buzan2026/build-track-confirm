@@ -278,6 +278,7 @@ export default function OrderHistory() {
           </div>
         </div>
 
+        <div className="overflow-hidden rounded-sm border border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-02)] shadow-[var(--shadow-1)]">
           <table className="w-full">
             <thead>
               <tr className="border-b border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-01)]">
