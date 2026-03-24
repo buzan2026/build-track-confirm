@@ -351,7 +351,7 @@ export default function OrderHistory() {
                     </td>
                     <td className="px-5 py-4 text-right">
                       <div className="flex items-center justify-end gap-2">
-                        {order.status === "delivered" && (
+                        {(order.status === "delivered" || order.status === "partial") && (
                           <Popover>
                             <PopoverTrigger asChild>
                               <button
