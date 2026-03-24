@@ -184,7 +184,100 @@ export default function OrderHistory() {
           </div>
         </div>
 
-        <div className="overflow-hidden rounded-sm border border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-02)] shadow-[var(--shadow-1)]">
+        {/* Search bar + date presets */}
+        <div className="mb-4 flex flex-wrap items-center gap-3">
+          <div className="relative flex-1 min-w-[240px] max-w-md">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--color-text-secondary)]" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Rechercher par n° commande, fournisseur, article…"
+              className="h-10 w-full rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-02)] pl-9 pr-9 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-secondary)] focus:border-[var(--color-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
+          </div>
+
+          <div className="flex items-center gap-2">
+            {datePresets.map((p) => (
+              <button
+                key={p.label}
+                onClick={() => applyPreset(p.label, p.getValue())}
+                className={cn(
+                  "h-10 rounded-[var(--border-radius-sm)] border px-3 text-xs font-medium transition-colors",
+                  activeDatePreset === p.label
+                    ? "border-[var(--color-primary)] bg-[var(--color-primary)] text-[var(--color-white)]"
+                    : "border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-02)] text-[var(--color-text-secondary)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]",
+                )}
+              >
+                {p.label}
+              </button>
+            ))}
+
+            <Popover>
+              <PopoverTrigger asChild>
+                <button className={cn(
+                  "inline-flex h-10 items-center gap-1.5 rounded-[var(--border-radius-sm)] border px-3 text-xs font-medium transition-colors",
+                  dateFrom && !activeDatePreset
+                    ? "border-[var(--color-primary)] bg-[var(--color-primary)] text-[var(--color-white)]"
+                    : "border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-02)] text-[var(--color-text-secondary)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]",
+                )}>
+                  <CalendarIcon className="h-3.5 w-3.5" />
+                  {dateFrom && !activeDatePreset ? format(dateFrom, "dd/MM/yy", { locale: fr }) : "Du"}
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={dateFrom}
+                  onSelect={(d) => { setDateFrom(d); setActiveDatePreset(null); }}
+                  initialFocus
+                  className="p-3 pointer-events-auto"
+                />
+              </PopoverContent>
+            </Popover>
+
+            <Popover>
+              <PopoverTrigger asChild>
+                <button className={cn(
+                  "inline-flex h-10 items-center gap-1.5 rounded-[var(--border-radius-sm)] border px-3 text-xs font-medium transition-colors",
+                  dateTo
+                    ? "border-[var(--color-primary)] bg-[var(--color-primary)] text-[var(--color-white)]"
+                    : "border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-02)] text-[var(--color-text-secondary)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]",
+                )}>
+                  <CalendarIcon className="h-3.5 w-3.5" />
+                  {dateTo ? format(dateTo, "dd/MM/yy", { locale: fr }) : "Au"}
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={dateTo}
+                  onSelect={(d) => { setDateTo(d); setActiveDatePreset(null); }}
+                  initialFocus
+                  className="p-3 pointer-events-auto"
+                />
+              </PopoverContent>
+            </Popover>
+
+            {hasActiveFilters && (
+              <button
+                onClick={clearFilters}
+                className="h-10 rounded-[var(--border-radius-sm)] border border-[var(--color-error)] px-3 text-xs font-medium text-[var(--color-error)] transition-colors hover:bg-[var(--color-alert-error-bg)]"
+              >
+                Effacer
+              </button>
+            )}
+          </div>
+        </div>
+
           <table className="w-full">
             <thead>
               <tr className="border-b border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-01)]">
