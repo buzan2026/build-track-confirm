@@ -133,13 +133,34 @@ export default function OrderHistory() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-01)]">
-                <th className="px-5 py-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-text-secondary)]">Commande</th>
-                <th className="px-5 py-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-text-secondary)]">Date</th>
-                <th className="px-5 py-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-text-secondary)]">Articles</th>
-                <th className="px-5 py-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-text-secondary)]">Livraison prevue</th>
-                <th className="px-5 py-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-text-secondary)]">Statut</th>
-                <th className="px-5 py-3 text-right text-xs font-medium uppercase tracking-wider text-[var(--color-text-secondary)]">Total HT</th>
-                <th className="px-5 py-3 text-right text-xs font-medium uppercase tracking-wider text-[var(--color-text-secondary)]" />
+                {([
+                  { key: "id" as const, label: "Commande", align: "left" },
+                  { key: "date" as const, label: "Date", align: "left" },
+                  { key: "items" as const, label: "Articles", align: "left" },
+                  { key: "delivery" as const, label: "Livraison prévue", align: "left" },
+                  { key: "status" as const, label: "Statut", align: "left" },
+                  { key: "total" as const, label: "Total HT", align: "right" },
+                ]).map((col) => {
+                  const active = sortKey === col.key;
+                  const Icon = active ? (sortDir === "asc" ? ArrowUp : ArrowDown) : ArrowUpDown;
+                  return (
+                    <th
+                      key={col.key}
+                      onClick={() => toggleSort(col.key)}
+                      className={cn(
+                        "cursor-pointer select-none px-5 py-3 text-xs font-medium uppercase tracking-wider transition-colors hover:text-[var(--color-primary)]",
+                        col.align === "right" ? "text-right" : "text-left",
+                        active ? "text-[var(--color-primary)]" : "text-[var(--color-text-secondary)]",
+                      )}
+                    >
+                      <span className={cn("inline-flex items-center gap-1", col.align === "right" && "flex-row-reverse")}>
+                        {col.label}
+                        <Icon className={cn("h-3 w-3", active ? "opacity-100" : "opacity-40")} />
+                      </span>
+                    </th>
+                  );
+                })}
+                <th className="px-5 py-3" />
               </tr>
             </thead>
             <tbody className="divide-y divide-[var(--color-border-subtle)]">
