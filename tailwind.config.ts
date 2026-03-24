@@ -203,7 +203,6 @@ export default {
         "slide-out-right": "slide-out-right 0.25s ease-out forwards",
         "fade-in": "fade-in 0.2s ease-out",
       },
-      },
     },
   },
   plugins: [require("tailwindcss-animate")],
