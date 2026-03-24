@@ -96,6 +96,23 @@ export const orders: Order[] = [
       { name: "Contacteur iCT 40A", reference: "ICT-40A-2NO", quantity: 4, unitPrice: 125.50, deliveredQty: 0 },
       { name: "Minuterie MINs", reference: "MINS-16A", quantity: 3, unitPrice: 67.00, deliveredQty: 3 },
     ],
+    shipments: [
+      {
+        id: "ENV-0835-1", date: "2026-03-12", status: "delivered",
+        items: [
+          { reference: "IC60N-32A-3P", quantity: 6 },
+          { reference: "VIGI-IC60-30", quantity: 4 },
+          { reference: "MINS-16A", quantity: 3 },
+        ],
+      },
+      {
+        id: "ENV-0835-2", date: "2026-03-18", status: "in_transit",
+        items: [
+          { reference: "VIGI-IC60-30", quantity: 2 },
+          { reference: "ICT-40A-2NO", quantity: 4 },
+        ],
+      },
+    ],
   },
   {
     id: "CMD-2026-0830", date: "2026-03-08", supplier: "Hager Distribution", total: 1890.50, status: "confirmed", deliveryStep: 1, expectedDelivery: "2026-03-20",
@@ -151,6 +168,22 @@ export const orders: Order[] = [
       { name: "Onduleur APC 3000VA", reference: "APC-SMT3000", quantity: 2, unitPrice: 1850.00, deliveredQty: 1 },
       { name: "Batterie APC RBC", reference: "APC-RBC33", quantity: 4, unitPrice: 215.00, deliveredQty: 4 },
       { name: "PDU rackable 16A", reference: "PDU-16A-8P", quantity: 2, unitPrice: 145.00, deliveredQty: 0 },
+    ],
+    shipments: [
+      {
+        id: "ENV-0790-1", date: "2026-02-27", status: "delivered",
+        items: [
+          { reference: "APC-SMT3000", quantity: 1 },
+          { reference: "APC-RBC33", quantity: 4 },
+        ],
+      },
+      {
+        id: "ENV-0790-2", date: "2026-03-04", status: "pending",
+        items: [
+          { reference: "APC-SMT3000", quantity: 1 },
+          { reference: "PDU-16A-8P", quantity: 2 },
+        ],
+      },
     ],
   },
   {
