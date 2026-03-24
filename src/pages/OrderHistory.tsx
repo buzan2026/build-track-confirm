@@ -300,6 +300,16 @@ export default function OrderHistory() {
                 />
               </PopoverContent>
             </Popover>
+
+            {(dateFrom || dateTo) && !activeDatePreset && (
+              <button
+                onClick={() => { setDateFrom(undefined); setDateTo(undefined); setActiveDatePreset(null); }}
+                className="inline-flex h-10 items-center gap-1 rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-02)] px-2 text-xs text-[var(--color-text-secondary)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-colors"
+                title="Effacer les dates"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
           </div>
         </div>
 
