@@ -9,7 +9,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/Pagination";
-import { Package, ChevronRight, Truck, Check, Clock, XCircle, ClipboardCheck, Download } from "lucide-react";
+import { Package, ChevronRight, Truck, Check, Clock, XCircle, ClipboardCheck, Download, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { documents } from "@/data/demoOrders";
 import { useOrderStore } from "@/stores/orderStore";
 import { cn } from "@/lib/utils";
@@ -56,12 +56,36 @@ export default function OrderHistory() {
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
   const [activeFilter, setActiveFilter] = useState<"Toutes" | "En cours" | "Livrées">("Toutes");
   const [panelSection, setPanelSection] = useState<"detail" | "documents" | "reception">("detail");
+  const [sortKey, setSortKey] = useState<"id" | "date" | "items" | "delivery" | "status" | "total">("date");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
+
+  const toggleSort = (key: typeof sortKey) => {
+    if (sortKey === key) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    else { setSortKey(key); setSortDir("asc"); }
+  };
+
   const selectedOrder = orders.find((o) => o.id === selectedOrderId) ?? null;
-  const filteredOrders = orders.filter((order) => {
-    if (activeFilter === "En cours") return order.status === "processing" || order.status === "confirmed";
-    if (activeFilter === "Livrées") return order.status === "delivered";
-    return true;
-  });
+
+  const statusOrder: Record<string, number> = { processing: 0, confirmed: 1, delivered: 2, cancelled: 3 };
+
+  const filteredOrders = orders
+    .filter((order) => {
+      if (activeFilter === "En cours") return order.status === "processing" || order.status === "confirmed";
+      if (activeFilter === "Livrées") return order.status === "delivered";
+      return true;
+    })
+    .sort((a, b) => {
+      let cmp = 0;
+      switch (sortKey) {
+        case "id": cmp = a.id.localeCompare(b.id); break;
+        case "date": cmp = new Date(a.date).getTime() - new Date(b.date).getTime(); break;
+        case "items": cmp = a.items.length - b.items.length; break;
+        case "delivery": cmp = (a.expectedDelivery === "—" ? 0 : new Date(a.expectedDelivery).getTime()) - (b.expectedDelivery === "—" ? 0 : new Date(b.expectedDelivery).getTime()); break;
+        case "status": cmp = (statusOrder[a.status] ?? 0) - (statusOrder[b.status] ?? 0); break;
+        case "total": cmp = a.total - b.total; break;
+      }
+      return sortDir === "asc" ? cmp : -cmp;
+    });
   const orderInvoices = selectedOrder ? documents.invoices.filter((d) => d.orderId === selectedOrder.id) : [];
   const orderSlips = selectedOrder ? documents.deliverySlips.filter((d) => d.orderId === selectedOrder.id) : [];
   const panelTabs = [
@@ -109,13 +133,34 @@ export default function OrderHistory() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-01)]">
-                <th className="px-5 py-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-text-secondary)]">Commande</th>
-                <th className="px-5 py-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-text-secondary)]">Date</th>
-                <th className="px-5 py-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-text-secondary)]">Articles</th>
-                <th className="px-5 py-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-text-secondary)]">Livraison prevue</th>
-                <th className="px-5 py-3 text-left text-xs font-medium uppercase tracking-wider text-[var(--color-text-secondary)]">Statut</th>
-                <th className="px-5 py-3 text-right text-xs font-medium uppercase tracking-wider text-[var(--color-text-secondary)]">Total HT</th>
-                <th className="px-5 py-3 text-right text-xs font-medium uppercase tracking-wider text-[var(--color-text-secondary)]" />
+                {([
+                  { key: "id" as const, label: "Commande", align: "left" },
+                  { key: "date" as const, label: "Date", align: "left" },
+                  { key: "items" as const, label: "Articles", align: "left" },
+                  { key: "delivery" as const, label: "Livraison prévue", align: "left" },
+                  { key: "status" as const, label: "Statut", align: "left" },
+                  { key: "total" as const, label: "Total HT", align: "right" },
+                ]).map((col) => {
+                  const active = sortKey === col.key;
+                  const Icon = active ? (sortDir === "asc" ? ArrowUp : ArrowDown) : ArrowUpDown;
+                  return (
+                    <th
+                      key={col.key}
+                      onClick={() => toggleSort(col.key)}
+                      className={cn(
+                        "cursor-pointer select-none px-5 py-3 text-xs font-medium uppercase tracking-wider transition-colors hover:text-[var(--color-primary)]",
+                        col.align === "right" ? "text-right" : "text-left",
+                        active ? "text-[var(--color-primary)]" : "text-[var(--color-text-secondary)]",
+                      )}
+                    >
+                      <span className={cn("inline-flex items-center gap-1", col.align === "right" && "flex-row-reverse")}>
+                        {col.label}
+                        <Icon className={cn("h-3 w-3", active ? "opacity-100" : "opacity-40")} />
+                      </span>
+                    </th>
+                  );
+                })}
+                <th className="px-5 py-3" />
               </tr>
             </thead>
             <tbody className="divide-y divide-[var(--color-border-subtle)]">
