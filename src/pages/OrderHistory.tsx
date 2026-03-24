@@ -546,13 +546,6 @@ export default function OrderHistory() {
                       </Button>
                     ))}
                   </div>
-                  <div>
-                    <Badge
-                      type={statusConfig[selectedOrder.status].badgeType}
-                      label={statusConfig[selectedOrder.status].label}
-                      className={statusConfig[selectedOrder.status].badgeClassName}
-                    />
-                  </div>
                 </div>
                 <div>
                   <p className="text-sm font-medium text-[var(--color-text-primary)]">{selectedOrder.supplier}</p>
