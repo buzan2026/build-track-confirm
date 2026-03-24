@@ -6,6 +6,13 @@ export interface OrderItem {
   deliveredQty?: number; // for partial deliveries
 }
 
+export interface Shipment {
+  id: string;
+  date: string; // ship date or delivery date
+  status: "pending" | "in_transit" | "delivered";
+  items: { reference: string; quantity: number }[];
+}
+
 export interface Order {
   id: string;
   date: string;
@@ -15,6 +22,7 @@ export interface Order {
   items: OrderItem[];
   expectedDelivery: string;
   deliveryStep: number; // 0-3
+  shipments?: Shipment[];
 }
 
 export const orders: Order[] = [
