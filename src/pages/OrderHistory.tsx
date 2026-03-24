@@ -9,7 +9,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/Pagination";
-import { Package, ChevronRight, Truck, Check, Clock, XCircle, ClipboardCheck, Download, ArrowUpDown, ArrowUp, ArrowDown, Search, X, CalendarIcon } from "lucide-react";
+import { Package, ChevronRight, Truck, Check, XCircle, ClipboardCheck, Download, ArrowUpDown, ArrowUp, ArrowDown, Search, X, CalendarIcon } from "lucide-react";
 import { documents } from "@/data/demoOrders";
 import { useOrderStore } from "@/stores/orderStore";
 import { cn } from "@/lib/utils";
