@@ -1,7 +1,7 @@
 import { Badge, type BadgeType } from "@/components/Badge";
 import { Button } from "@/components/Button";
 import { Sidepanel as SidePanel } from "@/components/Sidepanel";
-import { Package, ChevronRight, Truck, Check, XCircle, ClipboardCheck, Download, ArrowUpDown, ArrowUp, ArrowDown, Search, X, CalendarIcon, RefreshCw, Phone, User, AlertTriangle, PackageCheck, Clock } from "lucide-react";
+import { Package, ChevronRight, Truck, Check, XCircle, ClipboardCheck, Download, ArrowUpDown, ArrowUp, ArrowDown, Search, X, CalendarIcon, RefreshCw, Phone, Mail, User, AlertTriangle, PackageCheck, Clock } from "lucide-react";
 import { documents, type Shipment } from "@/data/demoOrders";
 import { useOrderStore } from "@/stores/orderStore";
 import { cn } from "@/lib/utils";
@@ -735,6 +735,9 @@ export default function OrderHistory() {
                       <p className="text-sm font-medium text-[var(--color-text-primary)]">Marc Lefebvre — Agence Paris-Est</p>
                       <a href="tel:0123456789" className="inline-flex items-center gap-1 text-xs text-[var(--color-primary)] hover:underline">
                         <Phone className="h-3 w-3" /> 01 23 45 67 89
+                      </a>
+                      <a href="mailto:m.lefebvre@rexel.fr" className="inline-flex items-center gap-1 text-xs text-[var(--color-primary)] hover:underline">
+                        <Mail className="h-3 w-3" /> m.lefebvre@rexel.fr
                       </a>
                     </div>
                   </div>
