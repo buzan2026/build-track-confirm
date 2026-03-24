@@ -51,8 +51,18 @@ export default function OrderHistory() {
   const orders = useOrderStore((s) => s.orders);
   const markDelivered = useOrderStore((s) => s.markDelivered);
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+  const [isClosing, setIsClosing] = useState(false);
   const [activeFilter, setActiveFilter] = useState<"Toutes" | "En cours" | "Livrées">("En cours");
   const [panelSection, setPanelSection] = useState<"detail" | "documents" | "reception">("detail");
+
+  const closePanel = useCallback(() => {
+    setIsClosing(true);
+    setTimeout(() => {
+      setSelectedOrderId(null);
+      setPanelSection("detail");
+      setIsClosing(false);
+    }, 250);
+  }, []);
   const [sortKey, setSortKey] = useState<"id" | "date" | "items" | "delivery" | "status" | "total">("date");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   const [searchQuery, setSearchQuery] = useState("");
@@ -429,23 +439,17 @@ export default function OrderHistory() {
 
       {selectedOrder ? (
         <div
-          className="fixed inset-0 z-50 flex justify-end bg-black/40 animate-fade-in"
+          className={cn("fixed inset-0 z-50 flex justify-end transition-opacity duration-250", isClosing ? "bg-black/0" : "bg-black/40 animate-fade-in")}
           role="dialog"
           aria-modal="true"
           onClick={(e) => {
-            if (e.target === e.currentTarget) {
-              setSelectedOrderId(null);
-              setPanelSection("detail");
-            }
+            if (e.target === e.currentTarget) closePanel();
           }}
         >
-          <div className="h-full w-full max-w-[var(--size-sheet-max)] animate-slide-in-right shadow-[var(--shadow-5)]">
+          <div className={cn("h-full w-full max-w-[var(--size-sheet-max)] shadow-[var(--shadow-5)]", isClosing ? "animate-slide-out-right" : "animate-slide-in-right")}>
             <SidePanel
               title={selectedOrder.id}
-              onClose={() => {
-                setSelectedOrderId(null);
-                setPanelSection("detail");
-              }}
+              onClose={closePanel}
               className="h-full"
               footer={
                 panelSection === "detail" ? (
