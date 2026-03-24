@@ -267,14 +267,6 @@ export default function OrderHistory() {
               </PopoverContent>
             </Popover>
 
-            {hasActiveFilters && (
-              <button
-                onClick={clearFilters}
-                className="h-10 rounded-[var(--border-radius-sm)] border border-[var(--color-error)] px-3 text-xs font-medium text-[var(--color-error)] transition-colors hover:bg-[var(--color-alert-error-bg)]"
-              >
-                Effacer
-              </button>
-            )}
           </div>
         </div>
 
