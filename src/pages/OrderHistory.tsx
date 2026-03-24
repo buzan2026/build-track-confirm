@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/Button";
 import { ArrowLeft, Package, ChevronRight, Truck, Check, Clock, XCircle, ClipboardCheck, X } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";

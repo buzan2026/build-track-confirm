@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { documents } from "@/data/orders";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/Button";
 import { Download, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";

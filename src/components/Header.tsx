@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Zap, Phone, Mail, Search } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/Button";
 import { Input } from "@/components/ui/input";
 import { CartDrawer } from "./CartDrawer";
 

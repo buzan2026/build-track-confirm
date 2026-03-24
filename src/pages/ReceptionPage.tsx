@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useOrderStore } from "@/stores/orderStore";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/Button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Check } from "lucide-react";

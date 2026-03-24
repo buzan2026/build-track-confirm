@@ -1,5 +1,6 @@
 :root {
   /* === SPACING === */
+  --spacing-none: 0px;
   --spacing-1: 4px;
   --spacing-2: 8px;
   --spacing-3: 16px;
@@ -14,36 +15,159 @@
   --spacing-12: 120px;
 
   /* === BORDER RADIUS === */
-  --border-radius-sm: 3px;
+  --border-radius-sm: 4px;
 
-  /* === COLORS: BRAND === */
-  --color-primary: #0072ce;
-  --color-primary-hover: #005ba3;
-  --color-white: #ffffff;
-  --color-gray: #6c757d;
-  --color-gray-dark: #343a40;
-  --color-orange: #ee7900;
-  --color-teal: #20c997;
+  /* === COLORS: PALETTE — NEUTRAL (Figma 6358:4826) === */
+  --color-neutral-10: #f4f4f4;
+  --color-neutral-20: #e0e0e0;
+  --color-neutral-30: #c6c6c6;
+  --color-neutral-40: #a8a8a8;
+  --color-neutral-50: #8d8d8d;
+  --color-neutral-60: #6f6f6f;
+  --color-neutral-70: #525252;
+  --color-neutral-80: #393939;
+  --color-neutral-90: #262626;
+  --color-neutral-100: #161616;
+  --color-neutral-white: #ffffff;
+  --color-neutral-black: #000000;
+  --color-neutral-transparent: #ffffff00;
+
+  /* === COLORS: PALETTE — BLUE (Figma 6355:17428) === */
+  --color-blue-10: #edf5ff;
+  --color-blue-20: #d0e2ff;
+  --color-blue-30: #a6c8ff;
+  --color-blue-40: #78a9ff;
+  --color-blue-50: #4589ff;
+  --color-blue-60: #0f62fe;
+  --color-blue-70: #0043ce;
+  --color-blue-80: #002d9c;
+  --color-blue-90: #001d6c;
+  --color-blue-100: #001141;
+
+  /* === COLORS: PALETTE — RED (Figma 6355:17613) === */
+  --color-red-10: #fff1f1;
+  --color-red-20: #ffd7d9;
+  --color-red-30: #ffb3b8;
+  --color-red-40: #ff8389;
+  --color-red-50: #fa4d56;
+  --color-red-60: #da1e28;
+  --color-red-70: #a2191f;
+  --color-red-80: #750e13;
+  --color-red-90: #520408;
+  --color-red-100: #2d0709;
+
+  /* === COLORS: PALETTE — GREEN (Figma 6357:4239) === */
+  --color-green-10: #defbe6;
+  --color-green-20: #a7f0ba;
+  --color-green-30: #6fdc8c;
+  --color-green-40: #42be65;
+  --color-green-50: #24a148;
+  --color-green-60: #198038;
+  --color-green-70: #0e6027;
+  --color-green-80: #044317;
+  --color-green-90: #022d0d;
+  --color-green-100: #071908;
+
+  /* === COLORS: PALETTE — ORANGE (Figma 6357:4427) === */
+  --color-orange-10: #fff2e8;
+  --color-orange-20: #ffd9be;
+  --color-orange-30: #ffb784;
+  --color-orange-40: #ff832b;
+  --color-orange-50: #eb6200;
+  --color-orange-60: #ba4e00;
+  --color-orange-70: #8a3800;
+  --color-orange-80: #5e2900;
+  --color-orange-90: #3e1a00;
+  --color-orange-100: #231000;
+
+  /* === COLORS: PALETTE — YELLOW (Figma 6357:4328) === */
+  --color-yellow-10: #fcf4d6;
+  --color-yellow-20: #fddc69;
+  --color-yellow-30: #f1c21b;
+  --color-yellow-40: #d2a106;
+  --color-yellow-50: #b28600;
+  --color-yellow-60: #8e6a00;
+  --color-yellow-70: #684e00;
+  --color-yellow-80: #483700;
+  --color-yellow-90: #302400;
+  --color-yellow-100: #1c1500;
+
+  /* === COLORS: PALETTE — REXEL PRIMARY (Figma 6358:5809) === */
+  --color-rexel-primary-10: #eceffd;
+  --color-rexel-primary-20: #c7d1fa;
+  --color-rexel-primary-30: #9daff5;
+  --color-rexel-primary-40: #7089f0;
+  --color-rexel-primary-50: #4261ea;
+  --color-rexel-primary-60: #2f4dcc;
+  --color-rexel-primary-70: #2e4eaa;
+  --color-rexel-primary-80: #223c80;
+  --color-rexel-primary-90: #192955;
+  --color-rexel-primary-100: #0c1429;
+
+  /* === COLORS: PALETTE — REXEL SECONDARY / TEAL (Figma 6483:7464) === */
+  --color-rexel-secondary-10: #eaf2f9;
+  --color-rexel-secondary-20: #c7ddf0;
+  --color-rexel-secondary-30: #9ac2e3;
+  --color-rexel-secondary-40: #6ea8d6;
+  --color-rexel-secondary-50: #4f94ca;
+  --color-rexel-secondary-60: #4487bd;
+  --color-rexel-secondary-70: #326a95;
+  --color-rexel-secondary-80: #234e6d;
+  --color-rexel-secondary-90: #163347;
+  --color-rexel-secondary-100: #0b1a25;
+
+  /* === COLORS: PALETTE — REXEL GREY (Figma 6381:8396) === */
+  --color-rexel-grey-10: #f3f3fa;
+  --color-rexel-grey-20: #d7d9e4;
+  --color-rexel-grey-30: #bbbfce;
+  --color-rexel-grey-40: #9fa4b7;
+  --color-rexel-grey-50: #838aa1;
+  --color-rexel-grey-60: #666f8a;
+  --color-rexel-grey-70: #596179;
+  --color-rexel-grey-80: #4b5268;
+  --color-rexel-grey-90: #3e4457;
+  --color-rexel-grey-100: #303545;
+
+  /* === COLORS: BRAND (aliases → Rexel / Orange scale; Figma text/background/border tokens) === */
+  --color-primary: var(--color-rexel-primary-70);
+  --color-primary-hover: var(--color-rexel-primary-60);
+  --color-text-brand: var(--color-rexel-primary-70);
+  --color-white: var(--color-neutral-white);
+  --color-gray: var(--color-rexel-grey-60);
+  --color-gray-dark: var(--color-rexel-grey-100);
+  --color-orange: var(--color-orange-40);
+  --color-teal: var(--color-rexel-secondary-60);
+  --color-text-primary: var(--color-rexel-grey-100);
+  --color-text-secondary: var(--color-rexel-grey-90);
+  --color-text-helper: var(--color-rexel-grey-70);
+  --color-text-placeholder: var(--color-neutral-40);
+  --color-text-link: var(--color-rexel-primary-60);
+  --color-bg-page: var(--color-neutral-white);
+  --color-bg-layer-01: var(--color-rexel-grey-10);
+  --color-bg-layer-02: var(--color-neutral-white);
+  --color-bg-layer-03: var(--color-rexel-grey-10);
+  --color-border-subtle: var(--color-rexel-grey-20);
+  --color-border-strong: var(--color-rexel-grey-40);
 
   /* === COLORS: SEMANTIC === */
-  --color-success: #16704a;
-  --color-error: #c8102e;
-  --color-warning: #ee7900;
-  --color-info: #0072ce;
+  --color-success: var(--color-green-70);
+  --color-error: var(--color-red-70);
+  --color-warning: var(--color-orange-70);
+  --color-info: var(--color-blue-70);
 
-  /* === COLORS: ALERTS === */
-  --color-alert-info-text: #0c5460;
-  --color-alert-info-bg: #d1ecf1;
-  --color-alert-info-border: #bee5eb;
-  --color-alert-success-text: #16704a;
-  --color-alert-success-bg: #d4edda;
-  --color-alert-success-border: #c3e6cb;
-  --color-alert-warning-text: #856404;
-  --color-alert-warning-bg: #fff3cd;
-  --color-alert-warning-border: #ffeeba;
-  --color-alert-error-text: #721c24;
-  --color-alert-error-bg: #f8d7da;
-  --color-alert-error-border: #f5c6cb;
+  /* === COLORS: ALERTS (aligned to Blue / Green / Orange / Red scales) === */
+  --color-alert-info-text: var(--color-blue-70);
+  --color-alert-info-bg: var(--color-blue-10);
+  --color-alert-info-border: var(--color-blue-70);
+  --color-alert-success-text: var(--color-green-70);
+  --color-alert-success-bg: var(--color-green-10);
+  --color-alert-success-border: var(--color-green-70);
+  --color-alert-warning-text: var(--color-orange-70);
+  --color-alert-warning-bg: var(--color-orange-10);
+  --color-alert-warning-border: var(--color-orange-70);
+  --color-alert-error-text: var(--color-red-70);
+  --color-alert-error-bg: var(--color-red-10);
+  --color-alert-error-border: var(--color-red-70);
 
   /* === ELEVATIONS === */
   --shadow-1: 0 2px 4px 0 rgba(0,0,0,0.10);
@@ -53,17 +177,23 @@
   --shadow-5: 0 30px 30px 0 rgba(0,0,0,0.10);
 
   /* === TYPOGRAPHY === */
-  --font-heading: "Montserrat", sans-serif;
+  --font-heading: "Open Sans", sans-serif;
   --font-body: "Open Sans", sans-serif;
-  --font-size-xs: 11px;
-  --font-size-s: 12px;
-  --font-size-m: 14px;
-  --font-size-l: 16px;
-  --font-size-xl: 18px;
-  --font-size-xxl: 24px;
+  --font-size-xs: 12px;
+  --font-size-s: 14px;
+  --font-size-m: 16px;
+  --font-size-l: 20px;
+  --font-size-xl: 28px;
+  --font-size-xxl: 32px;
   --font-weight-regular: 400;
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
+  --line-height-xs: 16px;
+  --line-height-s: 20px;
+  --line-height-m: 24px;
+  --line-height-l: 27px;
+  --line-height-xl: 38px;
+  --line-height-xxl: 40px;
 
   /* === EXTENSIONS === */
   --spacing-2-25: 18px;
@@ -97,70 +227,82 @@
 @layer base {
   :root {
     /* === COLORS: BACKGROUND === */
-    --background: 210 14% 97%;
-    --foreground: 210 14% 22%;
+    --background: 0 0% 100%;
+    --foreground: 227 18% 23%;
 
     --card: 0 0% 100%;
-    --card-foreground: 210 14% 22%;
+    --card-foreground: 227 18% 23%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 210 14% 22%;
+    --popover-foreground: 227 18% 23%;
 
-    /* === COLORS: BRAND === */
-    --primary: 208 100% 40%;
+    /* === COLORS: BRAND (references top-level :root Figma palettes) === */
+    --primary: 225 57% 42%;
     --primary-foreground: 0 0% 100%;
-    --color-primary: #0072ce;
-    --color-primary-hover: #005ba3;
-    --color-white: #ffffff;
-    --color-gray: #6c757d;
-    --color-gray-dark: #343a40;
+    --color-primary: var(--color-rexel-primary-70);
+    --color-primary-hover: var(--color-rexel-primary-60);
+    --color-text-brand: var(--color-rexel-primary-70);
+    --color-white: var(--color-neutral-white);
+    --color-gray: var(--color-rexel-grey-60);
+    --color-gray-dark: var(--color-rexel-grey-100);
     --color-favorited: #ffc107;
-    --color-bundle: #4487bd;
+    --color-bundle: var(--color-rexel-secondary-60);
     --color-indigo: #6610f2;
     --color-purple: #9b26b6;
     --color-pink: #bb29bb;
-    --color-orange: #ee7900;
-    --color-teal: #20c997;
+    --color-orange: var(--color-orange-40);
+    --color-teal: var(--color-rexel-secondary-60);
+    --color-text-primary: var(--color-rexel-grey-100);
+    --color-text-secondary: var(--color-rexel-grey-90);
+    --color-text-helper: var(--color-rexel-grey-70);
+    --color-text-placeholder: var(--color-neutral-40);
+    --color-text-link: var(--color-rexel-primary-60);
+    --color-bg-page: var(--color-neutral-white);
+    --color-bg-layer-01: var(--color-rexel-grey-10);
+    --color-bg-layer-02: var(--color-neutral-white);
+    --color-bg-layer-03: var(--color-rexel-grey-10);
+    --color-border-subtle: var(--color-rexel-grey-20);
+    --color-border-strong: var(--color-rexel-grey-40);
 
-    --secondary: 210 10% 93%;
-    --secondary-foreground: 210 14% 22%;
+    --secondary: 240 17% 97%;
+    --secondary-foreground: 227 18% 23%;
 
-    --muted: 210 7% 90%;
-    --muted-foreground: 210 7% 46%;
+    --muted: 229 24% 89%;
+    --muted-foreground: 224 8% 53%;
 
     --accent: 192 52% 91%;
     --accent-foreground: 192 45% 30%;
 
     /* === COLORS: SEMANTIC === */
-    --destructive: 352 83% 42%;
+    --destructive: 357 73% 37%;
     --destructive-foreground: 0 0% 100%;
-    --color-error: #c8102e;
+    --color-error: var(--color-red-70);
 
-    --success: 152 65% 26%;
+    --success: 126 74% 22%;
     --success-foreground: 0 0% 100%;
-    --color-success: #16704a;
+    --color-success: var(--color-green-70);
 
-    --warning: 30 100% 47%;
+    --warning: 25 95% 27%;
     --warning-foreground: 30 90% 15%;
-    --color-warning: #ee7900;
+    --color-warning: var(--color-orange-70);
 
-    --color-info: #0072ce;
+    --color-info: var(--color-blue-70);
 
     --favorited: 45 100% 51%;
 
     /* === COLORS: ALERTS === */
-    --color-alert-info-text: #0c5460;
-    --color-alert-info-bg: #d1ecf1;
-    --color-alert-info-border: #bee5eb;
-    --color-alert-success-text: #16704a;
-    --color-alert-success-bg: #d4edda;
-    --color-alert-success-border: #c3e6cb;
-    --color-alert-warning-text: #856404;
-    --color-alert-warning-bg: #fff3cd;
-    --color-alert-warning-border: #ffeeba;
-    --color-alert-error-text: #721c24;
-    --color-alert-error-bg: #f8d7da;
-    --color-alert-error-border: #f5c6cb;
+    --color-alert-info-text: var(--color-blue-70);
+    --color-alert-info-bg: var(--color-blue-10);
+    --color-alert-info-border: var(--color-blue-70);
+    --color-alert-success-text: var(--color-green-70);
+    --color-alert-success-bg: var(--color-green-10);
+    --color-alert-success-border: var(--color-green-70);
+    --color-alert-warning-text: var(--color-orange-70);
+    --color-alert-warning-bg: var(--color-orange-10);
+    --color-alert-warning-border: var(--color-orange-70);
+    --color-alert-error-text: var(--color-red-70);
+    --color-alert-error-bg: var(--color-red-10);
+    --color-alert-error-border: var(--color-red-70);
 
     /* === COLORS: SEGMENTS === */
     --color-segment-1: #1971c2;
@@ -187,13 +329,13 @@
     --color-new: #ee7900;
 
     /* === BORDERS === */
-    --border: 210 14% 87%;
-    --input: 210 14% 87%;
-    --ring: 208 100% 40%;
+    --border: 229 24% 89%;
+    --input: 228 17% 69%;
+    --ring: 225 57% 42%;
 
     /* === BORDER RADIUS === */
     --radius: 0.375rem;
-    --border-radius-sm: 3px;
+    --border-radius-sm: 4px;
 
     /* === ELEVATIONS === */
     --shadow-1: 0 2px 4px 0 rgba(0, 0, 0, 0.10);
@@ -203,6 +345,7 @@
     --shadow-5: 0 30px 30px 0 rgba(0, 0, 0, 0.10);
 
     /* === SPACING === */
+    --spacing-none: 0px;
     --spacing-1: 4px;
     --spacing-2: 8px;
     --spacing-3: 16px;
@@ -217,21 +360,23 @@
     --spacing-12: 120px;
 
     /* === TYPOGRAPHY === */
-    --font-heading: "Montserrat", sans-serif;
+    --font-heading: "Open Sans", sans-serif;
     --font-body: "Open Sans", sans-serif;
-    --font-size-xs: 11px;
-    --font-size-s: 12px;
-    --font-size-m: 14px;
-    --font-size-l: 16px;
-    --font-size-xl: 18px;
-    --font-size-xxl: 24px;
+    --font-size-xs: 12px;
+    --font-size-s: 14px;
+    --font-size-m: 16px;
+    --font-size-l: 20px;
+    --font-size-xl: 28px;
+    --font-size-xxl: 32px;
     --font-weight-regular: 400;
     --font-weight-semibold: 600;
     --font-weight-bold: 700;
-    --line-height-xs: 1.2;
-    --line-height-s: 1.4;
-    --line-height-m: 1.5;
-    --line-height-l: 1.6;
+    --line-height-xs: 16px;
+    --line-height-s: 20px;
+    --line-height-m: 24px;
+    --line-height-l: 27px;
+    --line-height-xl: 38px;
+    --line-height-xxl: 40px;
 
     /* Sidebar */
     --sidebar-background: 0 0% 98%;

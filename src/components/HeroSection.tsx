@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/Button";
 import { Truck, Shield, Clock, Users } from "lucide-react";
 
 export default function HeroSection() {

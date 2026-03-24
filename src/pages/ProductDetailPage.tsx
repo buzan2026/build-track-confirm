@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { storefrontApiRequest, PRODUCT_BY_HANDLE_QUERY } from "@/lib/shopify";
 import { useCartStore } from "@/stores/cartStore";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/Button";
 import { ShoppingCart, Loader2, ArrowLeft, Package, Minus, Plus } from "lucide-react";
 import { toast } from "sonner";
 import Header from "@/components/Header";

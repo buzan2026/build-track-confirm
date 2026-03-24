@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/Button";
 import { CheckCircle2 } from "lucide-react";
 
 export default function Success() {

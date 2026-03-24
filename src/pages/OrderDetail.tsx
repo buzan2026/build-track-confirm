@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { orders } from "@/data/orders";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/Button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Check, Package, Truck, ClipboardCheck } from "lucide-react";
 import { cn } from "@/lib/utils";

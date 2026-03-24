@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { storefrontApiRequest, STOREFRONT_QUERY, type ShopifyProduct } from "@/lib/shopify";
 import { useCartStore } from "@/stores/cartStore";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/Button";
 import { ShoppingCart, Loader2, Package } from "lucide-react";
 import { toast } from "sonner";
 

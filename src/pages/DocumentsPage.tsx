@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { documents } from "@/data/demoOrders";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/Button";
 import { ArrowLeft, Download, FileText } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
