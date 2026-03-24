@@ -1,19 +1,11 @@
 import { Badge, type BadgeType } from "@/components/Badge";
 import { Button } from "@/components/Button";
 import { Sidepanel as SidePanel } from "@/components/Sidepanel";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/Pagination";
 import { Package, ChevronRight, Truck, Check, XCircle, ClipboardCheck, Download, ArrowUpDown, ArrowUp, ArrowDown, Search, X, CalendarIcon, RefreshCw, Phone, User, AlertTriangle } from "lucide-react";
 import { documents } from "@/data/demoOrders";
 import { useOrderStore } from "@/stores/orderStore";
 import { cn } from "@/lib/utils";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import { subDays, subMonths, subYears, isAfter, startOfDay } from "date-fns";
 import { format } from "date-fns";
@@ -98,6 +90,25 @@ export default function OrderHistory() {
     setDateTo(undefined);
     setActiveDatePreset(null);
   };
+
+  const BATCH = 10;
+  const [visibleCount, setVisibleCount] = useState(BATCH);
+  const sentinelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setVisibleCount(BATCH);
+  }, [activeFilter, searchQuery, dateFrom, dateTo]);
+
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) setVisibleCount((v) => v + BATCH); },
+      { rootMargin: "200px" },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  });
 
   const hasActiveFilters = searchQuery || dateFrom || dateTo;
 
@@ -317,7 +328,7 @@ export default function OrderHistory() {
               </tr>
             </thead>
             <tbody className="divide-y divide-[var(--color-border-subtle)]">
-              {filteredOrders.map((order) => {
+              {filteredOrders.slice(0, visibleCount).map((order) => {
                 const cfg = statusConfig[order.status];
                 const isSelected = selectedOrder?.id === order.id;
                 return (
@@ -390,23 +401,11 @@ export default function OrderHistory() {
           </table>
         </div>
 
-        <div className="mt-4">
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious href="#" />
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationLink href="#" isActive>
-                  1
-                </PaginationLink>
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationNext href="#" />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        </div>
+        {filteredOrders.length > visibleCount && (
+          <div ref={sentinelRef} className="flex justify-center py-6">
+            <div className="h-6 w-6 animate-spin rounded-full border-2 border-[var(--color-border-subtle)] border-t-[var(--color-primary)]" />
+          </div>
+        )}
       </div>
 
       {selectedOrder ? (
@@ -517,7 +516,9 @@ export default function OrderHistory() {
                   <p className="text-sm font-medium text-[var(--color-text-primary)]">{selectedOrder.supplier}</p>
                   <p className="text-xs text-[var(--color-text-secondary)]">Commandée le {new Date(selectedOrder.date).toLocaleDateString("fr-FR")}</p>
                 </div>
-                {panelSection === "detail" ? (
+                {panelSection === "detail" ? (() => {
+                  const isPartial = selectedOrder.status === "partial";
+                  return (
                   <>
                     <div className="rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-01)] p-5">
                       <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">Suivi livraison</p>
@@ -552,22 +553,42 @@ export default function OrderHistory() {
                               <th className="px-3 py-2 text-left text-xs font-medium text-[var(--color-text-secondary)]">Article</th>
                               <th className="px-3 py-2 text-left text-xs font-medium text-[var(--color-text-secondary)]">Référence</th>
                               <th className="px-3 py-2 text-right text-xs font-medium text-[var(--color-text-secondary)]">Qté</th>
+                              {isPartial && <th className="px-3 py-2 text-right text-xs font-medium text-[var(--color-text-secondary)]">Livré</th>}
+                              {isPartial && <th className="px-3 py-2 text-right text-xs font-medium text-[var(--color-text-secondary)]">Reste</th>}
                               <th className="px-3 py-2 text-right text-xs font-medium text-[var(--color-text-secondary)]">Prix unit.</th>
                               <th className="px-3 py-2 text-right text-xs font-medium text-[var(--color-text-secondary)]">Total</th>
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-[var(--color-border-subtle)]">
-                            {selectedOrder.items.map((item, i) => (
-                              <tr key={i}>
-                                <td className="px-3 py-2.5 font-medium text-[var(--color-text-primary)]">{item.name}</td>
-                                <td className="px-3 py-2.5 text-xs text-[var(--color-text-secondary)]">{item.reference}</td>
-                                <td className="px-3 py-2.5 text-right text-[var(--color-text-primary)]">{item.quantity}</td>
-                                <td className="px-3 py-2.5 text-right text-[var(--color-text-secondary)]">{item.unitPrice.toFixed(2)} €</td>
-                                <td className="px-3 py-2.5 text-right font-semibold text-[var(--color-text-primary)]">
-                                  {(item.quantity * item.unitPrice).toLocaleString("fr-FR", { style: "currency", currency: "EUR" })}
-                                </td>
-                              </tr>
-                            ))}
+                            {selectedOrder.items.map((item, i) => {
+                              const delivered = item.deliveredQty ?? 0;
+                              const remaining = item.quantity - delivered;
+                              return (
+                                <tr key={i}>
+                                  <td className="px-3 py-2.5 font-medium text-[var(--color-text-primary)]">{item.name}</td>
+                                  <td className="px-3 py-2.5 text-xs text-[var(--color-text-secondary)]">{item.reference}</td>
+                                  <td className="px-3 py-2.5 text-right text-[var(--color-text-primary)]">{item.quantity}</td>
+                                  {isPartial && (
+                                    <td className="px-3 py-2.5 text-right">
+                                      <span className={cn("text-sm", delivered > 0 ? "text-[var(--color-success)] font-medium" : "text-[var(--color-text-secondary)]")}>
+                                        {delivered}
+                                      </span>
+                                    </td>
+                                  )}
+                                  {isPartial && (
+                                    <td className="px-3 py-2.5 text-right">
+                                      <span className={cn("text-sm", remaining > 0 ? "text-[var(--color-orange)] font-medium" : "text-[var(--color-text-secondary)]")}>
+                                        {remaining}
+                                      </span>
+                                    </td>
+                                  )}
+                                  <td className="px-3 py-2.5 text-right text-[var(--color-text-secondary)]">{item.unitPrice.toFixed(2)} €</td>
+                                  <td className="px-3 py-2.5 text-right font-semibold text-[var(--color-text-primary)]">
+                                    {(item.quantity * item.unitPrice).toLocaleString("fr-FR", { style: "currency", currency: "EUR" })}
+                                  </td>
+                                </tr>
+                              );
+                            })}
                           </tbody>
                         </table>
                       </div>
@@ -579,7 +600,8 @@ export default function OrderHistory() {
                       </div>
                     </div>
                   </>
-                ) : null}
+                  );
+                })() : null}
 
                 {panelSection === "documents" ? (
                   <div className="space-y-5">
@@ -649,7 +671,8 @@ export default function OrderHistory() {
                   </div>
                 ) : null}
 
-                {/* Contact Rexel */}
+                {/* Contact Rexel — hidden on documents tab */}
+                {panelSection !== "documents" && (
                 <div className="mt-auto sticky bottom-0 rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-01)] p-4">
                   <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-secondary)] mb-2">Votre contact Rexel</p>
                   <div className="flex items-center gap-3">
@@ -664,6 +687,7 @@ export default function OrderHistory() {
                     </div>
                   </div>
                 </div>
+                )}
               </div>
             </SidePanel>
           </div>
