@@ -9,12 +9,17 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/Pagination";
-import { Package, ChevronRight, Truck, Check, Clock, XCircle, ClipboardCheck, Download, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { Package, ChevronRight, Truck, Check, Clock, XCircle, ClipboardCheck, Download, ArrowUpDown, ArrowUp, ArrowDown, Search, X, CalendarIcon } from "lucide-react";
 import { documents } from "@/data/demoOrders";
 import { useOrderStore } from "@/stores/orderStore";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { toast } from "sonner";
+import { subDays, subMonths, subYears, isAfter, startOfDay } from "date-fns";
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 const statusConfig: Record<string, { label: string; badgeType: BadgeType; badgeClassName: string; icon: typeof Check }> = {
   delivered: {
@@ -58,34 +63,84 @@ export default function OrderHistory() {
   const [panelSection, setPanelSection] = useState<"detail" | "documents" | "reception">("detail");
   const [sortKey, setSortKey] = useState<"id" | "date" | "items" | "delivery" | "status" | "total">("date");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
+  const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
+  const [activeDatePreset, setActiveDatePreset] = useState<string | null>(null);
+
+  const datePresets = [
+    { label: "30 jours", getValue: () => subDays(new Date(), 30) },
+    { label: "3 mois", getValue: () => subMonths(new Date(), 3) },
+    { label: "6 mois", getValue: () => subMonths(new Date(), 6) },
+    { label: "1 an", getValue: () => subYears(new Date(), 1) },
+  ];
 
   const toggleSort = (key: typeof sortKey) => {
     if (sortKey === key) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
     else { setSortKey(key); setSortDir("asc"); }
   };
 
+  const applyPreset = (label: string, from: Date) => {
+    if (activeDatePreset === label) {
+      setActiveDatePreset(null);
+      setDateFrom(undefined);
+      setDateTo(undefined);
+    } else {
+      setActiveDatePreset(label);
+      setDateFrom(startOfDay(from));
+      setDateTo(undefined);
+    }
+  };
+
+  const clearFilters = () => {
+    setSearchQuery("");
+    setDateFrom(undefined);
+    setDateTo(undefined);
+    setActiveDatePreset(null);
+  };
+
+  const hasActiveFilters = searchQuery || dateFrom || dateTo;
+
   const selectedOrder = orders.find((o) => o.id === selectedOrderId) ?? null;
 
   const statusOrder: Record<string, number> = { processing: 0, confirmed: 1, delivered: 2, cancelled: 3 };
 
-  const filteredOrders = orders
-    .filter((order) => {
-      if (activeFilter === "En cours") return order.status === "processing" || order.status === "confirmed";
-      if (activeFilter === "Livrées") return order.status === "delivered";
-      return true;
-    })
-    .sort((a, b) => {
-      let cmp = 0;
-      switch (sortKey) {
-        case "id": cmp = a.id.localeCompare(b.id); break;
-        case "date": cmp = new Date(a.date).getTime() - new Date(b.date).getTime(); break;
-        case "items": cmp = a.items.length - b.items.length; break;
-        case "delivery": cmp = (a.expectedDelivery === "—" ? 0 : new Date(a.expectedDelivery).getTime()) - (b.expectedDelivery === "—" ? 0 : new Date(b.expectedDelivery).getTime()); break;
-        case "status": cmp = (statusOrder[a.status] ?? 0) - (statusOrder[b.status] ?? 0); break;
-        case "total": cmp = a.total - b.total; break;
-      }
-      return sortDir === "asc" ? cmp : -cmp;
-    });
+  const filteredOrders = useMemo(() => {
+    const q = searchQuery.toLowerCase().trim();
+    return orders
+      .filter((order) => {
+        if (activeFilter === "En cours") return order.status === "processing" || order.status === "confirmed";
+        if (activeFilter === "Livrées") return order.status === "delivered";
+        return true;
+      })
+      .filter((order) => {
+        if (!q) return true;
+        return (
+          order.id.toLowerCase().includes(q) ||
+          order.supplier.toLowerCase().includes(q) ||
+          order.items.some((item) => item.name.toLowerCase().includes(q) || item.reference.toLowerCase().includes(q))
+        );
+      })
+      .filter((order) => {
+        const d = new Date(order.date);
+        if (dateFrom && d < startOfDay(dateFrom)) return false;
+        if (dateTo && d > new Date(dateTo.getTime() + 86400000)) return false;
+        return true;
+      })
+      .sort((a, b) => {
+        let cmp = 0;
+        switch (sortKey) {
+          case "id": cmp = a.id.localeCompare(b.id); break;
+          case "date": cmp = new Date(a.date).getTime() - new Date(b.date).getTime(); break;
+          case "items": cmp = a.items.length - b.items.length; break;
+          case "delivery": cmp = (a.expectedDelivery === "—" ? 0 : new Date(a.expectedDelivery).getTime()) - (b.expectedDelivery === "—" ? 0 : new Date(b.expectedDelivery).getTime()); break;
+          case "status": cmp = (statusOrder[a.status] ?? 0) - (statusOrder[b.status] ?? 0); break;
+          case "total": cmp = a.total - b.total; break;
+        }
+        return sortDir === "asc" ? cmp : -cmp;
+      });
+  }, [orders, activeFilter, searchQuery, dateFrom, dateTo, sortKey, sortDir]);
+
   const orderInvoices = selectedOrder ? documents.invoices.filter((d) => d.orderId === selectedOrder.id) : [];
   const orderSlips = selectedOrder ? documents.deliverySlips.filter((d) => d.orderId === selectedOrder.id) : [];
   const panelTabs = [
@@ -126,6 +181,100 @@ export default function OrderHistory() {
                 {f}
               </Button>
             ))}
+          </div>
+        </div>
+
+        {/* Search bar + date presets */}
+        <div className="mb-4 flex flex-wrap items-center gap-3">
+          <div className="relative flex-1 min-w-[240px] max-w-md">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--color-text-secondary)]" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Rechercher par n° commande, fournisseur, article…"
+              className="h-10 w-full rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-02)] pl-9 pr-9 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-secondary)] focus:border-[var(--color-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
+          </div>
+
+          <div className="flex items-center gap-2">
+            {datePresets.map((p) => (
+              <button
+                key={p.label}
+                onClick={() => applyPreset(p.label, p.getValue())}
+                className={cn(
+                  "h-10 rounded-[var(--border-radius-sm)] border px-3 text-xs font-medium transition-colors",
+                  activeDatePreset === p.label
+                    ? "border-[var(--color-primary)] bg-[var(--color-primary)] text-[var(--color-white)]"
+                    : "border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-02)] text-[var(--color-text-secondary)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]",
+                )}
+              >
+                {p.label}
+              </button>
+            ))}
+
+            <Popover>
+              <PopoverTrigger asChild>
+                <button className={cn(
+                  "inline-flex h-10 items-center gap-1.5 rounded-[var(--border-radius-sm)] border px-3 text-xs font-medium transition-colors",
+                  dateFrom && !activeDatePreset
+                    ? "border-[var(--color-primary)] bg-[var(--color-primary)] text-[var(--color-white)]"
+                    : "border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-02)] text-[var(--color-text-secondary)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]",
+                )}>
+                  <CalendarIcon className="h-3.5 w-3.5" />
+                  {dateFrom && !activeDatePreset ? format(dateFrom, "dd/MM/yy", { locale: fr }) : "Du"}
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={dateFrom}
+                  onSelect={(d) => { setDateFrom(d); setActiveDatePreset(null); }}
+                  initialFocus
+                  className="p-3 pointer-events-auto"
+                />
+              </PopoverContent>
+            </Popover>
+
+            <Popover>
+              <PopoverTrigger asChild>
+                <button className={cn(
+                  "inline-flex h-10 items-center gap-1.5 rounded-[var(--border-radius-sm)] border px-3 text-xs font-medium transition-colors",
+                  dateTo
+                    ? "border-[var(--color-primary)] bg-[var(--color-primary)] text-[var(--color-white)]"
+                    : "border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-02)] text-[var(--color-text-secondary)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]",
+                )}>
+                  <CalendarIcon className="h-3.5 w-3.5" />
+                  {dateTo ? format(dateTo, "dd/MM/yy", { locale: fr }) : "Au"}
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={dateTo}
+                  onSelect={(d) => { setDateTo(d); setActiveDatePreset(null); }}
+                  initialFocus
+                  className="p-3 pointer-events-auto"
+                />
+              </PopoverContent>
+            </Popover>
+
+            {hasActiveFilters && (
+              <button
+                onClick={clearFilters}
+                className="h-10 rounded-[var(--border-radius-sm)] border border-[var(--color-error)] px-3 text-xs font-medium text-[var(--color-error)] transition-colors hover:bg-[var(--color-alert-error-bg)]"
+              >
+                Effacer
+              </button>
+            )}
           </div>
         </div>
 
