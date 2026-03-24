@@ -13,7 +13,7 @@ import { Package, ChevronRight, Truck, Check, XCircle, ClipboardCheck, Download,
 import { documents } from "@/data/demoOrders";
 import { useOrderStore } from "@/stores/orderStore";
 import { cn } from "@/lib/utils";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import { subDays, subMonths, subYears, isAfter, startOfDay } from "date-fns";
 import { format } from "date-fns";
@@ -390,23 +390,11 @@ export default function OrderHistory() {
           </table>
         </div>
 
-        <div className="mt-4">
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious href="#" />
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationLink href="#" isActive>
-                  1
-                </PaginationLink>
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationNext href="#" />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        </div>
+        {filteredOrders.length > visibleCount && (
+          <div ref={sentinelRef} className="flex justify-center py-6">
+            <div className="h-6 w-6 animate-spin rounded-full border-2 border-[var(--color-border-subtle)] border-t-[var(--color-primary)]" />
+          </div>
+        )}
       </div>
 
       {selectedOrder ? (
