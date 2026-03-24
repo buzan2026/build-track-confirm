@@ -442,7 +442,7 @@ export default function OrderHistory() {
           className={cn("fixed inset-0 z-50 flex justify-end transition-opacity duration-250", isClosing ? "bg-black/0" : "bg-black/40 animate-fade-in")}
           role="dialog"
           aria-modal="true"
-          onClick={(e) => {
+          onMouseDown={(e) => {
             if (e.target === e.currentTarget) closePanel();
           }}
         >
