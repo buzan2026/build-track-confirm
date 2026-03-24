@@ -50,6 +50,25 @@ export const orders: Order[] = [
       { name: "Prise Mosaic 2P+T", reference: "MOS-2PT-BLC", quantity: 50, unitPrice: 7.80 },
       { name: "Plaque Céliane Titane", reference: "CEL-PL-TIT", quantity: 50, unitPrice: 11.50 },
     ],
+    shipments: [
+      {
+        id: "ENV-0841-1", date: "2026-03-16", status: "delivered",
+        items: [
+          { reference: "ARM-800-600", quantity: 2 },
+          { reference: "H07VK-6-BL", quantity: 200 },
+          { reference: "H07VK-6-VJ", quantity: 200 },
+          { reference: "RAIL-DIN-2M", quantity: 20 },
+        ],
+      },
+      {
+        id: "ENV-0841-2", date: "2026-03-22", status: "pending",
+        items: [
+          { reference: "H07VK-6-BL", quantity: 100 },
+          { reference: "H07VK-6-VJ", quantity: 100 },
+          { reference: "EMB-6-ISOL", quantity: 500 },
+        ],
+      },
+    ],
   },
   {
     id: "CMD-2026-0841", date: "2026-03-15", supplier: "Rexel France", total: 4780.00, status: "partial", deliveryStep: 2, expectedDelivery: "2026-03-22",
