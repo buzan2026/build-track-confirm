@@ -546,51 +546,48 @@ export default function OrderHistory() {
                       <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">
                         Articles commandés ({selectedOrder.items.length})
                       </p>
-                      <div className="overflow-hidden rounded-lg border border-[var(--color-border-subtle)]">
-                        <table className="w-full text-sm">
-                          <thead>
-                            <tr className="border-b border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-01)]">
-                              <th className="px-3 py-2 text-left text-xs font-medium text-[var(--color-text-secondary)]">Article</th>
-                              <th className="px-3 py-2 text-left text-xs font-medium text-[var(--color-text-secondary)]">Référence</th>
-                              <th className="px-3 py-2 text-right text-xs font-medium text-[var(--color-text-secondary)]">Qté</th>
-                              {isPartial && <th className="px-3 py-2 text-right text-xs font-medium text-[var(--color-text-secondary)]">Livré</th>}
-                              {isPartial && <th className="px-3 py-2 text-right text-xs font-medium text-[var(--color-text-secondary)]">Reste</th>}
-                              <th className="px-3 py-2 text-right text-xs font-medium text-[var(--color-text-secondary)]">Prix unit.</th>
-                              <th className="px-3 py-2 text-right text-xs font-medium text-[var(--color-text-secondary)]">Total</th>
-                            </tr>
-                          </thead>
-                          <tbody className="divide-y divide-[var(--color-border-subtle)]">
-                            {selectedOrder.items.map((item, i) => {
-                              const delivered = item.deliveredQty ?? 0;
-                              const remaining = item.quantity - delivered;
-                              return (
-                                <tr key={i}>
-                                  <td className="px-3 py-2.5 font-medium text-[var(--color-text-primary)]">{item.name}</td>
-                                  <td className="px-3 py-2.5 text-xs text-[var(--color-text-secondary)]">{item.reference}</td>
-                                  <td className="px-3 py-2.5 text-right text-[var(--color-text-primary)]">{item.quantity}</td>
-                                  {isPartial && (
-                                    <td className="px-3 py-2.5 text-right">
-                                      <span className={cn("text-sm", delivered > 0 ? "text-[var(--color-success)] font-medium" : "text-[var(--color-text-secondary)]")}>
-                                        {delivered}
+                      <div className="space-y-0 overflow-hidden rounded-lg border border-[var(--color-border-subtle)]">
+                        {selectedOrder.items.map((item, i) => {
+                          const delivered = item.deliveredQty ?? 0;
+                          const remaining = item.quantity - delivered;
+                          const pct = item.quantity > 0 ? Math.round((delivered / item.quantity) * 100) : 0;
+                          const fullyDelivered = remaining === 0;
+                          return (
+                            <div key={i} className={cn("px-3 py-3", i > 0 && "border-t border-[var(--color-border-subtle)]")}>
+                              <div className="flex items-start justify-between gap-2">
+                                <div className="min-w-0 flex-1">
+                                  <p className="text-sm font-medium text-[var(--color-text-primary)] truncate">{item.name}</p>
+                                  <p className="text-xs text-[var(--color-text-secondary)]">{item.reference} · {item.unitPrice.toFixed(2)} €/u</p>
+                                </div>
+                                <p className="text-sm font-semibold text-[var(--color-text-primary)] whitespace-nowrap">
+                                  {(item.quantity * item.unitPrice).toLocaleString("fr-FR", { style: "currency", currency: "EUR" })}
+                                </p>
+                              </div>
+                              {isPartial ? (
+                                <div className="mt-2">
+                                  <div className="flex items-center justify-between text-xs mb-1">
+                                    <span className={cn(fullyDelivered ? "text-[var(--color-success)]" : "text-[var(--color-text-secondary)]")}>
+                                      {fullyDelivered ? `✓ ${delivered}/${item.quantity} livrés` : `${delivered}/${item.quantity} livrés`}
+                                    </span>
+                                    {!fullyDelivered && remaining > 0 && (
+                                      <span className="font-medium text-[var(--color-orange)]">
+                                        {remaining} restant{remaining > 1 ? "s" : ""}
                                       </span>
-                                    </td>
-                                  )}
-                                  {isPartial && (
-                                    <td className="px-3 py-2.5 text-right">
-                                      <span className={cn("text-sm", remaining > 0 ? "text-[var(--color-orange)] font-medium" : "text-[var(--color-text-secondary)]")}>
-                                        {remaining}
-                                      </span>
-                                    </td>
-                                  )}
-                                  <td className="px-3 py-2.5 text-right text-[var(--color-text-secondary)]">{item.unitPrice.toFixed(2)} €</td>
-                                  <td className="px-3 py-2.5 text-right font-semibold text-[var(--color-text-primary)]">
-                                    {(item.quantity * item.unitPrice).toLocaleString("fr-FR", { style: "currency", currency: "EUR" })}
-                                  </td>
-                                </tr>
-                              );
-                            })}
-                          </tbody>
-                        </table>
+                                    )}
+                                  </div>
+                                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-[var(--color-border-subtle)]">
+                                    <div
+                                      className={cn("h-full rounded-full transition-all", fullyDelivered ? "bg-[var(--color-success)]" : "bg-[var(--color-orange)]")}
+                                      style={{ width: `${pct}%` }}
+                                    />
+                                  </div>
+                                </div>
+                              ) : (
+                                <p className="mt-1 text-xs text-[var(--color-text-secondary)]">Qté : {item.quantity}</p>
+                              )}
+                            </div>
+                          );
+                        })}
                       </div>
                       <div className="mt-3 flex items-center justify-between px-1">
                         <span className="text-sm font-semibold text-[var(--color-text-primary)]">Total HT</span>
