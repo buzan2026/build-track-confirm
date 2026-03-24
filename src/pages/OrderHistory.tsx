@@ -559,22 +559,42 @@ export default function OrderHistory() {
                               <th className="px-3 py-2 text-left text-xs font-medium text-[var(--color-text-secondary)]">Article</th>
                               <th className="px-3 py-2 text-left text-xs font-medium text-[var(--color-text-secondary)]">Référence</th>
                               <th className="px-3 py-2 text-right text-xs font-medium text-[var(--color-text-secondary)]">Qté</th>
+                              {isPartial && <th className="px-3 py-2 text-right text-xs font-medium text-[var(--color-text-secondary)]">Livré</th>}
+                              {isPartial && <th className="px-3 py-2 text-right text-xs font-medium text-[var(--color-text-secondary)]">Reste</th>}
                               <th className="px-3 py-2 text-right text-xs font-medium text-[var(--color-text-secondary)]">Prix unit.</th>
                               <th className="px-3 py-2 text-right text-xs font-medium text-[var(--color-text-secondary)]">Total</th>
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-[var(--color-border-subtle)]">
-                            {selectedOrder.items.map((item, i) => (
-                              <tr key={i}>
-                                <td className="px-3 py-2.5 font-medium text-[var(--color-text-primary)]">{item.name}</td>
-                                <td className="px-3 py-2.5 text-xs text-[var(--color-text-secondary)]">{item.reference}</td>
-                                <td className="px-3 py-2.5 text-right text-[var(--color-text-primary)]">{item.quantity}</td>
-                                <td className="px-3 py-2.5 text-right text-[var(--color-text-secondary)]">{item.unitPrice.toFixed(2)} €</td>
-                                <td className="px-3 py-2.5 text-right font-semibold text-[var(--color-text-primary)]">
-                                  {(item.quantity * item.unitPrice).toLocaleString("fr-FR", { style: "currency", currency: "EUR" })}
-                                </td>
-                              </tr>
-                            ))}
+                            {selectedOrder.items.map((item, i) => {
+                              const delivered = item.deliveredQty ?? 0;
+                              const remaining = item.quantity - delivered;
+                              return (
+                                <tr key={i}>
+                                  <td className="px-3 py-2.5 font-medium text-[var(--color-text-primary)]">{item.name}</td>
+                                  <td className="px-3 py-2.5 text-xs text-[var(--color-text-secondary)]">{item.reference}</td>
+                                  <td className="px-3 py-2.5 text-right text-[var(--color-text-primary)]">{item.quantity}</td>
+                                  {isPartial && (
+                                    <td className="px-3 py-2.5 text-right">
+                                      <span className={cn("text-sm", delivered > 0 ? "text-[var(--color-success)] font-medium" : "text-[var(--color-text-secondary)]")}>
+                                        {delivered}
+                                      </span>
+                                    </td>
+                                  )}
+                                  {isPartial && (
+                                    <td className="px-3 py-2.5 text-right">
+                                      <span className={cn("text-sm", remaining > 0 ? "text-[var(--color-orange)] font-medium" : "text-[var(--color-text-secondary)]")}>
+                                        {remaining}
+                                      </span>
+                                    </td>
+                                  )}
+                                  <td className="px-3 py-2.5 text-right text-[var(--color-text-secondary)]">{item.unitPrice.toFixed(2)} €</td>
+                                  <td className="px-3 py-2.5 text-right font-semibold text-[var(--color-text-primary)]">
+                                    {(item.quantity * item.unitPrice).toLocaleString("fr-FR", { style: "currency", currency: "EUR" })}
+                                  </td>
+                                </tr>
+                              );
+                            })}
                           </tbody>
                         </table>
                       </div>
