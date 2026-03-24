@@ -6,7 +6,7 @@ import { ChevronRight } from "lucide-react";
 
 const statusConfig: Record<string, { label: string; type: BadgeType }> = {
   confirmed: { label: "Confirmee", type: "alreadyBought" },
-  processing: { label: "En cours", type: "availableJX" },
+  
   cancelled: { label: "Annulee", type: "offer" },
   delivered: { label: "Livree", type: "habituallyInStock" },
 };

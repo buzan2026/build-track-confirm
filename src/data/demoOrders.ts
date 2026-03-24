@@ -37,7 +37,7 @@ export const orders: Order[] = [
     date: "2026-03-20",
     supplier: "Sonepar Électrique",
     total: 1523.4,
-    status: "processing",
+    status: "confirmed",
     deliveryStep: 1,
     expectedDelivery: "2026-03-28",
     items: [

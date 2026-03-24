@@ -11,7 +11,7 @@ export interface Order {
   date: string;
   supplier: string;
   totalAmount: number;
-  status: "confirmed" | "processing" | "cancelled" | "delivered";
+  status: "confirmed" | "cancelled" | "delivered";
   deliveryStep: number; // 0-3
   expectedDelivery: string;
   items: OrderItem[];
@@ -40,7 +40,7 @@ export const orders: Order[] = [
     date: "2026-03-20",
     supplier: "Sonepar Électrique",
     totalAmount: 1523.40,
-    status: "processing",
+    status: "confirmed",
     deliveryStep: 1,
     expectedDelivery: "2026-03-28",
     items: [
