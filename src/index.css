@@ -223,6 +223,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@400;600;700&display=swap');
 
 @tailwind base;
+
+/* Sonner toast fade-out animation */
+[data-sonner-toast][data-removed="true"] {
+  animation: fade-out 0.3s ease-out forwards !important;
+  opacity: 0;
+}
 @tailwind components;
 @tailwind utilities;
 
