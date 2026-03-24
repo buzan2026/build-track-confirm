@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { Badge, type BadgeType } from "@/components/Badge";
 import { Button } from "@/components/Button";
-import { Link as DsLink } from "@/components/Link";
 import { SidePanel } from "@/components/SidePanel";
 import {
   Pagination,
@@ -11,9 +10,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/Pagination";
-import { ArrowLeft, Package, ChevronRight, Truck, Check, Clock, XCircle, ClipboardCheck } from "lucide-react";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import { Package, ChevronRight, Truck, Check, Clock, XCircle, ClipboardCheck } from "lucide-react";
 import { useOrderStore } from "@/stores/orderStore";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -22,7 +19,7 @@ import { useNavigate } from "react-router-dom";
 const statusConfig: Record<string, { label: string; badgeType: BadgeType; icon: typeof Check }> = {
   delivered: { label: "Livree", badgeType: "habituallyInStock", icon: Check },
   confirmed: { label: "Confirmee", badgeType: "alreadyBought", icon: Truck },
-  processing: { label: "En cours", badgeType: "availableJX", icon: Clock },
+  processing: { label: "En cours", badgeType: "priceFlag", icon: Clock },
   cancelled: { label: "Annulee", badgeType: "offer", icon: XCircle },
 };
 
@@ -40,21 +37,16 @@ export default function OrderHistory() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
+    <div className="min-h-screen bg-background font-[var(--font-body)]">
       <div className="container py-8">
-        <DsLink asChild variant="secondary" size="medium" iconLeft={<ArrowLeft className="h-4 w-4" />} className="mb-6">
-          <Link to="/">Retour a la boutique</Link>
-        </DsLink>
-
         <div className="mb-6 flex items-center justify-between">
           <div>
-            <h1 className="font-display text-2xl font-bold text-[var(--color-text-primary)]">Mes commandes</h1>
+            <h1 className="font-[var(--font-heading)] text-2xl font-bold text-[var(--color-text-primary)]">Mes commandes</h1>
             <p className="mt-1 text-sm text-[var(--color-text-secondary)]">Historique et suivi de vos commandes materiaux</p>
           </div>
           <div className="flex gap-2">
             {["Toutes", "En cours", "Livrees"].map((f) => (
-              <Button key={f} variant={f === "Toutes" ? "default" : "outline"} size="sm">
+              <Button key={f} variant={f === "Toutes" ? "primary" : "secondary"} size="sm">
                 {f}
               </Button>
             ))}
@@ -134,7 +126,6 @@ export default function OrderHistory() {
           </Pagination>
         </div>
       </div>
-      <Footer />
 
       {selectedOrder ? (
         <div className="fixed inset-0 z-50 flex justify-end bg-[var(--color-neutral-black)]/40" role="dialog" aria-modal="true">
