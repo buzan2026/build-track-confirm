@@ -22,17 +22,14 @@ export default function DocumentsPage() {
     <div className="min-h-screen bg-background">
       <Header />
       <div className="container max-w-2xl py-8">
-        <button
-          onClick={() => navigate("/orders")}
-          className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6"
-        >
+        <Button variant="link" size="sm" className="mb-6 px-0 text-[var(--color-text-secondary)]" onClick={() => navigate("/orders")}>
           <ArrowLeft className="h-4 w-4" /> Retour aux commandes
-        </button>
+        </Button>
 
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="font-display text-2xl font-bold text-foreground">Documents</h1>
-            <p className="text-sm text-muted-foreground mt-1">Factures et bons de livraison</p>
+            <p className="text-sm text-[var(--color-text-secondary)] mt-1">Factures et bons de livraison</p>
           </div>
           <Button size="sm" variant="outline" onClick={() => toast.success("Téléchargement groupé lancé")}>
             <Download className="h-4 w-4 mr-1" /> Tout télécharger
@@ -40,39 +37,47 @@ export default function DocumentsPage() {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 mb-6 rounded-lg bg-muted p-1">
+        <div className="flex gap-1 mb-6 rounded-lg bg-[var(--color-bg-layer-01)] p-1">
           {tabs.map((tab) => (
-            <button
+            <Button
               key={tab}
               onClick={() => setActive(tab)}
               className={cn(
-                "flex-1 rounded-md py-2 text-sm font-medium transition-colors",
-                active === tab ? "bg-card text-foreground shadow-sm" : "text-muted-foreground"
+                "flex-1 rounded-md py-2 text-sm",
+                active === tab
+                  ? "bg-[var(--color-bg-layer-02)] text-[var(--color-text-primary)] shadow-[var(--shadow-1)]"
+                  : "bg-transparent text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-layer-02)]"
               )}
+              variant="ghost"
             >
               {tab}
-            </button>
+            </Button>
           ))}
         </div>
 
         {/* Content */}
         {active === "Factures" && (
           <div className="space-y-3">
-            {invoices.length === 0 && <p className="text-sm text-muted-foreground text-center py-8">Aucune facture disponible.</p>}
+            {invoices.length === 0 && <p className="text-sm text-[var(--color-text-secondary)] text-center py-8">Aucune facture disponible.</p>}
             {invoices.map((doc, i) => (
-              <div key={i} className="flex items-center gap-4 rounded-sm border border-border bg-card p-4 shadow-elevation-1">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-                  <FileText className="h-5 w-5 text-primary" />
+              <div key={i} className="flex items-center gap-4 rounded-sm border border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-02)] p-4 shadow-[var(--shadow-1)]">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[var(--color-alert-info-bg)]">
+                  <FileText className="h-5 w-5 text-[var(--color-info)]" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-card-foreground truncate">{doc.name}</p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-sm font-medium text-[var(--color-text-primary)] truncate">{doc.name}</p>
+                  <p className="text-xs text-[var(--color-text-secondary)]">
                     {new Date(doc.date).toLocaleDateString("fr-FR")} — {doc.amount.toLocaleString("fr-FR", { style: "currency", currency: "EUR" })}
                   </p>
                 </div>
-                <button onClick={() => toast.success(`Téléchargement de ${doc.name}`)} className="shrink-0 text-primary hover:text-primary/80">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => toast.success(`Téléchargement de ${doc.name}`)}
+                  className="shrink-0 text-[var(--color-primary)] hover:text-[var(--color-primary-hover)]"
+                >
                   <Download className="h-5 w-5" />
-                </button>
+                </Button>
               </div>
             ))}
           </div>
@@ -80,19 +85,24 @@ export default function DocumentsPage() {
 
         {active === "Bons de livraison" && (
           <div className="space-y-3">
-            {slips.length === 0 && <p className="text-sm text-muted-foreground text-center py-8">Aucun bon de livraison disponible.</p>}
+            {slips.length === 0 && <p className="text-sm text-[var(--color-text-secondary)] text-center py-8">Aucun bon de livraison disponible.</p>}
             {slips.map((doc, i) => (
-              <div key={i} className="flex items-center gap-4 rounded-sm border border-border bg-card p-4 shadow-elevation-1">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-                  <FileText className="h-5 w-5 text-primary" />
+              <div key={i} className="flex items-center gap-4 rounded-sm border border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-02)] p-4 shadow-[var(--shadow-1)]">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[var(--color-alert-info-bg)]">
+                  <FileText className="h-5 w-5 text-[var(--color-info)]" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-card-foreground truncate">{doc.name}</p>
-                  <p className="text-xs text-muted-foreground">{new Date(doc.date).toLocaleDateString("fr-FR")}</p>
+                  <p className="text-sm font-medium text-[var(--color-text-primary)] truncate">{doc.name}</p>
+                  <p className="text-xs text-[var(--color-text-secondary)]">{new Date(doc.date).toLocaleDateString("fr-FR")}</p>
                 </div>
-                <button onClick={() => toast.success(`Téléchargement de ${doc.name}`)} className="shrink-0 text-primary hover:text-primary/80">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => toast.success(`Téléchargement de ${doc.name}`)}
+                  className="shrink-0 text-[var(--color-primary)] hover:text-[var(--color-primary-hover)]"
+                >
                   <Download className="h-5 w-5" />
-                </button>
+                </Button>
               </div>
             ))}
           </div>

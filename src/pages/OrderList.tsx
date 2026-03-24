@@ -1,13 +1,14 @@
 import { useNavigate } from "react-router-dom";
 import { orders } from "@/data/orders";
-import { Badge } from "@/components/ui/badge";
+import { Badge, type BadgeType } from "@/components/Badge";
+import { Button } from "@/components/Button";
 import { ChevronRight } from "lucide-react";
 
-const statusConfig: Record<string, { label: string; variant: "default" | "success" | "warning" | "destructive" }> = {
-  confirmed: { label: "Confirmée", variant: "success" },
-  processing: { label: "En cours", variant: "warning" },
-  cancelled: { label: "Annulée", variant: "destructive" },
-  delivered: { label: "Livrée", variant: "default" },
+const statusConfig: Record<string, { label: string; type: BadgeType }> = {
+  confirmed: { label: "Confirmee", type: "alreadyBought" },
+  processing: { label: "En cours", type: "availableJX" },
+  cancelled: { label: "Annulee", type: "offer" },
+  delivered: { label: "Livree", type: "habituallyInStock" },
 };
 
 export default function OrderList() {
@@ -16,30 +17,31 @@ export default function OrderList() {
   return (
     <div className="p-4">
       <h1 className="mb-1 text-xl font-bold text-foreground">Commandes</h1>
-      <p className="mb-4 text-sm text-muted-foreground">Suivi des commandes matériaux</p>
+      <p className="mb-4 text-sm text-[var(--color-text-secondary)]">Suivi des commandes matériaux</p>
 
       <div className="space-y-3">
         {orders.map((order) => {
           const cfg = statusConfig[order.status];
           return (
-            <button
+            <Button
               key={order.id}
               onClick={() => navigate(`/order/${order.id}`)}
-              className="flex w-full items-center gap-3 rounded-xl border border-border bg-card p-4 text-left shadow-sm transition-shadow hover:shadow-md"
+              variant="ghost"
+              className="flex w-full items-center gap-3 rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-02)] p-4 text-left shadow-[var(--shadow-1)] hover:bg-[var(--color-bg-layer-01)]"
             >
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="font-semibold text-sm text-card-foreground">{order.orderNumber}</span>
-                  <Badge variant={cfg.variant} className="text-[length:var(--font-size-xs)] px-2 py-0">{cfg.label}</Badge>
+                  <span className="font-semibold text-sm text-[var(--color-text-primary)]">{order.orderNumber}</span>
+                  <Badge type={cfg.type} label={cfg.label} className="text-[length:var(--font-size-xs)] px-2 py-0" />
                 </div>
-                <p className="text-xs text-muted-foreground">{order.supplier}</p>
-                <p className="text-xs text-muted-foreground">{new Date(order.date).toLocaleDateString("fr-FR")}</p>
+                <p className="text-xs text-[var(--color-text-secondary)]">{order.supplier}</p>
+                <p className="text-xs text-[var(--color-text-secondary)]">{new Date(order.date).toLocaleDateString("fr-FR")}</p>
               </div>
               <div className="text-right shrink-0">
-                <p className="font-semibold text-sm text-card-foreground">{order.totalAmount.toLocaleString("fr-FR", { style: "currency", currency: "EUR" })}</p>
+                <p className="font-semibold text-sm text-[var(--color-text-primary)]">{order.totalAmount.toLocaleString("fr-FR", { style: "currency", currency: "EUR" })}</p>
               </div>
-              <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
-            </button>
+              <ChevronRight className="h-4 w-4 text-[var(--color-text-secondary)] shrink-0" />
+            </Button>
           );
         })}
       </div>

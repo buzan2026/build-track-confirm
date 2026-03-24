@@ -2,8 +2,8 @@ import { useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useOrderStore } from "@/stores/orderStore";
 import { Button } from "@/components/Button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/Checkbox";
+import { Textarea } from "@/components/Textarea";
 import { ArrowLeft, Check } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -67,7 +67,7 @@ export default function ReceptionPage() {
       <div className="min-h-screen bg-background">
         <Header />
         <div className="container py-12 text-center">
-          <p className="text-muted-foreground">Commande introuvable.</p>
+          <p className="text-[var(--color-text-secondary)]">Commande introuvable.</p>
           <Button variant="outline" className="mt-4" onClick={() => navigate("/orders")}>Retour</Button>
         </div>
         <Footer />
@@ -81,23 +81,20 @@ export default function ReceptionPage() {
     <div className="min-h-screen bg-background">
       <Header />
       <div className="container max-w-2xl py-8">
-        <button
-          onClick={() => navigate("/orders")}
-          className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6"
-        >
+        <Button variant="link" size="sm" className="mb-6 px-0 text-[var(--color-text-secondary)]" onClick={() => navigate("/orders")}>
           <ArrowLeft className="h-4 w-4" /> Retour aux commandes
-        </button>
+        </Button>
 
         <div className="mb-6">
-          <h1 className="font-display text-2xl font-bold text-foreground">Réception de livraison</h1>
-          <p className="text-sm text-muted-foreground mt-1">
+          <h1 className="font-display text-2xl font-bold text-[var(--color-text-primary)]">Réception de livraison</h1>
+          <p className="text-sm text-[var(--color-text-secondary)] mt-1">
             {order.id} — {order.supplier}
           </p>
         </div>
 
         {/* Checklist */}
-        <div className="rounded-sm border border-border bg-card p-5 shadow-elevation-1 mb-6">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-4">
+        <div className="rounded-sm border border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-02)] p-5 shadow-[var(--shadow-1)] mb-6">
+          <p className="text-xs font-semibold text-[var(--color-text-secondary)] uppercase tracking-wide mb-4">
             Articles à réceptionner ({order.items.length})
           </p>
           <div className="space-y-3">
@@ -109,8 +106,8 @@ export default function ReceptionPage() {
                   className="mt-0.5"
                 />
                 <div className="flex-1">
-                  <p className={cn("text-sm font-medium text-card-foreground", checkedItems[item.reference] && "line-through text-muted-foreground")}>{item.name}</p>
-                  <p className="text-xs text-muted-foreground">Réf: {item.reference} — Qté: {item.quantity}</p>
+                  <p className={cn("text-sm font-medium text-[var(--color-text-primary)]", checkedItems[item.reference] && "line-through text-[var(--color-text-secondary)]")}>{item.name}</p>
+                  <p className="text-xs text-[var(--color-text-secondary)]">Réf: {item.reference} — Qté: {item.quantity}</p>
                 </div>
               </label>
             ))}
@@ -119,7 +116,7 @@ export default function ReceptionPage() {
 
         {/* Notes */}
         <div className="mb-6">
-          <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2 block">
+          <label className="text-xs font-semibold text-[var(--color-text-secondary)] uppercase tracking-wide mb-2 block">
             Articles manquants ou endommagés
           </label>
           <Textarea
@@ -139,13 +136,13 @@ export default function ReceptionPage() {
         )}
 
         {showSignPad && (
-          <div className="rounded-sm border border-border bg-card p-5 shadow-elevation-1 mb-6">
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">Signature</p>
+          <div className="rounded-sm border border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-02)] p-5 shadow-[var(--shadow-1)] mb-6">
+            <p className="text-xs font-semibold text-[var(--color-text-secondary)] uppercase tracking-wide mb-3">Signature</p>
             <canvas
               ref={canvasRef}
               width={500}
               height={180}
-              className="w-full rounded-lg border border-border bg-background touch-none"
+              className="w-full rounded-lg border border-[var(--color-border-subtle)] bg-[var(--color-bg-page)] touch-none"
               onMouseDown={startDraw}
               onMouseMove={draw}
               onMouseUp={endDraw}
@@ -162,11 +159,11 @@ export default function ReceptionPage() {
         )}
 
         {signed && (
-          <div className="mb-6 flex items-center gap-2 rounded-lg bg-primary/10 p-3">
-            <div className="h-5 w-5 rounded-full bg-primary flex items-center justify-center">
-              <Check className="h-3 w-3 text-primary-foreground" />
+          <div className="mb-6 flex items-center gap-2 rounded-lg bg-[var(--color-alert-success-bg)] p-3">
+            <div className="h-5 w-5 rounded-full bg-[var(--color-success)] flex items-center justify-center">
+              <Check className="h-3 w-3 text-[var(--color-white)]" />
             </div>
-            <span className="text-sm font-medium text-foreground">Signature enregistrée</span>
+            <span className="text-sm font-medium text-[var(--color-text-primary)]">Signature enregistrée</span>
           </div>
         )}
 
