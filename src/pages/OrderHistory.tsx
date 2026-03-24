@@ -517,9 +517,7 @@ export default function OrderHistory() {
                     <h2 className="font-[var(--font-heading)] text-[var(--font-size-l)] font-[var(--font-weight-semibold)] text-[var(--color-text-primary)]">
                       {selectedOrder.id}
                     </h2>
-                    <Badge type={statusConfig[selectedOrder.status].badgeType} className={statusConfig[selectedOrder.status].badgeClassName}>
-                      {statusConfig[selectedOrder.status].label}
-                    </Badge>
+                    <Badge type={statusConfig[selectedOrder.status].badgeType} label={statusConfig[selectedOrder.status].label} className={statusConfig[selectedOrder.status].badgeClassName} />
                   </div>
                   <div
                     className="flex w-full overflow-hidden rounded-[var(--border-radius-sm)] border border-[var(--color-border-strong)] bg-[var(--color-bg-layer-02)]"
