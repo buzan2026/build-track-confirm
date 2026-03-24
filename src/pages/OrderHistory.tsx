@@ -642,6 +642,22 @@ export default function OrderHistory() {
                     </div>
                   </div>
                 ) : null}
+
+                {/* Contact Rexel */}
+                <div className="mt-auto sticky bottom-0 rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-01)] p-4">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-secondary)] mb-2">Votre contact Rexel</p>
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary)] text-[var(--color-white)]">
+                      <User className="h-4 w-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-[var(--color-text-primary)]">Marc Lefebvre — Agence Paris-Est</p>
+                      <a href="tel:0123456789" className="inline-flex items-center gap-1 text-xs text-[var(--color-primary)] hover:underline">
+                        <Phone className="h-3 w-3" /> 01 23 45 67 89
+                      </a>
+                    </div>
+                  </div>
+                </div>
               </div>
             </SidePanel>
           </div>
