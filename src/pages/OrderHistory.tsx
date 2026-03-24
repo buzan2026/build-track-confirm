@@ -9,7 +9,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/Pagination";
-import { Package, ChevronRight, Truck, Check, XCircle, ClipboardCheck, Download, ArrowUpDown, ArrowUp, ArrowDown, Search, X, CalendarIcon } from "lucide-react";
+import { Package, ChevronRight, Truck, Check, XCircle, ClipboardCheck, Download, ArrowUpDown, ArrowUp, ArrowDown, Search, X, CalendarIcon, RefreshCw, Phone, User } from "lucide-react";
 import { documents } from "@/data/demoOrders";
 import { useOrderStore } from "@/stores/orderStore";
 import { cn } from "@/lib/utils";
@@ -53,7 +53,7 @@ export default function OrderHistory() {
   const orders = useOrderStore((s) => s.orders);
   const markDelivered = useOrderStore((s) => s.markDelivered);
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
-  const [activeFilter, setActiveFilter] = useState<"Toutes" | "En cours" | "Livrées">("Toutes");
+  const [activeFilter, setActiveFilter] = useState<"Toutes" | "En cours" | "Reste à livrer" | "Livrées">("En cours");
   const [panelSection, setPanelSection] = useState<"detail" | "documents" | "reception">("detail");
   const [sortKey, setSortKey] = useState<"id" | "date" | "items" | "delivery" | "status" | "total">("date");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
@@ -104,6 +104,7 @@ export default function OrderHistory() {
     return orders
       .filter((order) => {
         if (activeFilter === "En cours") return order.status === "confirmed";
+        if (activeFilter === "Reste à livrer") return order.status === "confirmed" || order.status === "delivered";
         if (activeFilter === "Livrées") return order.status === "delivered";
         return true;
       })
@@ -156,7 +157,7 @@ export default function OrderHistory() {
             role="tablist"
             aria-label="Filtre des commandes"
           >
-            {(["Toutes", "En cours", "Livrées"] as const).map((f, idx, arr) => (
+            {(["En cours", "Reste à livrer", "Livrées", "Toutes"] as const).map((f, idx, arr) => (
               <Button
                 key={f}
                 variant={f === activeFilter ? "primary" : "secondary"}
