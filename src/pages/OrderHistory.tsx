@@ -1,8 +1,8 @@
 import { Badge, type BadgeType } from "@/components/Badge";
 import { Button } from "@/components/Button";
 import { Sidepanel as SidePanel } from "@/components/Sidepanel";
-import { Package, ChevronRight, Truck, Check, XCircle, ClipboardCheck, Download, ArrowUpDown, ArrowUp, ArrowDown, Search, X, CalendarIcon, RefreshCw, Phone, User, AlertTriangle } from "lucide-react";
-import { documents } from "@/data/demoOrders";
+import { Package, ChevronRight, Truck, Check, XCircle, ClipboardCheck, Download, ArrowUpDown, ArrowUp, ArrowDown, Search, X, CalendarIcon, RefreshCw, Phone, User, AlertTriangle, PackageCheck, Clock } from "lucide-react";
+import { documents, type Shipment } from "@/data/demoOrders";
 import { useOrderStore } from "@/stores/orderStore";
 import { cn } from "@/lib/utils";
 import { useState, useMemo, useCallback, useRef, useEffect } from "react";
