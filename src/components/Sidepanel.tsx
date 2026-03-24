@@ -201,3 +201,17 @@ SidepanelHeader.displayName = "SidepanelHeader";
 SidepanelBody.displayName = "SidepanelBody";
 SidepanelFooter.displayName = "SidepanelFooter";
 Sidepanel.displayName = "Sidepanel";
+
+// PascalCase re-exports for consumers
+export {
+  Sidepanel as SidePanel,
+  SidepanelBody as SidePanelBody,
+  SidepanelFooter as SidePanelFooter,
+  SidepanelHeader as SidePanelHeader,
+  SidepanelRoot as SidePanelRoot,
+  type SidepanelProps as SidePanelProps,
+  type SidepanelBodyProps as SidePanelBodyProps,
+  type SidepanelFooterProps as SidePanelFooterProps,
+  type SidepanelHeaderProps as SidePanelHeaderProps,
+  type SidepanelRootProps as SidePanelRootProps,
+};
