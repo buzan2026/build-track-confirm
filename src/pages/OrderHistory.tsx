@@ -679,7 +679,8 @@ export default function OrderHistory() {
                   </div>
                 ) : null}
 
-                {/* Contact Rexel */}
+                {/* Contact Rexel — hidden on documents tab */}
+                {panelSection !== "documents" && (
                 <div className="mt-auto sticky bottom-0 rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-01)] p-4">
                   <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-secondary)] mb-2">Votre contact Rexel</p>
                   <div className="flex items-center gap-3">
