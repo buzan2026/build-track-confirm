@@ -1,3 +1,4 @@
+// Re-exports for PascalCase consumers
 export {
   Sidepanel as SidePanel,
   SidepanelBody as SidePanelBody,
@@ -9,7 +10,7 @@ export {
   type SidepanelFooterProps as SidePanelFooterProps,
   type SidepanelHeaderProps as SidePanelHeaderProps,
   type SidepanelRootProps as SidePanelRootProps,
-} from "@/components/Sidepanel";
+};
 
 import * as React from "react";
 
