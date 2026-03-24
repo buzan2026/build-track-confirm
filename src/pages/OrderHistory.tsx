@@ -733,10 +733,11 @@ export default function OrderHistory() {
                     </div>
                     <div className="min-w-0 space-y-1">
                       <p className="text-sm font-medium text-[var(--color-text-primary)]">Marc Lefebvre — Agence Paris-Est</p>
-                      <div className="flex flex-col gap-1">
+                      <div className="flex items-center gap-3">
                         <a href="tel:0123456789" className="inline-flex items-center gap-1 text-xs text-[var(--color-primary)] hover:underline">
                           <Phone className="h-3 w-3" /> 01 23 45 67 89
                         </a>
+                        <span className="text-[var(--color-border-subtle)]">·</span>
                         <a href="mailto:m.lefebvre@rexel.fr" className="inline-flex items-center gap-1 text-xs text-[var(--color-primary)] hover:underline">
                           <Mail className="h-3 w-3" /> m.lefebvre@rexel.fr
                         </a>
