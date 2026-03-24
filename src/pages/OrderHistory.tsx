@@ -54,6 +54,7 @@ export default function OrderHistory() {
   const [isClosing, setIsClosing] = useState(false);
   const [activeFilter, setActiveFilter] = useState<"Toutes" | "En cours" | "Livrées">("En cours");
   const [panelSection, setPanelSection] = useState<"detail" | "documents" | "reception">("detail");
+  const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({});
 
   const closePanel = useCallback(() => {
     setIsClosing(true);
@@ -713,12 +714,47 @@ export default function OrderHistory() {
                 ) : null}
 
                 {panelSection === "reception" ? (
-                  <div className="rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-01)] p-4">
-                    <p className="text-sm text-[var(--color-text-primary)]">
-                      Confirmez la réception pour marquer la commande comme livrée, sans quitter cette page.
-                    </p>
-                    <div className="mt-3 text-xs text-[var(--color-text-secondary)]">
-                      Statut actuel : {statusConfig[selectedOrder.status].label}
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">
+                        Vérification des articles ({selectedOrder.items.filter(it => checkedItems[it.reference]).length}/{selectedOrder.items.length})
+                      </p>
+                      <button
+                        type="button"
+                        className="text-xs font-medium text-[var(--color-primary)] hover:underline"
+                        onClick={() => {
+                          const allChecked = selectedOrder.items.every(it => checkedItems[it.reference]);
+                          const next: Record<string, boolean> = {};
+                          selectedOrder.items.forEach(it => { next[it.reference] = !allChecked; });
+                          setCheckedItems(next);
+                        }}
+                      >
+                        {selectedOrder.items.every(it => checkedItems[it.reference]) ? "Tout décocher" : "Tout confirmer"}
+                      </button>
+                    </div>
+                    <div className="overflow-hidden rounded-lg border border-[var(--color-border-subtle)] divide-y divide-[var(--color-border-subtle)]">
+                      {selectedOrder.items.map((item) => (
+                        <label
+                          key={item.reference}
+                          className="flex items-center gap-3 px-3 py-2.5 cursor-pointer hover:bg-[var(--color-bg-layer-01)] transition-colors"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={!!checkedItems[item.reference]}
+                            onChange={() => setCheckedItems(prev => ({ ...prev, [item.reference]: !prev[item.reference] }))}
+                            className="h-4 w-4 rounded border-[var(--color-border-strong)] text-[var(--color-primary)] accent-[var(--color-primary)]"
+                          />
+                          <div className="min-w-0 flex-1">
+                            <p className={cn("text-sm font-medium text-[var(--color-text-primary)]", checkedItems[item.reference] && "line-through text-[var(--color-text-secondary)]")}>
+                              {item.name}
+                            </p>
+                            <p className="text-xs text-[var(--color-text-secondary)]">Réf : {item.reference} — Qté : {item.quantity}</p>
+                          </div>
+                          {checkedItems[item.reference] && (
+                            <Check className="h-4 w-4 shrink-0 text-[var(--color-success)]" />
+                          )}
+                        </label>
+                      ))}
                     </div>
                   </div>
                 ) : null}
