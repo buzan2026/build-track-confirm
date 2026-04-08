@@ -686,6 +686,8 @@ export default function OrderHistory() {
           </button>
         </div>
       )}
+
+      <OrderSidePanel orderNumber={sidePanelOrder} onClose={() => setSidePanelOrder(null)} />
     </div>
   );
 }
