@@ -509,7 +509,9 @@ export default function OrderHistory() {
                     key={order.id}
                     className={cn(
                       "group transition-colors cursor-pointer",
-                      selectedIds.has(order.id) ? "bg-[var(--color-rexel-primary-10)]" : "hover:bg-[var(--color-bg-layer-01)]"
+                      sidePanelOrder === order.order_number
+                        ? "bg-[var(--color-rexel-primary-10)] border-l-2 border-l-[var(--color-primary)]"
+                        : selectedIds.has(order.id) ? "bg-[var(--color-rexel-primary-10)]" : "hover:bg-[var(--color-bg-layer-01)]"
                     )}
                     onClick={() => setSidePanelOrder(order.order_number)}
                   >
