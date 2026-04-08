@@ -14,7 +14,179 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      line_items: {
+        Row: {
+          id: string
+          order_id: string
+          product_name: string
+          product_reference: string
+          quantity: number
+          remaining: number
+          shipment_id: string | null
+          supplier: string
+          unit_price: number
+        }
+        Insert: {
+          id?: string
+          order_id: string
+          product_name: string
+          product_reference: string
+          quantity?: number
+          remaining?: number
+          shipment_id?: string | null
+          supplier: string
+          unit_price?: number
+        }
+        Update: {
+          id?: string
+          order_id?: string
+          product_name?: string
+          product_reference?: string
+          quantity?: number
+          remaining?: number
+          shipment_id?: string | null
+          supplier?: string
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "line_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "line_items_shipment_id_fkey"
+            columns: ["shipment_id"]
+            isOneToOne: false
+            referencedRelation: "shipments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notification_preferences: {
+        Row: {
+          daily_digest: boolean
+          email: boolean
+          event_type: string
+          id: string
+          push: boolean
+        }
+        Insert: {
+          daily_digest?: boolean
+          email?: boolean
+          event_type: string
+          id?: string
+          push?: boolean
+        }
+        Update: {
+          daily_digest?: boolean
+          email?: boolean
+          event_type?: string
+          id?: string
+          push?: boolean
+        }
+        Relationships: []
+      }
+      orders: {
+        Row: {
+          created_at: string
+          customer_email: string | null
+          delivery_address: Json | null
+          expected_delivery: string | null
+          id: string
+          items_remaining: number
+          order_date: string
+          order_number: string
+          order_type: string
+          po_number: string | null
+          previous_expected_delivery: string | null
+          project_name: string | null
+          status: string
+          total_amount: number
+        }
+        Insert: {
+          created_at?: string
+          customer_email?: string | null
+          delivery_address?: Json | null
+          expected_delivery?: string | null
+          id?: string
+          items_remaining?: number
+          order_date?: string
+          order_number: string
+          order_type?: string
+          po_number?: string | null
+          previous_expected_delivery?: string | null
+          project_name?: string | null
+          status?: string
+          total_amount?: number
+        }
+        Update: {
+          created_at?: string
+          customer_email?: string | null
+          delivery_address?: Json | null
+          expected_delivery?: string | null
+          id?: string
+          items_remaining?: number
+          order_date?: string
+          order_number?: string
+          order_type?: string
+          po_number?: string | null
+          previous_expected_delivery?: string | null
+          project_name?: string | null
+          status?: string
+          total_amount?: number
+        }
+        Relationships: []
+      }
+      shipments: {
+        Row: {
+          carrier: string | null
+          data_source: string
+          delivered_at: string | null
+          delivered_signed_by: string | null
+          expected_delivery: string | null
+          id: string
+          last_update: string
+          order_id: string
+          shipment_index: number
+          status: string
+        }
+        Insert: {
+          carrier?: string | null
+          data_source?: string
+          delivered_at?: string | null
+          delivered_signed_by?: string | null
+          expected_delivery?: string | null
+          id?: string
+          last_update?: string
+          order_id: string
+          shipment_index?: number
+          status?: string
+        }
+        Update: {
+          carrier?: string | null
+          data_source?: string
+          delivered_at?: string | null
+          delivered_signed_by?: string | null
+          expected_delivery?: string | null
+          id?: string
+          last_update?: string
+          order_id?: string
+          shipment_index?: number
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shipments_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
