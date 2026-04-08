@@ -12,6 +12,7 @@ import ReceptionSuccess from "./pages/ReceptionSuccess";
 import StyleGuide from "./pages/StyleGuide";
 import OrderDetailPage from "./pages/OrderDetailPage";
 import DeliveryToday from "./pages/DeliveryToday";
+import NotificationPreferences from "./pages/NotificationPreferences";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,6 +28,7 @@ function AppContent() {
         <Route path="/orders/:id/reception" element={<ReceptionPage />} />
         <Route path="/orders/:id/documents" element={<DocumentsPage />} />
         <Route path="/orders/:orderNumber" element={<OrderDetailPage />} />
+        <Route path="/settings/notifications" element={<NotificationPreferences />} />
         <Route path="/style-guide" element={<StyleGuide />} />
       </Route>
       <Route path="*" element={<NotFound />} />

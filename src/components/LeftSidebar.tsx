@@ -6,6 +6,7 @@ import {
   ClipboardList,
   Truck,
   FileText,
+  Bell,
   User,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -17,6 +18,7 @@ const navItems = [
   { icon: ClipboardList, label: "Orders", path: "/" },
   { icon: Truck, label: "Delivery Today", path: "/delivery-today" },
   { icon: FileText, label: "Quotes", path: "/quotes" },
+  { icon: Bell, label: "Notifications", path: "/settings/notifications" },
   { icon: User, label: "Account", path: "/account" },
 ];
 
