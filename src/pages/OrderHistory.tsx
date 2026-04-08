@@ -7,6 +7,7 @@ import {
   FileText, RefreshCw, Phone, ChevronLeft, ChevronRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import OrderSidePanel from "@/components/OrderSidePanel";
 import { useOrders, useLineItems, type OrderRow, type LineItemRow } from "@/hooks/useOrders";
 import { toast } from "sonner";
 import { format, subDays, subMonths, subYears, startOfDay, startOfYear } from "date-fns";
@@ -171,6 +172,7 @@ export default function OrderHistory() {
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [currentPage, setCurrentPage] = useState(1);
+  const [sidePanelOrder, setSidePanelOrder] = useState<string | null>(null);
   const ROWS_PER_PAGE = 10;
 
   const projects = useMemo(
@@ -509,7 +511,7 @@ export default function OrderHistory() {
                       "group transition-colors cursor-pointer",
                       selectedIds.has(order.id) ? "bg-[var(--color-rexel-primary-10)]" : "hover:bg-[var(--color-bg-layer-01)]"
                     )}
-                    onClick={() => navigate(`/orders/${order.order_number}`)}
+                    onClick={() => setSidePanelOrder(order.order_number)}
                   >
                     <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
                       <Checkbox
