@@ -23,7 +23,7 @@ function AppContent() {
         <Route path="/orders/success" element={<ReceptionSuccess />} />
         <Route path="/orders/:id/reception" element={<ReceptionPage />} />
         <Route path="/orders/:id/documents" element={<DocumentsPage />} />
-        <Route path="/orders/:orderNumber" element={<div>Order detail (Prompt 7)</div>} />
+        <Route path="/orders/:orderNumber" element={<OrderDetailPage />} />
         <Route path="/style-guide" element={<StyleGuide />} />
       </Route>
       <Route path="*" element={<NotFound />} />
