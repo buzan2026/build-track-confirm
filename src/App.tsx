@@ -10,6 +10,7 @@ import ReceptionPage from "./pages/ReceptionPage";
 import DocumentsPage from "./pages/DocumentsPage";
 import ReceptionSuccess from "./pages/ReceptionSuccess";
 import StyleGuide from "./pages/StyleGuide";
+import OrderDetailPage from "./pages/OrderDetailPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
