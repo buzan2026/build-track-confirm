@@ -14,6 +14,7 @@ const navItems = [
   { icon: Package, label: "Products", path: "/products" },
   { icon: ShoppingCart, label: "Cart", path: "/cart" },
   { icon: ClipboardList, label: "Orders", path: "/" },
+  { icon: Truck, label: "Delivery Today", path: "/delivery-today" },
   { icon: FileText, label: "Quotes", path: "/quotes" },
   { icon: User, label: "Account", path: "/account" },
 ];
