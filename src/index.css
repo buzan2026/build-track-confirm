@@ -179,7 +179,7 @@
   --shadow-5: 0 30px 30px 0 rgba(0,0,0,0.10);
 
   /* === TYPOGRAPHY === */
-  --font-heading: "Open Sans", sans-serif;
+  --font-heading: "Montserrat", sans-serif;
   --font-body: "Open Sans", sans-serif;
   --font-size-xs: 12px;
   --font-size-s: 14px;
@@ -368,7 +368,7 @@
     --spacing-12: 120px;
 
     /* === TYPOGRAPHY === */
-    --font-heading: "Open Sans", sans-serif;
+    --font-heading: "Montserrat", sans-serif;
     --font-body: "Open Sans", sans-serif;
     --font-size-xs: 12px;
     --font-size-s: 14px;
@@ -406,9 +406,9 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-family: var(--font-body);
-    font-size: var(--font-size-m);
+    font-size: var(--font-size-s);
     font-weight: var(--font-weight-regular);
-    line-height: var(--line-height-m);
+    line-height: var(--line-height-s);
   }
 
   h1, h2 {
