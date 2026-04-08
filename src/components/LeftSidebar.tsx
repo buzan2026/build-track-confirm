@@ -6,6 +6,7 @@ import {
   ClipboardList,
   Truck,
   FileText,
+  Bell,
   User,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
