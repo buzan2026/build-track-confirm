@@ -4,6 +4,7 @@ import {
   Package,
   ShoppingCart,
   ClipboardList,
+  Truck,
   FileText,
   User,
 } from "lucide-react";
