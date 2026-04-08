@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useCartSync } from "@/hooks/useCartSync";
+import LayoutShell from "./components/LayoutShell";
 import OrderHistory from "./pages/OrderHistory";
 import ReceptionPage from "./pages/ReceptionPage";
 import DocumentsPage from "./pages/DocumentsPage";
@@ -17,11 +18,13 @@ function AppContent() {
   useCartSync();
   return (
     <Routes>
-      <Route path="/" element={<OrderHistory />} />
-      <Route path="/orders/success" element={<ReceptionSuccess />} />
-      <Route path="/orders/:id/reception" element={<ReceptionPage />} />
-      <Route path="/orders/:id/documents" element={<DocumentsPage />} />
-      <Route path="/style-guide" element={<StyleGuide />} />
+      <Route element={<LayoutShell />}>
+        <Route path="/" element={<OrderHistory />} />
+        <Route path="/orders/success" element={<ReceptionSuccess />} />
+        <Route path="/orders/:id/reception" element={<ReceptionPage />} />
+        <Route path="/orders/:id/documents" element={<DocumentsPage />} />
+        <Route path="/style-guide" element={<StyleGuide />} />
+      </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
