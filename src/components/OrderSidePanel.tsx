@@ -374,7 +374,7 @@ export default function OrderSidePanel({ orderNumber, onClose }: OrderSidePanelP
                               </div>
                               <button
                                 onClick={() => handleReorderItem(item)}
-                                className="h-8 w-8 flex items-center justify-center rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] text-[var(--color-primary)] hover:bg-[var(--color-rexel-primary-10)] transition-colors"
+                                 className="h-8 w-8 flex items-center justify-center rounded-[var(--border-radius-sm)] border border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-rexel-primary-10)] transition-colors"
                                 title="Reorder this item"
                               >
                                 <ShoppingCart className="h-3.5 w-3.5" />
@@ -406,7 +406,7 @@ export default function OrderSidePanel({ orderNumber, onClose }: OrderSidePanelP
                             </div>
                             <button
                               onClick={() => handleReorderItem(item)}
-                              className="h-8 w-8 flex items-center justify-center rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] text-[var(--color-primary)] hover:bg-[var(--color-rexel-primary-10)] transition-colors"
+                              className="h-8 w-8 flex items-center justify-center rounded-[var(--border-radius-sm)] border border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-rexel-primary-10)] transition-colors"
                               title="Reorder this item"
                             >
                               <ShoppingCart className="h-3.5 w-3.5" />
