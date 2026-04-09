@@ -629,27 +629,13 @@ export default function OrderHistory() {
                     <td className="px-4 py-3 text-[13px] text-[var(--color-text-secondary)]">{formatDate(order.expected_delivery)}</td>
                     <td className="px-4 py-3 text-[13px] text-[var(--color-text-secondary)]">{order.items_remaining}</td>
                     <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <button className="flex h-8 w-8 items-center justify-center rounded-[var(--border-radius-sm)] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-layer-01)] hover:text-[var(--color-text-primary)] transition-colors">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => setSidePanelOrder(order.order_number)}>
-                            <Eye className="h-4 w-4 mr-2" /> View details
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <FileText className="h-4 w-4 mr-2" /> Download invoice
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleReorderAll(order)}>
-                            <RefreshCw className="h-4 w-4 mr-2" /> Reorder all
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <Phone className="h-4 w-4 mr-2" /> Contact sales rep
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                      <button
+                        onClick={() => handleReorderAll(order)}
+                        className="flex h-8 w-8 items-center justify-center rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] text-[var(--color-text-secondary)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-colors"
+                        title="Reorder all items"
+                      >
+                        <ShoppingCart className="h-3.5 w-3.5" />
+                      </button>
                     </td>
                   </tr>
                 ))}
