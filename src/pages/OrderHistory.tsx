@@ -223,7 +223,7 @@ export default function OrderHistory() {
       })
       .filter((o) => {
         if (!q) return true;
-        const orderMatch = o.order_number.toLowerCase().includes(q) || (o.po_number?.toLowerCase().includes(q) ?? false);
+        const orderMatch = o.order_number.toLowerCase().includes(q) || (o.po_number?.toLowerCase().includes(q) ?? false) || (o.project_name?.toLowerCase().includes(q) ?? false);
         const itemMatch = lineItems.filter((li) => li.order_id === o.id).some(
           (li) => li.product_name.toLowerCase().includes(q) || li.product_reference.toLowerCase().includes(q) || li.supplier.toLowerCase().includes(q)
         );
