@@ -273,12 +273,6 @@ export default function OrderSidePanel({ orderNumber, onClose }: OrderSidePanelP
                       Ordered <span className="font-semibold text-[var(--color-text-primary)]">{fmtDate(data.order.order_date)}</span>
                       {data.order.po_number && <> · PO: {data.order.po_number}</>}
                     </p>
-                    {data.order.expected_delivery && data.order.status !== "completed" && (
-                      <span className="inline-flex items-center gap-1 text-[13px] font-semibold text-[var(--color-primary)]">
-                        <Truck className="h-3.5 w-3.5" />
-                        Exp. {fmtDate(data.order.expected_delivery)}
-                      </span>
-                    )}
                   </div>
                   {data.order.project_name && (
                     <span className="inline-flex items-center gap-1 mt-2 rounded-full bg-[var(--color-bg-layer-01)] px-2 py-0.5 text-[11px] font-semibold text-[var(--color-text-secondary)]">
@@ -310,7 +304,7 @@ export default function OrderSidePanel({ orderNumber, onClose }: OrderSidePanelP
               {/* ===== Detail Tab ===== */}
               {activeTab === "detail" && (
                 <div className="px-6 py-5 space-y-5">
-                  {/* Summary row — inline with delivery */}
+                  {/* Summary row */}
                   <div className="flex items-center gap-3 flex-wrap">
                     <div className="flex items-center gap-2 rounded-[var(--border-radius-sm)] bg-[var(--color-bg-layer-01)] px-3 py-2">
                       <span className="text-[14px] font-bold text-[var(--color-text-primary)]">{fmtCurrency(data.order.total_amount)}</span>
@@ -324,22 +318,39 @@ export default function OrderSidePanel({ orderNumber, onClose }: OrderSidePanelP
                       <span className="text-[14px] font-bold text-[var(--color-text-primary)]">{data.shipments.length}</span>
                       <span className="text-[11px] text-[var(--color-text-secondary)] uppercase">shipments</span>
                     </div>
-                    {data.order.status !== "cancelled" && data.order.expected_delivery && (
-                      <div className="flex items-center gap-2 rounded-[var(--border-radius-sm)] border border-[var(--color-primary)] bg-[var(--color-rexel-primary-10)] px-3 py-2">
-                        <Truck className="h-3.5 w-3.5 text-[var(--color-primary)]" />
-                        <span className="text-[14px] font-bold text-[var(--color-primary)]">{fmtDate(data.order.expected_delivery)}</span>
-                      </div>
-                    )}
                   </div>
 
-                  {/* Delay warning */}
-                  {data.order.previous_expected_delivery && data.order.status === "delayed" && (
-                    <p className="text-[12px] text-[#8A3800]">
-                      <AlertTriangle className="inline h-3 w-3 mr-1" />
-                      Originally <span className="line-through">{fmtDate(data.order.previous_expected_delivery)}</span>
-                      {data.order.items_remaining > 0 && <> — {data.order.items_remaining} item(s) remaining</>}
-                    </p>
-                  )}
+                  {/* Delivery date — contextual inline message */}
+                  {data.order.expected_delivery && data.order.status !== "completed" && data.order.status !== "cancelled" && (() => {
+                    const isDelayed = data.order.status === "delayed";
+                    const isPartial = data.order.status === "partially_delivered";
+                    const isWarning = isDelayed || isPartial;
+                    const bgColor = isWarning ? "bg-[#FFF2E8]" : "bg-[var(--color-alert-info-bg)]";
+                    const borderColor = isWarning ? "border-[#8A3800]" : "border-[var(--color-info)]";
+                    const textColor = isWarning ? "text-[#8A3800]" : "text-[var(--color-info)]";
+                    const Icon = isDelayed ? AlertTriangle : Truck;
+                    return (
+                      <div className={cn("flex items-center gap-2 rounded-[var(--border-radius-sm)] border px-3 py-2 text-[13px] font-semibold", bgColor, borderColor, textColor)}>
+                        <Icon className="h-3.5 w-3.5 shrink-0" />
+                        <span>
+                          {isDelayed ? "Delayed — " : "Expected delivery: "}
+                          {fmtDate(data.order.expected_delivery)}
+                          {isDelayed && data.order.previous_expected_delivery && (
+                            <> (was <span className="line-through">{fmtDate(data.order.previous_expected_delivery)}</span>)</>
+                          )}
+                          {isPartial && data.order.items_remaining > 0 && <> — {data.order.items_remaining} item(s) remaining</>}
+                        </span>
+                      </div>
+                    );
+                  })()}
+
+                  {data.order.status === "completed" && (
+                    <div className="flex items-center gap-2 rounded-[var(--border-radius-sm)] border border-[var(--color-success)] bg-[var(--color-alert-success-bg)] px-3 py-2 text-[13px] font-semibold text-[var(--color-success)]">
+                      <CheckCircle className="h-3.5 w-3.5 shrink-0" />
+                      Delivered — Order completed
+                    </div>
+                  )
+
 
                   {/* Shipments */}
                   {data.shipments.length > 0 && (
