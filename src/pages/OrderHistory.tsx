@@ -598,9 +598,9 @@ export default function OrderHistory() {
               return (
                 <div className="space-y-3">
                   {title && (
-                    <div className="flex items-center gap-2">
-                      {isAttention && <AlertTriangle className="h-4 w-4 text-[#8A3800]" />}
-                      <h2 className={cn("text-[16px] font-bold font-[var(--font-heading)]", isAttention ? "text-[#8A3800]" : "text-[var(--color-text-primary)]")}>
+              <div className="flex items-center gap-2">
+                      {isAttention && <AlertTriangle className="h-4 w-4 text-[var(--color-text-primary)]" />}
+                      <h2 className="text-[16px] font-bold font-[var(--font-heading)] text-[var(--color-text-primary)]">
                         {title} ({rows.length})
                       </h2>
                     </div>
@@ -800,10 +800,10 @@ export default function OrderHistory() {
           {needsAttentionOrders.length > 0 && (
             <div className="space-y-3">
               <div className="flex items-center gap-2">
-                <AlertTriangle className="h-5 w-5 text-[#8A3800]" />
-                <h2 className="text-[18px] font-bold font-[var(--font-heading)] text-[#8A3800]">Needs attention ({needsAttentionOrders.length})</h2>
+                <AlertTriangle className="h-5 w-5 text-[var(--color-text-primary)]" />
+                <h2 className="text-[18px] font-bold font-[var(--font-heading)] text-[var(--color-text-primary)]">Needs attention ({needsAttentionOrders.length})</h2>
               </div>
-              <div className="grid gap-3 md:grid-cols-2">
+              <div className="grid gap-3 grid-cols-1">
                 {needsAttentionOrders.map((o) => (
                   <OrderCard key={o.id} order={o} lineItems={lineItems} onClick={() => setSidePanelOrder(o.order_number)} warning onReorder={() => handleReorderAll(o)} />
                 ))}
@@ -819,7 +819,7 @@ export default function OrderHistory() {
           {activeTab === "ongoing" && ongoingOrders.length > 0 && (
             <div className="space-y-3">
               <h2 className="text-[18px] font-bold font-[var(--font-heading)] text-[var(--color-text-primary)]">Ongoing ({ongoingOrders.length})</h2>
-              <div className="grid gap-3 md:grid-cols-2">
+              <div className="grid gap-3 grid-cols-1">
                 {ongoingOrders.slice(0, visibleCount).map((o) => (
                   <OrderCard key={o.id} order={o} lineItems={lineItems} onClick={() => setSidePanelOrder(o.order_number)} onReorder={() => handleReorderAll(o)} />
                 ))}
@@ -828,7 +828,7 @@ export default function OrderHistory() {
           )}
 
           {activeTab !== "ongoing" && ongoingOrders.length > 0 && (
-            <div className="grid gap-3 md:grid-cols-2">
+            <div className="grid gap-3 grid-cols-1">
               {ongoingOrders.slice(0, visibleCount).map((o) => (
                 <OrderCard key={o.id} order={o} lineItems={lineItems} onClick={() => setSidePanelOrder(o.order_number)} onReorder={() => handleReorderAll(o)} />
               ))}
