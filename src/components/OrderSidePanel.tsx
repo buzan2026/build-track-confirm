@@ -349,7 +349,7 @@ export default function OrderSidePanel({ orderNumber, onClose }: OrderSidePanelP
                       <CheckCircle className="h-3.5 w-3.5 shrink-0" />
                       Delivered — Order completed
                     </div>
-                  )
+                  )}
 
 
                   {/* Shipments */}
