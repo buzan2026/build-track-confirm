@@ -2,8 +2,8 @@ import { useState, useMemo, useEffect } from "react";
 import {
   Search, X, AlertTriangle, XCircle, CheckCircle, Package,
   Truck, Copy, Download, CalendarIcon, LayoutGrid, List,
-  ArrowUpDown, ArrowUp, ArrowDown, MoreHorizontal, Eye,
-  FileText, RefreshCw, Phone, ChevronLeft, ChevronRight, ShoppingCart,
+  ArrowUpDown, ArrowUp, ArrowDown, ShoppingCart,
+  ChevronLeft, ChevronRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import OrderSidePanel from "@/components/OrderSidePanel";
@@ -15,9 +15,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Checkbox } from "@/components/ui/checkbox";
 
 // --- Product image helper (picsum for reliable loading) ---
