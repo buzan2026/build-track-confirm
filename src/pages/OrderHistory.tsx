@@ -270,7 +270,7 @@ export default function OrderHistory() {
   const needsAttentionOrders = activeTab === "ongoing" ? filtered.filter((o) => needsAttention(o.status)) : [];
   const ongoingOrders = activeTab === "ongoing" ? filtered.filter((o) => !needsAttention(o.status)) : filtered;
 
-  useEffect(() => { setVisibleCount(10); setCurrentPage(1); setSelectedIds(new Set()); }, [activeTab, searchQuery, dateFrom, dateTo, projectFilter]);
+  useEffect(() => { setVisibleCount(10); setCurrentPage(1); }, [activeTab, searchQuery, dateFrom, dateTo, projectFilter]);
 
   const hasActiveFilters = searchQuery || projectFilter !== "all" || dateFrom || dateTo;
 
