@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   CheckCircle, Truck, Package, AlertTriangle, XCircle,
   ClipboardCheck, FileText, ShoppingCart,
@@ -26,8 +26,8 @@ const statusMeta: Record<string, { label: string; icon: typeof CheckCircle; colo
   on_track: { label: "On track", icon: CheckCircle, colorClass: "text-[var(--color-success)]", bgClass: "bg-[var(--color-alert-success-bg)] border-[var(--color-success)]" },
   being_prepared: { label: "Being prepared", icon: Package, colorClass: "text-[var(--color-info)]", bgClass: "bg-[var(--color-alert-info-bg)] border-[var(--color-info)]" },
   in_transit: { label: "In transit", icon: Truck, colorClass: "text-[var(--color-info)]", bgClass: "bg-[var(--color-alert-info-bg)] border-[var(--color-info)]" },
-  partially_delivered: { label: "Partially delivered", icon: Package, colorClass: "text-[var(--color-warning)]", bgClass: "bg-[var(--color-alert-warning-bg)] border-[var(--color-warning)]" },
-  delayed: { label: "Delayed", icon: AlertTriangle, colorClass: "text-[var(--color-warning)]", bgClass: "bg-[var(--color-alert-warning-bg)] border-[var(--color-warning)]" },
+  partially_delivered: { label: "Partially delivered", icon: Package, colorClass: "text-[#8A3800]", bgClass: "bg-[#FFF2E8] border-[#8A3800]" },
+  delayed: { label: "Delayed", icon: AlertTriangle, colorClass: "text-[#8A3800]", bgClass: "bg-[#FFF2E8] border-[#8A3800]" },
   cancelled: { label: "Cancelled", icon: XCircle, colorClass: "text-[var(--color-error)]", bgClass: "bg-[var(--color-alert-error-bg)] border-[var(--color-error)]" },
   completed: { label: "Completed", icon: CheckCircle, colorClass: "text-[var(--color-success)]", bgClass: "bg-[var(--color-alert-success-bg)] border-[var(--color-success)]" },
 };
@@ -73,9 +73,9 @@ function ShipmentMini({ shipment, lineItems }: { shipment: ShipmentRow; lineItem
   const items = lineItems.filter((li) => li.shipment_id === shipment.id);
 
   return (
-    <div className="rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] p-3">
+    <div className="rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] p-4">
       <div className="flex items-center justify-between mb-3">
-        <span className="text-[12px] font-semibold text-[var(--color-text-primary)]">Shipment {shipment.shipment_index}</span>
+        <span className="text-[13px] font-semibold text-[var(--color-text-primary)]">Shipment {shipment.shipment_index}</span>
         <span className="text-[12px] text-[var(--color-text-secondary)]">{shipment.carrier ?? ""}</span>
       </div>
 
@@ -99,14 +99,14 @@ function ShipmentMini({ shipment, lineItems }: { shipment: ShipmentRow; lineItem
         })}
       </div>
 
-      <p className="text-[12px] text-[var(--color-text-secondary)] mb-2">
+      <p className="text-[12px] text-[var(--color-text-secondary)] mb-3">
         {shipment.status === "delivered"
           ? `Delivered ${fmtDate(shipment.delivered_at)}${shipment.delivered_signed_by ? ` — Signed by ${shipment.delivered_signed_by}` : ""}`
           : `Expected ${fmtDate(shipment.expected_delivery)}`}
       </p>
 
       {items.length > 0 && (
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           {items.map((item) => {
             const delivered = item.quantity - item.remaining;
             const pct = item.quantity > 0 ? Math.round((delivered / item.quantity) * 100) : 0;
@@ -127,17 +127,28 @@ function ShipmentMini({ shipment, lineItems }: { shipment: ShipmentRow; lineItem
   );
 }
 
-/* ── Mock documents ── */
+/* ── Mock documents grouped by type ── */
 const MOCK_DOCUMENTS = [
   { name: "Invoice INV-2024-0847", type: "Invoice", date: "2024-12-15", icon: FileText },
+  { name: "Invoice INV-2024-0612", type: "Invoice", date: "2024-12-01", icon: FileText },
   { name: "Delivery note BL-2024-1293", type: "Delivery note", date: "2024-12-14", icon: FileText },
+  { name: "Delivery note BL-2024-1180", type: "Delivery note", date: "2024-12-10", icon: FileText },
   { name: "Order confirmation", type: "Confirmation", date: "2024-12-10", icon: ClipboardCheck },
   { name: "Pro-forma invoice", type: "Pro-forma", date: "2024-12-09", icon: FileText },
   { name: "Technical datasheet — Câble R2V", type: "Technical", date: "2024-12-08", icon: FileText },
   { name: "Certificate of conformity", type: "Certificate", date: "2024-12-08", icon: ClipboardCheck },
-  { name: "Material Safety Data Sheet", type: "MSDS", date: "2024-12-07", icon: FileText },
-  { name: "Warranty certificate", type: "Warranty", date: "2024-12-05", icon: ClipboardCheck },
+  { name: "Material Safety Data Sheet", type: "Technical", date: "2024-12-07", icon: FileText },
+  { name: "Warranty certificate", type: "Certificate", date: "2024-12-05", icon: ClipboardCheck },
 ];
+
+function groupDocsByType(docs: typeof MOCK_DOCUMENTS) {
+  const groups: Record<string, typeof MOCK_DOCUMENTS> = {};
+  docs.forEach((doc) => {
+    if (!groups[doc.type]) groups[doc.type] = [];
+    groups[doc.type].push(doc);
+  });
+  return groups;
+}
 
 /* ── Side Panel ── */
 interface OrderSidePanelProps {
@@ -154,13 +165,26 @@ export default function OrderSidePanel({ orderNumber, onClose }: OrderSidePanelP
   const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({});
 
   const open = !!orderNumber;
+  const isCompletedOrder = data?.order.status === "completed";
 
-  const toggleItem = (id: string) => setCheckedItems((p) => ({ ...p, [id]: !p[id] }));
+  // Auto-check all items when order is completed
+  useEffect(() => {
+    if (data && isCompletedOrder) {
+      const all: Record<string, boolean> = {};
+      data.lineItems.forEach((li) => { all[li.id] = true; });
+      setCheckedItems(all);
+    }
+  }, [data, isCompletedOrder]);
+
+  const toggleItem = (id: string) => {
+    if (isCompletedOrder) return;
+    setCheckedItems((p) => ({ ...p, [id]: !p[id] }));
+  };
   const checkedCount = data ? Object.values(checkedItems).filter(Boolean).length : 0;
   const allChecked = data ? data.lineItems.length > 0 && checkedCount === data.lineItems.length : false;
 
   const checkAll = () => {
-    if (!data) return;
+    if (!data || isCompletedOrder) return;
     const all: Record<string, boolean> = {};
     data.lineItems.forEach((li) => { all[li.id] = true; });
     setCheckedItems(all);
@@ -168,13 +192,10 @@ export default function OrderSidePanel({ orderNumber, onClose }: OrderSidePanelP
 
   const handleValidateReception = async () => {
     if (!data) return;
-    // Update order status to completed
     await supabase.from("orders").update({ status: "completed", items_remaining: 0 }).eq("id", data.order.id);
-    // Update all shipments to delivered
     for (const s of data.shipments) {
       await supabase.from("shipments").update({ status: "delivered", delivered_at: new Date().toISOString() }).eq("id", s.id);
     }
-    // Update line items remaining to 0
     for (const li of data.lineItems) {
       await supabase.from("line_items").update({ remaining: 0 }).eq("id", li.id);
     }
@@ -192,7 +213,6 @@ export default function OrderSidePanel({ orderNumber, onClose }: OrderSidePanelP
     toast.success(`${data.lineItems.length} item(s) added to cart`, { description: `From order ${data.order.order_number}` });
   };
 
-  // Reset tab when panel opens/closes
   const handleOpenChange = (v: boolean) => {
     if (!v) {
       onClose();
@@ -207,30 +227,32 @@ export default function OrderSidePanel({ orderNumber, onClose }: OrderSidePanelP
     { key: "reception", label: "Reception", icon: ClipboardCheck },
   ];
 
+  const docGroups = groupDocsByType(MOCK_DOCUMENTS);
+
   return (
     <Sheet open={open} onOpenChange={handleOpenChange}>
       <SheetContent
         side="right"
-        className="w-full sm:max-w-[480px] p-0 flex flex-col [&>button]:hidden"
+        className="w-full sm:max-w-[30vw] sm:min-w-[420px] p-0 flex flex-col [&>button]:hidden"
       >
         {isLoading ? (
-          <div className="p-5 space-y-4">
+          <div className="p-6 space-y-4">
             <Skeleton className="h-6 w-48" />
             <Skeleton className="h-4 w-32" />
             <Skeleton className="h-32 w-full" />
             <Skeleton className="h-48 w-full" />
           </div>
         ) : !data ? (
-          <div className="p-5 text-center text-[var(--color-text-secondary)]">Order not found</div>
+          <div className="p-6 text-center text-[var(--color-text-secondary)]">Order not found</div>
         ) : (
           <>
             {/* Scrollable body */}
             <div className="flex-1 overflow-y-auto">
               {/* Header */}
               <div className="sticky top-0 z-10 bg-[var(--color-bg-page)] border-b border-[var(--color-border-subtle)]">
-                <div className="px-5 py-4">
+                <div className="px-6 py-5">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-3">
                       <CopyPill text={data.order.order_number} />
                       {(() => {
                         const meta = statusMeta[data.order.status] ?? statusMeta.on_track;
@@ -246,20 +268,33 @@ export default function OrderSidePanel({ orderNumber, onClose }: OrderSidePanelP
                       <X className="h-5 w-5" />
                     </button>
                   </div>
-                  <p className="text-[13px] text-[var(--color-text-secondary)] mt-1">
-                    Ordered <span className="font-semibold text-[var(--color-text-primary)]">{fmtDate(data.order.order_date)}</span>
-                    {data.order.po_number && <> · PO: {data.order.po_number}</>}
-                  </p>
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2">
+                    <p className="text-[13px] text-[var(--color-text-secondary)]">
+                      Ordered <span className="font-semibold text-[var(--color-text-primary)]">{fmtDate(data.order.order_date)}</span>
+                      {data.order.po_number && <> · PO: {data.order.po_number}</>}
+                    </p>
+                    {data.order.expected_delivery && data.order.status !== "completed" && (
+                      <span className="inline-flex items-center gap-1 text-[13px] font-semibold text-[var(--color-primary)]">
+                        <Truck className="h-3.5 w-3.5" />
+                        Exp. {fmtDate(data.order.expected_delivery)}
+                      </span>
+                    )}
+                  </div>
+                  {data.order.project_name && (
+                    <span className="inline-flex items-center gap-1 mt-2 rounded-full bg-[var(--color-bg-layer-01)] px-2 py-0.5 text-[11px] font-semibold text-[var(--color-text-secondary)]">
+                      {data.order.project_name}
+                    </span>
+                  )}
                 </div>
 
-                {/* Tabs */}
-                <div className="flex px-5 border-t border-[var(--color-border-subtle)]">
+                {/* Tabs — more breathing room */}
+                <div className="flex px-6">
                   {tabs.map((tab) => (
                     <button
                       key={tab.key}
                       onClick={() => setActiveTab(tab.key)}
                       className={cn(
-                        "flex items-center gap-1.5 px-4 py-2.5 text-[12px] font-semibold border-b-2 -mb-px transition-colors",
+                        "flex items-center gap-1.5 px-4 py-3 text-[13px] font-semibold border-b-2 -mb-px transition-colors",
                         activeTab === tab.key
                           ? "border-[var(--color-primary)] text-[var(--color-primary)]"
                           : "border-transparent text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
@@ -274,30 +309,33 @@ export default function OrderSidePanel({ orderNumber, onClose }: OrderSidePanelP
 
               {/* ===== Detail Tab ===== */}
               {activeTab === "detail" && (
-                <div className="px-5 py-4 space-y-4">
+                <div className="px-6 py-5 space-y-5">
                   {/* Summary row */}
                   <div className="grid grid-cols-3 gap-3">
                     <div className="rounded-[var(--border-radius-sm)] bg-[var(--color-bg-layer-01)] p-3 text-center">
                       <p className="text-[16px] font-bold font-[var(--font-heading)] text-[var(--color-text-primary)]">{fmtCurrency(data.order.total_amount)}</p>
-                      <p className="text-[12px] text-[var(--color-text-secondary)] uppercase">Total excl. tax</p>
+                      <p className="text-[12px] text-[var(--color-text-secondary)] uppercase mt-1">Total excl. tax</p>
                     </div>
                     <div className="rounded-[var(--border-radius-sm)] bg-[var(--color-bg-layer-01)] p-3 text-center">
                       <p className="text-[16px] font-bold font-[var(--font-heading)] text-[var(--color-text-primary)]">{data.lineItems.length}</p>
-                      <p className="text-[12px] text-[var(--color-text-secondary)] uppercase">Items</p>
+                      <p className="text-[12px] text-[var(--color-text-secondary)] uppercase mt-1">Items</p>
                     </div>
                     <div className="rounded-[var(--border-radius-sm)] bg-[var(--color-bg-layer-01)] p-3 text-center">
                       <p className="text-[16px] font-bold font-[var(--font-heading)] text-[var(--color-text-primary)]">{data.shipments.length}</p>
-                      <p className="text-[12px] text-[var(--color-text-secondary)] uppercase">Shipments</p>
+                      <p className="text-[12px] text-[var(--color-text-secondary)] uppercase mt-1">Shipments</p>
                     </div>
                   </div>
 
                   {/* Delivery info */}
-                  {data.order.status !== "cancelled" && (
-                    <div className="rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] p-3">
-                      <p className="text-[12px] text-[var(--color-text-secondary)] mb-1">Expected delivery</p>
-                      <p className="text-[13px] font-semibold text-[var(--color-text-primary)]">{fmtDate(data.order.expected_delivery)}</p>
+                  {data.order.status !== "cancelled" && data.order.expected_delivery && (
+                    <div className="rounded-[var(--border-radius-sm)] border border-[var(--color-primary)] bg-[var(--color-rexel-primary-10)] p-4">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Truck className="h-4 w-4 text-[var(--color-primary)]" />
+                        <p className="text-[12px] font-semibold text-[var(--color-primary)] uppercase">Expected delivery</p>
+                      </div>
+                      <p className="text-[18px] font-bold font-[var(--font-heading)] text-[var(--color-primary)]">{fmtDate(data.order.expected_delivery)}</p>
                       {data.order.previous_expected_delivery && data.order.status === "delayed" && (
-                        <p className="text-[12px] text-[var(--color-warning)] mt-1">
+                        <p className="text-[12px] text-[#8A3800] mt-1">
                           <AlertTriangle className="inline h-3 w-3 mr-1" />
                           Originally <span className="line-through">{fmtDate(data.order.previous_expected_delivery)}</span>
                         </p>
@@ -311,7 +349,7 @@ export default function OrderSidePanel({ orderNumber, onClose }: OrderSidePanelP
                   {/* Shipments */}
                   {data.shipments.length > 0 && (
                     <div className="space-y-3">
-                      <h3 className="text-[12px] font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider">Shipments</h3>
+                      <h3 className="text-[13px] font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider">Shipments</h3>
                       {data.shipments.map((s) => (
                         <ShipmentMini key={s.id} shipment={s} lineItems={data.lineItems} />
                       ))}
@@ -323,25 +361,25 @@ export default function OrderSidePanel({ orderNumber, onClose }: OrderSidePanelP
                     const unassigned = data.lineItems.filter((li) => !li.shipment_id);
                     if (unassigned.length === 0) return null;
                     return (
-                      <div className="space-y-2">
-                        <h3 className="text-[12px] font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider">Awaiting shipment</h3>
+                      <div className="space-y-3">
+                        <h3 className="text-[13px] font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider">Awaiting shipment</h3>
                         {unassigned.map((item) => (
-                          <div key={item.id} className="flex items-center justify-between text-[13px] rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] p-2.5">
-                            <div className="flex items-center gap-2 min-w-0">
-                              <img src={productImageUrl(item.product_reference)} alt={item.product_name} className="h-8 w-8 rounded border border-[var(--color-border-subtle)] object-cover shrink-0" />
+                          <div key={item.id} className="flex items-center justify-between text-[13px] rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] p-3">
+                            <div className="flex items-center gap-3 min-w-0">
+                              <img src={productImageUrl(item.product_reference)} alt={item.product_name} className="h-10 w-10 rounded border border-[var(--color-border-subtle)] object-cover shrink-0" />
                               <div className="min-w-0">
                                 <p className="font-semibold text-[var(--color-text-primary)] truncate">{item.product_name}</p>
                                 <CopyPill text={item.product_reference} />
                               </div>
                             </div>
-                            <div className="flex items-center gap-2 shrink-0 ml-3">
+                            <div className="flex items-center gap-3 shrink-0 ml-3">
                               <div className="text-right">
                                 <p className="text-[var(--color-text-primary)]">×{item.quantity}</p>
                                 <p className="text-[12px] text-[var(--color-text-secondary)]">{fmtCurrency(item.unit_price)}</p>
                               </div>
                               <button
                                 onClick={() => handleReorderItem(item)}
-                                className="h-7 w-7 flex items-center justify-center rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] text-[var(--color-primary)] hover:bg-[var(--color-rexel-primary-10)] transition-colors"
+                                className="h-8 w-8 flex items-center justify-center rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] text-[var(--color-primary)] hover:bg-[var(--color-rexel-primary-10)] transition-colors"
                                 title="Reorder this item"
                               >
                                 <ShoppingCart className="h-3.5 w-3.5" />
@@ -355,25 +393,25 @@ export default function OrderSidePanel({ orderNumber, onClose }: OrderSidePanelP
 
                   {/* All line items with reorder */}
                   {data.lineItems.filter((li) => li.shipment_id).length > 0 && (
-                    <div className="space-y-2">
-                      <h3 className="text-[12px] font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider">All items</h3>
+                    <div className="space-y-3">
+                      <h3 className="text-[13px] font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider">All items</h3>
                       {data.lineItems.filter((li) => li.shipment_id).map((item) => (
-                        <div key={item.id} className="flex items-center justify-between text-[13px] rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] p-2.5">
-                          <div className="flex items-center gap-2 min-w-0">
-                            <img src={productImageUrl(item.product_reference)} alt={item.product_name} className="h-8 w-8 rounded border border-[var(--color-border-subtle)] object-cover shrink-0" />
+                        <div key={item.id} className="flex items-center justify-between text-[13px] rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] p-3">
+                          <div className="flex items-center gap-3 min-w-0">
+                            <img src={productImageUrl(item.product_reference)} alt={item.product_name} className="h-10 w-10 rounded border border-[var(--color-border-subtle)] object-cover shrink-0" />
                             <div className="min-w-0">
                               <p className="font-semibold text-[var(--color-text-primary)] truncate">{item.product_name}</p>
                               <CopyPill text={item.product_reference} />
                             </div>
                           </div>
-                          <div className="flex items-center gap-2 shrink-0 ml-3">
+                          <div className="flex items-center gap-3 shrink-0 ml-3">
                             <div className="text-right">
                               <p className="text-[var(--color-text-primary)]">×{item.quantity}</p>
                               <p className="text-[12px] text-[var(--color-text-secondary)]">{fmtCurrency(item.unit_price)}</p>
                             </div>
                             <button
                               onClick={() => handleReorderItem(item)}
-                              className="h-7 w-7 flex items-center justify-center rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] text-[var(--color-primary)] hover:bg-[var(--color-rexel-primary-10)] transition-colors"
+                              className="h-8 w-8 flex items-center justify-center rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] text-[var(--color-primary)] hover:bg-[var(--color-rexel-primary-10)] transition-colors"
                               title="Reorder this item"
                             >
                               <ShoppingCart className="h-3.5 w-3.5" />
@@ -385,7 +423,7 @@ export default function OrderSidePanel({ orderNumber, onClose }: OrderSidePanelP
                   )}
 
                   {/* Contact block */}
-                  <div className="rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] p-3">
+                  <div className="rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] p-4">
                     <p className="text-[12px] font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider mb-2">Your sales rep</p>
                     <p className="text-[13px] font-semibold text-[var(--color-text-primary)]">Gisèle Michu — Agence Paris-Est</p>
                     <p className="text-[12px] text-[var(--color-text-secondary)] mt-1">
@@ -399,22 +437,36 @@ export default function OrderSidePanel({ orderNumber, onClose }: OrderSidePanelP
 
               {/* ===== Documents Tab ===== */}
               {activeTab === "documents" && (
-                <div className="px-5 py-4 space-y-3">
+                <div className="px-6 py-5 space-y-5">
                   <p className="text-[12px] text-[var(--color-text-secondary)]">
                     {MOCK_DOCUMENTS.length} document(s) associated with this order
                   </p>
-                  {MOCK_DOCUMENTS.map((doc, i) => (
-                    <div key={i} className="flex items-center gap-3 rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] p-3 hover:bg-[var(--color-bg-layer-01)] transition-colors cursor-pointer group">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-[var(--border-radius-sm)] bg-[var(--color-rexel-primary-10)] text-[var(--color-primary)] shrink-0">
-                        <doc.icon className="h-4 w-4" />
+                  {Object.entries(docGroups).map(([type, docs]) => (
+                    <div key={type} className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-[13px] font-semibold text-[var(--color-text-primary)]">{type} ({docs.length})</h3>
+                        <button
+                          onClick={() => toast.success(`Downloading ${docs.length} ${type.toLowerCase()}(s)`)}
+                          className="inline-flex items-center gap-1 text-[12px] font-semibold text-[var(--color-primary)] hover:underline"
+                        >
+                          <Download className="h-3 w-3" />
+                          Download all
+                        </button>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-[13px] font-semibold text-[var(--color-text-primary)] truncate">{doc.name}</p>
-                        <p className="text-[12px] text-[var(--color-text-secondary)]">{doc.type} · {fmtDate(doc.date)}</p>
-                      </div>
-                      <button className="opacity-0 group-hover:opacity-100 h-8 w-8 flex items-center justify-center rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] transition-all">
-                        <Download className="h-4 w-4" />
-                      </button>
+                      {docs.map((doc, i) => (
+                        <div key={i} className="flex items-center gap-3 rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] p-3 hover:bg-[var(--color-bg-layer-01)] transition-colors cursor-pointer group">
+                          <div className="flex h-9 w-9 items-center justify-center rounded-[var(--border-radius-sm)] bg-[var(--color-rexel-primary-10)] text-[var(--color-primary)] shrink-0">
+                            <doc.icon className="h-4 w-4" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-[13px] font-semibold text-[var(--color-text-primary)] truncate">{doc.name}</p>
+                            <p className="text-[12px] text-[var(--color-text-secondary)]">{fmtDate(doc.date)}</p>
+                          </div>
+                          <button className="opacity-0 group-hover:opacity-100 h-8 w-8 flex items-center justify-center rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] transition-all">
+                            <Download className="h-4 w-4" />
+                          </button>
+                        </div>
+                      ))}
                     </div>
                   ))}
                 </div>
@@ -422,28 +474,40 @@ export default function OrderSidePanel({ orderNumber, onClose }: OrderSidePanelP
 
               {/* ===== Reception Tab ===== */}
               {activeTab === "reception" && (
-                <div className="px-5 py-4 space-y-3">
+                <div className="px-6 py-5 space-y-4">
+                  {isCompletedOrder && (
+                    <div className="rounded-[var(--border-radius-sm)] border border-[var(--color-success)] bg-[var(--color-alert-success-bg)] p-3 text-[13px] text-[var(--color-success)] flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4 shrink-0" />
+                      This order has been fully received and validated.
+                    </div>
+                  )}
                   <div className="flex items-center justify-between">
                     <p className="text-[12px] text-[var(--color-text-secondary)]">
-                      Check each item received, then validate.
+                      {isCompletedOrder ? "All items received." : "Check each item received, then validate."}
                     </p>
-                    <button onClick={checkAll} className="text-[12px] font-semibold text-[var(--color-primary)] hover:underline">
-                      Check all
-                    </button>
+                    {!isCompletedOrder && (
+                      <button onClick={checkAll} className="text-[12px] font-semibold text-[var(--color-primary)] hover:underline">
+                        Check all
+                      </button>
+                    )}
                   </div>
 
                   {data.lineItems.map((item) => (
                     <label
                       key={item.id}
-                      className="flex items-start gap-3 cursor-pointer rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] p-3 hover:bg-[var(--color-bg-layer-01)] transition-colors"
+                      className={cn(
+                        "flex items-start gap-3 rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] p-3 transition-colors",
+                        isCompletedOrder ? "opacity-80" : "cursor-pointer hover:bg-[var(--color-bg-layer-01)]"
+                      )}
                     >
                       <Checkbox
                         checked={!!checkedItems[item.id]}
                         onCheckedChange={() => toggleItem(item.id)}
                         className="mt-0.5"
+                        disabled={isCompletedOrder}
                       />
-                      <div className="flex items-center gap-2 flex-1 min-w-0">
-                        <img src={productImageUrl(item.product_reference)} alt={item.product_name} className="h-8 w-8 rounded border border-[var(--color-border-subtle)] object-cover shrink-0" />
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <img src={productImageUrl(item.product_reference)} alt={item.product_name} className="h-10 w-10 rounded border border-[var(--color-border-subtle)] object-cover shrink-0" />
                         <div className="min-w-0">
                           <p className={cn(
                             "text-[13px] font-semibold text-[var(--color-text-primary)] truncate",
@@ -459,7 +523,7 @@ export default function OrderSidePanel({ orderNumber, onClose }: OrderSidePanelP
                     </label>
                   ))}
 
-                  <div className="pt-2 text-center text-[12px] text-[var(--color-text-secondary)]">
+                  <div className="pt-1 text-center text-[12px] text-[var(--color-text-secondary)]">
                     {checkedCount}/{data.lineItems.length} item(s) checked
                   </div>
                 </div>
@@ -467,19 +531,19 @@ export default function OrderSidePanel({ orderNumber, onClose }: OrderSidePanelP
             </div>
 
             {/* Sticky footer */}
-            <div className="border-t border-[var(--color-border-subtle)] bg-[var(--color-bg-page)] px-5 py-3 flex items-center gap-3">
+            <div className="border-t border-[var(--color-border-subtle)] bg-[var(--color-bg-page)] px-6 py-4 flex items-center gap-3">
               {activeTab === "reception" ? (
                 <button
-                  disabled={!allChecked}
+                  disabled={!allChecked || isCompletedOrder}
                   onClick={handleValidateReception}
                   className={cn(
                     "flex-1 inline-flex items-center justify-center gap-2 h-10 rounded-[var(--border-radius-sm)] text-[13px] font-semibold transition-colors",
-                    allChecked
+                    allChecked && !isCompletedOrder
                       ? "bg-[var(--color-success)] text-white hover:opacity-90"
                       : "bg-[var(--color-bg-layer-01)] text-[var(--color-text-placeholder)] cursor-not-allowed"
                   )}
                 >
-                  <Check className="h-4 w-4" /> Validate reception ({checkedCount}/{data.lineItems.length})
+                  <Check className="h-4 w-4" /> {isCompletedOrder ? "Already validated" : `Validate reception (${checkedCount}/${data.lineItems.length})`}
                 </button>
               ) : (
                 <button
