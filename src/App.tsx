@@ -6,13 +6,9 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useCartSync } from "@/hooks/useCartSync";
 import LayoutShell from "./components/LayoutShell";
 import OrderHistory from "./pages/OrderHistory";
-import ReceptionPage from "./pages/ReceptionPage";
-import DocumentsPage from "./pages/DocumentsPage";
-import ReceptionSuccess from "./pages/ReceptionSuccess";
-import StyleGuide from "./pages/StyleGuide";
-import OrderDetailPage from "./pages/OrderDetailPage";
 import DeliveryToday from "./pages/DeliveryToday";
 import NotificationPreferences from "./pages/NotificationPreferences";
+import StyleGuide from "./pages/StyleGuide";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,10 +20,6 @@ function AppContent() {
       <Route element={<LayoutShell />}>
         <Route path="/" element={<OrderHistory />} />
         <Route path="/delivery-today" element={<DeliveryToday />} />
-        <Route path="/orders/success" element={<ReceptionSuccess />} />
-        <Route path="/orders/:id/reception" element={<ReceptionPage />} />
-        <Route path="/orders/:id/documents" element={<DocumentsPage />} />
-        <Route path="/orders/:orderNumber" element={<OrderDetailPage />} />
         <Route path="/settings/notifications" element={<NotificationPreferences />} />
         <Route path="/style-guide" element={<StyleGuide />} />
       </Route>
