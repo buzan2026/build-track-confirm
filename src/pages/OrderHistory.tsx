@@ -15,7 +15,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
+
 
 // --- Product image helper (picsum for reliable loading) ---
 function productImageUrl(ref: string) {
@@ -196,7 +196,7 @@ export default function OrderHistory() {
   // Table state
   const [sortKey, setSortKey] = useState<SortKey>("order_date");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  
   const [currentPage, setCurrentPage] = useState(1);
   const [sidePanelOrder, setSidePanelOrder] = useState<string | null>(null);
   const ROWS_PER_PAGE = 10;
@@ -270,7 +270,7 @@ export default function OrderHistory() {
   const needsAttentionOrders = activeTab === "ongoing" ? filtered.filter((o) => needsAttention(o.status)) : [];
   const ongoingOrders = activeTab === "ongoing" ? filtered.filter((o) => !needsAttention(o.status)) : filtered;
 
-  useEffect(() => { setVisibleCount(10); setCurrentPage(1); setSelectedIds(new Set()); }, [activeTab, searchQuery, dateFrom, dateTo, projectFilter]);
+  useEffect(() => { setVisibleCount(10); setCurrentPage(1); }, [activeTab, searchQuery, dateFrom, dateTo, projectFilter]);
 
   const hasActiveFilters = searchQuery || projectFilter !== "all" || dateFrom || dateTo;
 
@@ -297,21 +297,6 @@ export default function OrderHistory() {
     else { setSortKey(key); setSortDir("asc"); }
   };
 
-  const toggleSelect = (id: string) => {
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id); else next.add(id);
-      return next;
-    });
-  };
-
-  const toggleSelectAll = () => {
-    if (selectedIds.size === paginatedRows.length) {
-      setSelectedIds(new Set());
-    } else {
-      setSelectedIds(new Set(paginatedRows.map((o) => o.id)));
-    }
-  };
 
   const handleReorderAll = (order: OrderRow) => {
     const items = lineItems.filter((li) => li.order_id === order.id);
@@ -556,32 +541,6 @@ export default function OrderHistory() {
       {/* ===== TABLE VIEW ===== */}
       {viewMode === "table" && (
         <div className="space-y-6">
-          {/* Bulk actions bar */}
-          {selectedIds.size > 0 && (
-            <div className="flex items-center justify-between rounded-[var(--border-radius-sm)] bg-[var(--color-primary)] px-4 py-2.5">
-              <span className="text-[13px] font-semibold text-[var(--color-white)]">
-                {selectedIds.size} order{selectedIds.size > 1 ? "s" : ""} selected
-              </span>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => {
-                    const selected = filtered.filter((o) => selectedIds.has(o.id));
-                    exportCSV(selected);
-                  }}
-                  className="inline-flex h-8 items-center gap-1.5 rounded-[var(--border-radius-sm)] border border-[var(--color-primary)] bg-[var(--color-white)] px-3 text-[12px] font-semibold text-[var(--color-primary)] hover:bg-[var(--color-bg-layer-01)] transition-colors"
-                >
-                  <Download className="h-3.5 w-3.5" />
-                  Export selection (CSV)
-                </button>
-                <button
-                  onClick={() => setSelectedIds(new Set())}
-                  className="inline-flex h-8 items-center px-3 text-[12px] font-semibold text-[var(--color-white)] hover:text-[var(--color-white)]/80 transition-colors"
-                >
-                  Clear selection
-                </button>
-              </div>
-            </div>
-          )}
 
           {/* Needs Attention table section */}
           {(() => {
@@ -609,20 +568,6 @@ export default function OrderHistory() {
                     <table className="w-full">
                       <thead>
                         <tr className="border-b border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-01)]">
-                          <th className="px-4 py-3 w-10">
-                            <Checkbox
-                              checked={displayRows.length > 0 && displayRows.every((r) => selectedIds.has(r.id))}
-                              onCheckedChange={() => {
-                                const ids = displayRows.map((r) => r.id);
-                                const allSelected = ids.every((id) => selectedIds.has(id));
-                                setSelectedIds((prev) => {
-                                  const next = new Set(prev);
-                                  ids.forEach((id) => allSelected ? next.delete(id) : next.add(id));
-                                  return next;
-                                });
-                              }}
-                            />
-                          </th>
                           <SortableHeader colKey="order_number" label="Order #" />
                           <SortableHeader colKey="po_number" label="PO #" />
                           <SortableHeader colKey="order_date" label="Date" />
@@ -641,13 +586,10 @@ export default function OrderHistory() {
                               "group transition-colors cursor-pointer",
                               sidePanelOrder === order.order_number
                                 ? "bg-[var(--color-rexel-primary-10)] border-l-2 border-l-[var(--color-primary)]"
-                                : selectedIds.has(order.id) ? "bg-[var(--color-rexel-primary-10)]" : "hover:bg-[var(--color-bg-layer-01)]"
+                                : "hover:bg-[var(--color-bg-layer-01)]"
                             )}
                             onClick={() => setSidePanelOrder(order.order_number)}
                           >
-                            <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
-                              <Checkbox checked={selectedIds.has(order.id)} onCheckedChange={() => toggleSelect(order.id)} />
-                            </td>
                             <td className="px-4 py-3 text-[13px] font-semibold text-[var(--color-text-primary)]">{order.order_number}</td>
                             <td className="px-4 py-3 text-[13px] text-[var(--color-text-secondary)]">{order.po_number ?? "—"}</td>
                             <td className="px-4 py-3 text-[13px] text-[var(--color-text-secondary)]">{formatDate(order.order_date)}</td>
@@ -716,9 +658,6 @@ export default function OrderHistory() {
                   <table className="w-full">
                     <thead>
                       <tr className="border-b border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-01)]">
-                        <th className="px-4 py-3 w-10">
-                          <Checkbox checked={displayRows.length > 0 && selectedIds.size === displayRows.length} onCheckedChange={toggleSelectAll} />
-                        </th>
                         <SortableHeader colKey="order_number" label="Order #" />
                         <SortableHeader colKey="po_number" label="PO #" />
                         <SortableHeader colKey="order_date" label="Date" />
@@ -734,13 +673,10 @@ export default function OrderHistory() {
                         <tr key={order.id}
                           className={cn("group transition-colors cursor-pointer",
                             sidePanelOrder === order.order_number ? "bg-[var(--color-rexel-primary-10)] border-l-2 border-l-[var(--color-primary)]"
-                              : selectedIds.has(order.id) ? "bg-[var(--color-rexel-primary-10)]" : "hover:bg-[var(--color-bg-layer-01)]"
+                              : "hover:bg-[var(--color-bg-layer-01)]"
                           )}
                           onClick={() => setSidePanelOrder(order.order_number)}
                         >
-                          <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
-                            <Checkbox checked={selectedIds.has(order.id)} onCheckedChange={() => toggleSelect(order.id)} />
-                          </td>
                           <td className="px-4 py-3 text-[13px] font-semibold text-[var(--color-text-primary)]">{order.order_number}</td>
                           <td className="px-4 py-3 text-[13px] text-[var(--color-text-secondary)]">{order.po_number ?? "—"}</td>
                           <td className="px-4 py-3 text-[13px] text-[var(--color-text-secondary)]">{formatDate(order.order_date)}</td>
