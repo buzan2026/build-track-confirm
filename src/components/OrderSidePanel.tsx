@@ -482,25 +482,13 @@ export default function OrderSidePanel({ orderNumber, onClose }: OrderSidePanelP
                   <Check className="h-4 w-4" /> Validate reception ({checkedCount}/{data.lineItems.length})
                 </button>
               ) : (
-                <>
-                  <button
-                    onClick={() => setReturnOpen(true)}
-                    className="flex-1 inline-flex items-center justify-center gap-2 h-10 rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] text-[13px] font-semibold text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-layer-01)] transition-colors"
-                  >
-                    <RotateCcw className="h-4 w-4" /> Return
-                  </button>
-                  <button
-                    onClick={handleReorderAll}
-                    className="flex-1 inline-flex items-center justify-center gap-2 h-10 rounded-[var(--border-radius-sm)] bg-[var(--color-primary)] text-[var(--color-white)] text-[13px] font-semibold hover:bg-[var(--color-primary-hover)] transition-colors"
-                  >
-                    <ShoppingCart className="h-4 w-4" /> Reorder all
-                  </button>
-                </>
+                <button
+                  onClick={handleReorderAll}
+                  className="flex-1 inline-flex items-center justify-center gap-2 h-10 rounded-[var(--border-radius-sm)] bg-[var(--color-primary)] text-[var(--color-white)] text-[13px] font-semibold hover:bg-[var(--color-primary-hover)] transition-colors"
+                >
+                  <ShoppingCart className="h-4 w-4" /> Reorder all
+                </button>
               )}
-            </div>
-
-            {/* Return dialog */}
-            <ReturnDialog open={returnOpen} onOpenChange={setReturnOpen} lineItems={data.lineItems} />
           </>
         )}
       </SheetContent>
