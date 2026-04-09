@@ -2,8 +2,8 @@ import { useState, useMemo, useEffect } from "react";
 import {
   Search, X, AlertTriangle, XCircle, CheckCircle, Package,
   Truck, Copy, Download, CalendarIcon, LayoutGrid, List,
-  ArrowUpDown, ArrowUp, ArrowDown, MoreHorizontal, Eye,
-  FileText, RefreshCw, Phone, ChevronLeft, ChevronRight, ShoppingCart,
+  ArrowUpDown, ArrowUp, ArrowDown, ShoppingCart,
+  ChevronLeft, ChevronRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import OrderSidePanel from "@/components/OrderSidePanel";
@@ -15,9 +15,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Checkbox } from "@/components/ui/checkbox";
 
 // --- Product image helper (picsum for reliable loading) ---
@@ -116,10 +113,10 @@ function OrderCard({
           {onReorder && (
             <button
               onClick={(e) => { e.stopPropagation(); onReorder(); }}
-              className="opacity-0 group-hover:opacity-100 inline-flex items-center gap-1 rounded-[var(--border-radius-sm)] bg-[var(--color-primary)] text-white px-2.5 py-1 text-[12px] font-semibold hover:bg-[var(--color-primary-hover)] transition-all"
+              className="inline-flex h-7 w-7 items-center justify-center rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] text-[var(--color-text-secondary)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-colors"
               title="Reorder all items"
             >
-              <ShoppingCart className="h-3 w-3" /> Reorder
+              <ShoppingCart className="h-3.5 w-3.5" />
             </button>
           )}
           <StatusBadge status={order.status} />
@@ -135,6 +132,11 @@ function OrderCard({
 
       <div className="flex items-center gap-3 text-[12px] text-[var(--color-text-helper)] mb-3">
         {order.po_number && <span>PO: {order.po_number}</span>}
+        {order.project_name && (
+          <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-bg-layer-01)] px-2 py-0.5 text-[11px] font-semibold text-[var(--color-text-secondary)]">
+            {order.project_name}
+          </span>
+        )}
       </div>
 
       <div className="flex items-center gap-2">
@@ -218,7 +220,7 @@ export default function OrderHistory() {
       })
       .filter((o) => {
         if (!q) return true;
-        const orderMatch = o.order_number.toLowerCase().includes(q) || (o.po_number?.toLowerCase().includes(q) ?? false);
+        const orderMatch = o.order_number.toLowerCase().includes(q) || (o.po_number?.toLowerCase().includes(q) ?? false) || (o.project_name?.toLowerCase().includes(q) ?? false);
         const itemMatch = lineItems.filter((li) => li.order_id === o.id).some(
           (li) => li.product_name.toLowerCase().includes(q) || li.product_reference.toLowerCase().includes(q) || li.supplier.toLowerCase().includes(q)
         );
@@ -624,27 +626,13 @@ export default function OrderHistory() {
                     <td className="px-4 py-3 text-[13px] text-[var(--color-text-secondary)]">{formatDate(order.expected_delivery)}</td>
                     <td className="px-4 py-3 text-[13px] text-[var(--color-text-secondary)]">{order.items_remaining}</td>
                     <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <button className="flex h-8 w-8 items-center justify-center rounded-[var(--border-radius-sm)] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-layer-01)] hover:text-[var(--color-text-primary)] transition-colors">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => setSidePanelOrder(order.order_number)}>
-                            <Eye className="h-4 w-4 mr-2" /> View details
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <FileText className="h-4 w-4 mr-2" /> Download invoice
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleReorderAll(order)}>
-                            <RefreshCw className="h-4 w-4 mr-2" /> Reorder all
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <Phone className="h-4 w-4 mr-2" /> Contact sales rep
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                      <button
+                        onClick={() => handleReorderAll(order)}
+                        className="flex h-8 w-8 items-center justify-center rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] text-[var(--color-text-secondary)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-colors"
+                        title="Reorder all items"
+                      >
+                        <ShoppingCart className="h-3.5 w-3.5" />
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -698,10 +686,10 @@ export default function OrderHistory() {
         <>
           {/* Needs Attention section */}
           {needsAttentionOrders.length > 0 && (
-            <div className="space-y-3">
+            <div className="rounded-[var(--border-radius-sm)] border border-[var(--color-warning)] bg-[var(--color-alert-warning-bg)] p-4 space-y-3">
               <div className="flex items-center gap-2">
                 <AlertTriangle className="h-4 w-4 text-[var(--color-warning)]" />
-                <h2 className="text-[13px] font-semibold text-[var(--color-text-primary)]">Needs attention ({needsAttentionOrders.length})</h2>
+                <h2 className="text-[13px] font-semibold text-[var(--color-alert-warning-text)]">Needs attention ({needsAttentionOrders.length})</h2>
               </div>
               <div className="grid gap-3 md:grid-cols-2">
                 {needsAttentionOrders.map((o) => (
@@ -711,11 +699,14 @@ export default function OrderHistory() {
             </div>
           )}
 
+          {/* Separator between sections */}
+          {needsAttentionOrders.length > 0 && ongoingOrders.length > 0 && activeTab === "ongoing" && (
+            <div className="border-t border-[var(--color-border-subtle)]" />
+          )}
+
           {activeTab === "ongoing" && ongoingOrders.length > 0 && (
             <div className="space-y-3">
-              {needsAttentionOrders.length > 0 && (
-                <h2 className="text-[13px] font-semibold text-[var(--color-text-primary)]">Ongoing ({ongoingOrders.length})</h2>
-              )}
+              <h2 className="text-[13px] font-semibold text-[var(--color-text-primary)]">Ongoing ({ongoingOrders.length})</h2>
               <div className="grid gap-3 md:grid-cols-2">
                 {ongoingOrders.slice(0, visibleCount).map((o) => (
                   <OrderCard key={o.id} order={o} lineItems={lineItems} onClick={() => setSidePanelOrder(o.order_number)} onReorder={() => handleReorderAll(o)} />
