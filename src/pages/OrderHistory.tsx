@@ -558,8 +558,8 @@ export default function OrderHistory() {
         <div className="space-y-6">
           {/* Bulk actions bar */}
           {selectedIds.size > 0 && (
-            <div className="flex items-center justify-between rounded-[var(--border-radius-sm)] border border-[var(--color-primary)] bg-[var(--color-rexel-primary-10)] px-4 py-2.5">
-              <span className="text-[13px] font-semibold text-[var(--color-primary)]">
+            <div className="flex items-center justify-between rounded-[var(--border-radius-sm)] bg-[var(--color-primary)] px-4 py-2.5">
+              <span className="text-[13px] font-semibold text-[var(--color-white)]">
                 {selectedIds.size} order{selectedIds.size > 1 ? "s" : ""} selected
               </span>
               <div className="flex items-center gap-2">
@@ -568,14 +568,14 @@ export default function OrderHistory() {
                     const selected = filtered.filter((o) => selectedIds.has(o.id));
                     exportCSV(selected);
                   }}
-                  className="inline-flex h-8 items-center gap-1.5 rounded-[var(--border-radius-sm)] border border-[var(--color-primary)] px-3 text-[12px] font-semibold text-[var(--color-primary)] hover:bg-[var(--color-rexel-primary-20)] transition-colors"
+                  className="inline-flex h-8 items-center gap-1.5 rounded-[var(--border-radius-sm)] border border-[var(--color-primary)] bg-[var(--color-white)] px-3 text-[12px] font-semibold text-[var(--color-primary)] hover:bg-[var(--color-bg-layer-01)] transition-colors"
                 >
                   <Download className="h-3.5 w-3.5" />
                   Export selection (CSV)
                 </button>
                 <button
                   onClick={() => setSelectedIds(new Set())}
-                  className="inline-flex h-8 items-center px-3 text-[12px] font-semibold text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"
+                  className="inline-flex h-8 items-center px-3 text-[12px] font-semibold text-[var(--color-white)] hover:text-[var(--color-white)]/80 transition-colors"
                 >
                   Clear selection
                 </button>
