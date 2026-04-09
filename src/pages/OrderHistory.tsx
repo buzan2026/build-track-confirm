@@ -102,7 +102,7 @@ function OrderCard({
       className={cn(
         "group cursor-pointer rounded-[var(--border-radius-sm)] border p-4 transition-all hover:shadow-[var(--shadow-2)]",
         "border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-02)]",
-        warning && "border-l-[3px] border-l-[#8A3800]"
+        warning && "border-l-4 border-l-[#8A3800]"
       )}
     >
       <div className="flex items-start justify-between gap-2 mb-2">
@@ -149,7 +149,7 @@ function OrderCard({
         {onReorder && (
           <button
             onClick={(e) => { e.stopPropagation(); onReorder(); }}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] text-[var(--color-text-secondary)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-colors"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-[var(--border-radius-sm)] border border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-rexel-primary-10)] transition-colors"
             title="Reorder all items"
           >
             <ShoppingCart className="h-4 w-4" />
@@ -555,10 +555,10 @@ export default function OrderHistory() {
 
       {/* ===== TABLE VIEW ===== */}
       {viewMode === "table" && (
-        <div className="space-y-0">
+        <div className="space-y-6">
           {/* Bulk actions bar */}
           {selectedIds.size > 0 && (
-            <div className="flex items-center justify-between rounded-t-[var(--border-radius-sm)] border border-b-0 border-[var(--color-primary)] bg-[var(--color-rexel-primary-10)] px-4 py-2.5">
+            <div className="flex items-center justify-between rounded-[var(--border-radius-sm)] border border-[var(--color-primary)] bg-[var(--color-rexel-primary-10)] px-4 py-2.5">
               <span className="text-[13px] font-semibold text-[var(--color-primary)]">
                 {selectedIds.size} order{selectedIds.size > 1 ? "s" : ""} selected
               </span>
@@ -583,109 +583,213 @@ export default function OrderHistory() {
             </div>
           )}
 
-          <div className={cn(
-            "overflow-hidden border border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-02)] shadow-[var(--shadow-1)]",
-            selectedIds.size > 0 ? "rounded-b-[var(--border-radius-sm)]" : "rounded-[var(--border-radius-sm)]"
-          )}>
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-01)]">
-                  <th className="px-4 py-3 w-10">
-                    <Checkbox
-                      checked={paginatedRows.length > 0 && selectedIds.size === paginatedRows.length}
-                      onCheckedChange={toggleSelectAll}
-                    />
-                  </th>
-                  <SortableHeader colKey="order_number" label="Order #" />
-                  <SortableHeader colKey="po_number" label="PO #" />
-                  <SortableHeader colKey="order_date" label="Date" />
-                  <SortableHeader colKey="status" label="Status" />
-                  <SortableHeader colKey="total_amount" label="Total" align="right" />
-                  <SortableHeader colKey="expected_delivery" label="Exp. delivery" />
-                  <SortableHeader colKey="items_remaining" label="Remaining" />
-                  <th className="px-4 py-3 w-10" />
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[var(--color-border-subtle)]">
-                {paginatedRows.map((order) => (
-                  <tr
-                    key={order.id}
-                    className={cn(
-                      "group transition-colors cursor-pointer",
-                      sidePanelOrder === order.order_number
-                        ? "bg-[var(--color-rexel-primary-10)] border-l-2 border-l-[var(--color-primary)]"
-                        : selectedIds.has(order.id) ? "bg-[var(--color-rexel-primary-10)]" : "hover:bg-[var(--color-bg-layer-01)]"
-                    )}
-                    onClick={() => setSidePanelOrder(order.order_number)}
-                  >
-                    <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
-                      <Checkbox
-                        checked={selectedIds.has(order.id)}
-                        onCheckedChange={() => toggleSelect(order.id)}
-                      />
-                    </td>
-                    <td className="px-4 py-3 text-[13px] font-semibold text-[var(--color-text-primary)]">{order.order_number}</td>
-                    <td className="px-4 py-3 text-[13px] text-[var(--color-text-secondary)]">{order.po_number ?? "—"}</td>
-                    <td className="px-4 py-3 text-[13px] text-[var(--color-text-secondary)]">{formatDate(order.order_date)}</td>
-                    <td className="px-4 py-3"><StatusBadge status={order.status} /></td>
-                    <td className="px-4 py-3 text-[13px] text-right font-semibold text-[var(--color-text-primary)]">{formatCurrency(order.total_amount)}</td>
-                    <td className="px-4 py-3 text-[13px] font-semibold text-[var(--color-primary)]">
-                      {formatDate(order.expected_delivery)}
-                    </td>
-                    <td className="px-4 py-3 text-[13px] text-[var(--color-text-secondary)]">{order.items_remaining}</td>
-                    <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
-                      <button
-                        onClick={() => handleReorderAll(order)}
-                        className="flex h-8 w-8 items-center justify-center rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] text-[var(--color-text-secondary)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-colors"
-                        title="Reorder all items"
-                      >
-                        <ShoppingCart className="h-3.5 w-3.5" />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          {/* Needs Attention table section */}
+          {(() => {
+            const attentionRows = activeTab === "ongoing" ? tableSorted.filter((o) => needsAttention(o.status)) : [];
+            const regularRows = activeTab === "ongoing" ? tableSorted.filter((o) => !needsAttention(o.status)) : tableSorted;
+            const attentionPaginated = attentionRows; // show all attention rows (usually few)
 
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="flex items-center justify-between pt-4">
-              <span className="text-[12px] text-[var(--color-text-secondary)]">
-                Showing {(currentPage - 1) * ROWS_PER_PAGE + 1}–{Math.min(currentPage * ROWS_PER_PAGE, tableSorted.length)} of {tableSorted.length}
-              </span>
-              <div className="flex items-center gap-1">
-                <button
-                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                  disabled={currentPage === 1}
-                  className="flex h-8 w-8 items-center justify-center rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-layer-01)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </button>
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                  <button
-                    key={page}
-                    onClick={() => setCurrentPage(page)}
-                    className={cn(
-                      "flex h-8 w-8 items-center justify-center rounded-[var(--border-radius-sm)] text-[12px] font-semibold transition-colors",
-                      page === currentPage
-                        ? "bg-[var(--color-primary)] text-white"
-                        : "border border-[var(--color-border-subtle)] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-layer-01)]"
-                    )}
-                  >
-                    {page}
-                  </button>
-                ))}
-                <button
-                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                  disabled={currentPage === totalPages}
-                  className="flex h-8 w-8 items-center justify-center rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-layer-01)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
-          )}
+            const renderTableBlock = (rows: typeof tableSorted, title?: string, isAttention?: boolean) => {
+              if (rows.length === 0) return null;
+              // For ongoing tab with sections, no pagination per section — paginate only regular
+              const displayRows = title === "Ongoing" ? rows.slice((currentPage - 1) * ROWS_PER_PAGE, currentPage * ROWS_PER_PAGE) : rows;
+              const pageCount = title === "Ongoing" ? Math.ceil(rows.length / ROWS_PER_PAGE) : 0;
+
+              return (
+                <div className="space-y-3">
+                  {title && (
+                    <div className="flex items-center gap-2">
+                      {isAttention && <AlertTriangle className="h-4 w-4 text-[#8A3800]" />}
+                      <h2 className={cn("text-[16px] font-bold font-[var(--font-heading)]", isAttention ? "text-[#8A3800]" : "text-[var(--color-text-primary)]")}>
+                        {title} ({rows.length})
+                      </h2>
+                    </div>
+                  )}
+                  <div className="overflow-hidden rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-02)] shadow-[var(--shadow-1)]">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-01)]">
+                          <th className="px-4 py-3 w-10">
+                            <Checkbox
+                              checked={displayRows.length > 0 && displayRows.every((r) => selectedIds.has(r.id))}
+                              onCheckedChange={() => {
+                                const ids = displayRows.map((r) => r.id);
+                                const allSelected = ids.every((id) => selectedIds.has(id));
+                                setSelectedIds((prev) => {
+                                  const next = new Set(prev);
+                                  ids.forEach((id) => allSelected ? next.delete(id) : next.add(id));
+                                  return next;
+                                });
+                              }}
+                            />
+                          </th>
+                          <SortableHeader colKey="order_number" label="Order #" />
+                          <SortableHeader colKey="po_number" label="PO #" />
+                          <SortableHeader colKey="order_date" label="Date" />
+                          <SortableHeader colKey="status" label="Status" />
+                          <SortableHeader colKey="total_amount" label="Total" align="right" />
+                          <SortableHeader colKey="expected_delivery" label="Exp. delivery" />
+                          <SortableHeader colKey="items_remaining" label="Remaining" />
+                          <th className="px-4 py-3 w-10" />
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-[var(--color-border-subtle)]">
+                        {displayRows.map((order) => (
+                          <tr
+                            key={order.id}
+                            className={cn(
+                              "group transition-colors cursor-pointer",
+                              sidePanelOrder === order.order_number
+                                ? "bg-[var(--color-rexel-primary-10)] border-l-2 border-l-[var(--color-primary)]"
+                                : selectedIds.has(order.id) ? "bg-[var(--color-rexel-primary-10)]" : "hover:bg-[var(--color-bg-layer-01)]"
+                            )}
+                            onClick={() => setSidePanelOrder(order.order_number)}
+                          >
+                            <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
+                              <Checkbox checked={selectedIds.has(order.id)} onCheckedChange={() => toggleSelect(order.id)} />
+                            </td>
+                            <td className="px-4 py-3 text-[13px] font-semibold text-[var(--color-text-primary)]">{order.order_number}</td>
+                            <td className="px-4 py-3 text-[13px] text-[var(--color-text-secondary)]">{order.po_number ?? "—"}</td>
+                            <td className="px-4 py-3 text-[13px] text-[var(--color-text-secondary)]">{formatDate(order.order_date)}</td>
+                            <td className="px-4 py-3"><StatusBadge status={order.status} /></td>
+                            <td className="px-4 py-3 text-[13px] text-right font-semibold text-[var(--color-text-primary)]">{formatCurrency(order.total_amount)}</td>
+                            <td className="px-4 py-3 text-[13px] font-semibold text-[var(--color-primary)]">{formatDate(order.expected_delivery)}</td>
+                            <td className="px-4 py-3 text-[13px] text-[var(--color-text-secondary)]">{order.items_remaining}</td>
+                            <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
+                              <button
+                                onClick={() => handleReorderAll(order)}
+                                className="flex h-8 w-8 items-center justify-center rounded-[var(--border-radius-sm)] border border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-rexel-primary-10)] transition-colors"
+                                title="Reorder all items"
+                              >
+                                <ShoppingCart className="h-3.5 w-3.5" />
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Pagination for ongoing section */}
+                  {pageCount > 1 && (
+                    <div className="flex items-center justify-between pt-2">
+                      <span className="text-[12px] text-[var(--color-text-secondary)]">
+                        Showing {(currentPage - 1) * ROWS_PER_PAGE + 1}–{Math.min(currentPage * ROWS_PER_PAGE, rows.length)} of {rows.length}
+                      </span>
+                      <div className="flex items-center gap-1">
+                        <button onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1}
+                          className="flex h-8 w-8 items-center justify-center rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-layer-01)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+                          <ChevronLeft className="h-4 w-4" />
+                        </button>
+                        {Array.from({ length: pageCount }, (_, i) => i + 1).map((page) => (
+                          <button key={page} onClick={() => setCurrentPage(page)}
+                            className={cn("flex h-8 w-8 items-center justify-center rounded-[var(--border-radius-sm)] text-[12px] font-semibold transition-colors",
+                              page === currentPage ? "bg-[var(--color-primary)] text-white" : "border border-[var(--color-border-subtle)] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-layer-01)]"
+                            )}>
+                            {page}
+                          </button>
+                        ))}
+                        <button onClick={() => setCurrentPage((p) => Math.min(pageCount, p + 1))} disabled={currentPage === pageCount}
+                          className="flex h-8 w-8 items-center justify-center rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-layer-01)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+                          <ChevronRight className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            };
+
+            if (activeTab === "ongoing") {
+              return (
+                <>
+                  {renderTableBlock(attentionPaginated, "Needs attention", true)}
+                  {renderTableBlock(regularRows, "Ongoing")}
+                </>
+              );
+            }
+            // For other tabs, single table with pagination
+            const displayRows = tableSorted.slice((currentPage - 1) * ROWS_PER_PAGE, currentPage * ROWS_PER_PAGE);
+            return (
+              <>
+                <div className="overflow-hidden rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-02)] shadow-[var(--shadow-1)]">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-01)]">
+                        <th className="px-4 py-3 w-10">
+                          <Checkbox checked={displayRows.length > 0 && selectedIds.size === displayRows.length} onCheckedChange={toggleSelectAll} />
+                        </th>
+                        <SortableHeader colKey="order_number" label="Order #" />
+                        <SortableHeader colKey="po_number" label="PO #" />
+                        <SortableHeader colKey="order_date" label="Date" />
+                        <SortableHeader colKey="status" label="Status" />
+                        <SortableHeader colKey="total_amount" label="Total" align="right" />
+                        <SortableHeader colKey="expected_delivery" label="Exp. delivery" />
+                        <SortableHeader colKey="items_remaining" label="Remaining" />
+                        <th className="px-4 py-3 w-10" />
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[var(--color-border-subtle)]">
+                      {displayRows.map((order) => (
+                        <tr key={order.id}
+                          className={cn("group transition-colors cursor-pointer",
+                            sidePanelOrder === order.order_number ? "bg-[var(--color-rexel-primary-10)] border-l-2 border-l-[var(--color-primary)]"
+                              : selectedIds.has(order.id) ? "bg-[var(--color-rexel-primary-10)]" : "hover:bg-[var(--color-bg-layer-01)]"
+                          )}
+                          onClick={() => setSidePanelOrder(order.order_number)}
+                        >
+                          <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
+                            <Checkbox checked={selectedIds.has(order.id)} onCheckedChange={() => toggleSelect(order.id)} />
+                          </td>
+                          <td className="px-4 py-3 text-[13px] font-semibold text-[var(--color-text-primary)]">{order.order_number}</td>
+                          <td className="px-4 py-3 text-[13px] text-[var(--color-text-secondary)]">{order.po_number ?? "—"}</td>
+                          <td className="px-4 py-3 text-[13px] text-[var(--color-text-secondary)]">{formatDate(order.order_date)}</td>
+                          <td className="px-4 py-3"><StatusBadge status={order.status} /></td>
+                          <td className="px-4 py-3 text-[13px] text-right font-semibold text-[var(--color-text-primary)]">{formatCurrency(order.total_amount)}</td>
+                          <td className="px-4 py-3 text-[13px] font-semibold text-[var(--color-primary)]">{formatDate(order.expected_delivery)}</td>
+                          <td className="px-4 py-3 text-[13px] text-[var(--color-text-secondary)]">{order.items_remaining}</td>
+                          <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
+                            <button onClick={() => handleReorderAll(order)}
+                              className="flex h-8 w-8 items-center justify-center rounded-[var(--border-radius-sm)] border border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-rexel-primary-10)] transition-colors"
+                              title="Reorder all items">
+                              <ShoppingCart className="h-3.5 w-3.5" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-between pt-4">
+                    <span className="text-[12px] text-[var(--color-text-secondary)]">
+                      Showing {(currentPage - 1) * ROWS_PER_PAGE + 1}–{Math.min(currentPage * ROWS_PER_PAGE, tableSorted.length)} of {tableSorted.length}
+                    </span>
+                    <div className="flex items-center gap-1">
+                      <button onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1}
+                        className="flex h-8 w-8 items-center justify-center rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-layer-01)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+                        <ChevronLeft className="h-4 w-4" />
+                      </button>
+                      {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                        <button key={page} onClick={() => setCurrentPage(page)}
+                          className={cn("flex h-8 w-8 items-center justify-center rounded-[var(--border-radius-sm)] text-[12px] font-semibold transition-colors",
+                            page === currentPage ? "bg-[var(--color-primary)] text-white" : "border border-[var(--color-border-subtle)] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-layer-01)]"
+                          )}>
+                          {page}
+                        </button>
+                      ))}
+                      <button onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}
+                        className="flex h-8 w-8 items-center justify-center rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-layer-01)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+                        <ChevronRight className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </>
+            );
+          })()}
         </div>
       )}
 
