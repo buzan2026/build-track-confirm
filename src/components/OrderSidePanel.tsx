@@ -149,7 +149,7 @@ type TabKey = "detail" | "documents" | "reception";
 
 export default function OrderSidePanel({ orderNumber, onClose }: OrderSidePanelProps) {
   const { data, isLoading, refetch } = useOrderWithDetails(orderNumber ?? undefined);
-  const [returnOpen, setReturnOpen] = useState(false);
+  
   const [activeTab, setActiveTab] = useState<TabKey>("detail");
   const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({});
 
