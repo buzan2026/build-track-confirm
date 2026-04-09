@@ -489,6 +489,7 @@ export default function OrderSidePanel({ orderNumber, onClose }: OrderSidePanelP
                   <ShoppingCart className="h-4 w-4" /> Reorder all
                 </button>
               )}
+            </div>
           </>
         )}
       </SheetContent>
