@@ -1,16 +1,21 @@
+import { useState } from "react";
 import {
   CheckCircle, Truck, Package, AlertTriangle, XCircle,
   ClipboardCheck, FileText, RotateCcw, ShoppingCart,
-  Phone, Mail, X, Copy,
+  Phone, Mail, X, Copy, Check,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Progress } from "@/components/ui/progress";
 import { useOrderWithDetails, type ShipmentRow, type LineItemRow } from "@/hooks/useOrders";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
+} from "@/components/ui/dialog";
 import { format } from "date-fns";
 import { toast } from "sonner";
-
 /* ── Product image helper ── */
 function productImageUrl(ref: string) {
   const hash = Array.from(ref).reduce((a, c) => a + c.charCodeAt(0), 0);
