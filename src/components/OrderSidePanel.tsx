@@ -233,7 +233,7 @@ export default function OrderSidePanel({ orderNumber, onClose }: OrderSidePanelP
     <Sheet open={open} onOpenChange={handleOpenChange}>
       <SheetContent
         side="right"
-        className="w-full sm:max-w-[30vw] sm:min-w-[420px] p-0 flex flex-col [&>button]:hidden"
+        className="w-full sm:max-w-[50vw] sm:min-w-[480px] p-0 flex flex-col [&>button]:hidden"
       >
         {isLoading ? (
           <div className="p-6 space-y-4">
@@ -310,40 +310,35 @@ export default function OrderSidePanel({ orderNumber, onClose }: OrderSidePanelP
               {/* ===== Detail Tab ===== */}
               {activeTab === "detail" && (
                 <div className="px-6 py-5 space-y-5">
-                  {/* Summary row */}
-                  <div className="grid grid-cols-3 gap-3">
-                    <div className="rounded-[var(--border-radius-sm)] bg-[var(--color-bg-layer-01)] p-3 text-center">
-                      <p className="text-[16px] font-bold font-[var(--font-heading)] text-[var(--color-text-primary)]">{fmtCurrency(data.order.total_amount)}</p>
-                      <p className="text-[12px] text-[var(--color-text-secondary)] uppercase mt-1">Total excl. tax</p>
+                  {/* Summary row — inline with delivery */}
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <div className="flex items-center gap-2 rounded-[var(--border-radius-sm)] bg-[var(--color-bg-layer-01)] px-3 py-2">
+                      <span className="text-[14px] font-bold text-[var(--color-text-primary)]">{fmtCurrency(data.order.total_amount)}</span>
+                      <span className="text-[11px] text-[var(--color-text-secondary)] uppercase">excl. tax</span>
                     </div>
-                    <div className="rounded-[var(--border-radius-sm)] bg-[var(--color-bg-layer-01)] p-3 text-center">
-                      <p className="text-[16px] font-bold font-[var(--font-heading)] text-[var(--color-text-primary)]">{data.lineItems.length}</p>
-                      <p className="text-[12px] text-[var(--color-text-secondary)] uppercase mt-1">Items</p>
+                    <div className="flex items-center gap-2 rounded-[var(--border-radius-sm)] bg-[var(--color-bg-layer-01)] px-3 py-2">
+                      <span className="text-[14px] font-bold text-[var(--color-text-primary)]">{data.lineItems.length}</span>
+                      <span className="text-[11px] text-[var(--color-text-secondary)] uppercase">items</span>
                     </div>
-                    <div className="rounded-[var(--border-radius-sm)] bg-[var(--color-bg-layer-01)] p-3 text-center">
-                      <p className="text-[16px] font-bold font-[var(--font-heading)] text-[var(--color-text-primary)]">{data.shipments.length}</p>
-                      <p className="text-[12px] text-[var(--color-text-secondary)] uppercase mt-1">Shipments</p>
+                    <div className="flex items-center gap-2 rounded-[var(--border-radius-sm)] bg-[var(--color-bg-layer-01)] px-3 py-2">
+                      <span className="text-[14px] font-bold text-[var(--color-text-primary)]">{data.shipments.length}</span>
+                      <span className="text-[11px] text-[var(--color-text-secondary)] uppercase">shipments</span>
                     </div>
+                    {data.order.status !== "cancelled" && data.order.expected_delivery && (
+                      <div className="flex items-center gap-2 rounded-[var(--border-radius-sm)] border border-[var(--color-primary)] bg-[var(--color-rexel-primary-10)] px-3 py-2">
+                        <Truck className="h-3.5 w-3.5 text-[var(--color-primary)]" />
+                        <span className="text-[14px] font-bold text-[var(--color-primary)]">{fmtDate(data.order.expected_delivery)}</span>
+                      </div>
+                    )}
                   </div>
 
-                  {/* Delivery info */}
-                  {data.order.status !== "cancelled" && data.order.expected_delivery && (
-                    <div className="rounded-[var(--border-radius-sm)] border border-[var(--color-primary)] bg-[var(--color-rexel-primary-10)] p-4">
-                      <div className="flex items-center gap-2 mb-1">
-                        <Truck className="h-4 w-4 text-[var(--color-primary)]" />
-                        <p className="text-[12px] font-semibold text-[var(--color-primary)] uppercase">Expected delivery</p>
-                      </div>
-                      <p className="text-[18px] font-bold font-[var(--font-heading)] text-[var(--color-primary)]">{fmtDate(data.order.expected_delivery)}</p>
-                      {data.order.previous_expected_delivery && data.order.status === "delayed" && (
-                        <p className="text-[12px] text-[#8A3800] mt-1">
-                          <AlertTriangle className="inline h-3 w-3 mr-1" />
-                          Originally <span className="line-through">{fmtDate(data.order.previous_expected_delivery)}</span>
-                        </p>
-                      )}
-                      {data.order.items_remaining > 0 && (
-                        <p className="text-[12px] text-[var(--color-text-secondary)] mt-1">{data.order.items_remaining} item(s) remaining</p>
-                      )}
-                    </div>
+                  {/* Delay warning */}
+                  {data.order.previous_expected_delivery && data.order.status === "delayed" && (
+                    <p className="text-[12px] text-[#8A3800]">
+                      <AlertTriangle className="inline h-3 w-3 mr-1" />
+                      Originally <span className="line-through">{fmtDate(data.order.previous_expected_delivery)}</span>
+                      {data.order.items_remaining > 0 && <> — {data.order.items_remaining} item(s) remaining</>}
+                    </p>
                   )}
 
                   {/* Shipments */}
@@ -379,7 +374,7 @@ export default function OrderSidePanel({ orderNumber, onClose }: OrderSidePanelP
                               </div>
                               <button
                                 onClick={() => handleReorderItem(item)}
-                                className="h-8 w-8 flex items-center justify-center rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] text-[var(--color-primary)] hover:bg-[var(--color-rexel-primary-10)] transition-colors"
+                                 className="h-8 w-8 flex items-center justify-center rounded-[var(--border-radius-sm)] border border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-rexel-primary-10)] transition-colors"
                                 title="Reorder this item"
                               >
                                 <ShoppingCart className="h-3.5 w-3.5" />
@@ -411,7 +406,7 @@ export default function OrderSidePanel({ orderNumber, onClose }: OrderSidePanelP
                             </div>
                             <button
                               onClick={() => handleReorderItem(item)}
-                              className="h-8 w-8 flex items-center justify-center rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] text-[var(--color-primary)] hover:bg-[var(--color-rexel-primary-10)] transition-colors"
+                              className="h-8 w-8 flex items-center justify-center rounded-[var(--border-radius-sm)] border border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-rexel-primary-10)] transition-colors"
                               title="Reorder this item"
                             >
                               <ShoppingCart className="h-3.5 w-3.5" />
