@@ -273,12 +273,6 @@ export default function OrderSidePanel({ orderNumber, onClose }: OrderSidePanelP
                       Ordered <span className="font-semibold text-[var(--color-text-primary)]">{fmtDate(data.order.order_date)}</span>
                       {data.order.po_number && <> · PO: {data.order.po_number}</>}
                     </p>
-                    {data.order.expected_delivery && data.order.status !== "completed" && (
-                      <span className="inline-flex items-center gap-1 text-[13px] font-semibold text-[var(--color-primary)]">
-                        <Truck className="h-3.5 w-3.5" />
-                        Exp. {fmtDate(data.order.expected_delivery)}
-                      </span>
-                    )}
                   </div>
                   {data.order.project_name && (
                     <span className="inline-flex items-center gap-1 mt-2 rounded-full bg-[var(--color-bg-layer-01)] px-2 py-0.5 text-[11px] font-semibold text-[var(--color-text-secondary)]">
