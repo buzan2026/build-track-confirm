@@ -689,10 +689,10 @@ export default function OrderHistory() {
         <>
           {/* Needs Attention section */}
           {needsAttentionOrders.length > 0 && (
-            <div className="space-y-3">
+            <div className="rounded-[var(--border-radius-sm)] border border-[var(--color-warning)] bg-[var(--color-alert-warning-bg)] p-4 space-y-3">
               <div className="flex items-center gap-2">
                 <AlertTriangle className="h-4 w-4 text-[var(--color-warning)]" />
-                <h2 className="text-[13px] font-semibold text-[var(--color-text-primary)]">Needs attention ({needsAttentionOrders.length})</h2>
+                <h2 className="text-[13px] font-semibold text-[var(--color-alert-warning-text)]">Needs attention ({needsAttentionOrders.length})</h2>
               </div>
               <div className="grid gap-3 md:grid-cols-2">
                 {needsAttentionOrders.map((o) => (
@@ -702,11 +702,14 @@ export default function OrderHistory() {
             </div>
           )}
 
+          {/* Separator between sections */}
+          {needsAttentionOrders.length > 0 && ongoingOrders.length > 0 && activeTab === "ongoing" && (
+            <div className="border-t border-[var(--color-border-subtle)]" />
+          )}
+
           {activeTab === "ongoing" && ongoingOrders.length > 0 && (
             <div className="space-y-3">
-              {needsAttentionOrders.length > 0 && (
-                <h2 className="text-[13px] font-semibold text-[var(--color-text-primary)]">Ongoing ({ongoingOrders.length})</h2>
-              )}
+              <h2 className="text-[13px] font-semibold text-[var(--color-text-primary)]">Ongoing ({ongoingOrders.length})</h2>
               <div className="grid gap-3 md:grid-cols-2">
                 {ongoingOrders.slice(0, visibleCount).map((o) => (
                   <OrderCard key={o.id} order={o} lineItems={lineItems} onClick={() => setSidePanelOrder(o.order_number)} onReorder={() => handleReorderAll(o)} />
