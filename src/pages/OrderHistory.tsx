@@ -116,10 +116,10 @@ function OrderCard({
           {onReorder && (
             <button
               onClick={(e) => { e.stopPropagation(); onReorder(); }}
-              className="opacity-0 group-hover:opacity-100 inline-flex items-center gap-1 rounded-[var(--border-radius-sm)] bg-[var(--color-primary)] text-white px-2.5 py-1 text-[12px] font-semibold hover:bg-[var(--color-primary-hover)] transition-all"
+              className="inline-flex h-7 w-7 items-center justify-center rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] text-[var(--color-text-secondary)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-colors"
               title="Reorder all items"
             >
-              <ShoppingCart className="h-3 w-3" /> Reorder
+              <ShoppingCart className="h-3.5 w-3.5" />
             </button>
           )}
           <StatusBadge status={order.status} />
@@ -135,6 +135,11 @@ function OrderCard({
 
       <div className="flex items-center gap-3 text-[12px] text-[var(--color-text-helper)] mb-3">
         {order.po_number && <span>PO: {order.po_number}</span>}
+        {order.project_name && (
+          <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-bg-layer-01)] px-2 py-0.5 text-[11px] font-semibold text-[var(--color-text-secondary)]">
+            {order.project_name}
+          </span>
+        )}
       </div>
 
       <div className="flex items-center gap-2">
