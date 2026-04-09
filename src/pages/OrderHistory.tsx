@@ -3,7 +3,7 @@ import {
   Search, X, AlertTriangle, XCircle, CheckCircle, Package,
   Truck, Copy, Download, CalendarIcon, LayoutGrid, List,
   ArrowUpDown, ArrowUp, ArrowDown, MoreHorizontal, Eye,
-  FileText, RefreshCw, Phone, ChevronLeft, ChevronRight,
+  FileText, RefreshCw, Phone, ChevronLeft, ChevronRight, ShoppingCart,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import OrderSidePanel from "@/components/OrderSidePanel";
@@ -20,11 +20,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Checkbox } from "@/components/ui/checkbox";
 
-// --- Product image helper ---
+// --- Product image helper (picsum for reliable loading) ---
 function productImageUrl(ref: string) {
   const hash = Array.from(ref).reduce((a, c) => a + c.charCodeAt(0), 0);
-  const id = (hash % 50) + 100;
-  return `https://images.unsplash.com/photo-${1550009158 + id}-cac3dad205e4?w=64&h=64&fit=crop&auto=format`;
+  const id = (hash % 200) + 10;
+  return `https://picsum.photos/seed/${id}/64/64`;
 }
 
 // --- Status config ---
@@ -33,7 +33,7 @@ const statusMeta: Record<string, { label: string; icon: typeof CheckCircle; colo
   being_prepared: { label: "Being prepared", icon: Package, colorClass: "text-[var(--color-info)]", bgClass: "bg-[var(--color-alert-info-bg)] border-[var(--color-info)]" },
   in_transit: { label: "In transit", icon: Truck, colorClass: "text-[var(--color-info)]", bgClass: "bg-[var(--color-alert-info-bg)] border-[var(--color-info)]" },
   partially_delivered: { label: "Partially delivered", icon: Package, colorClass: "text-[var(--color-warning)]", bgClass: "bg-[var(--color-alert-warning-bg)] border-[var(--color-warning)]" },
-  delayed: { label: "Delayed", icon: AlertTriangle, colorClass: "text-[var(--color-error)]", bgClass: "bg-[var(--color-alert-error-bg)] border-[var(--color-error)]" },
+  delayed: { label: "Delayed", icon: AlertTriangle, colorClass: "text-[var(--color-warning)]", bgClass: "bg-[var(--color-alert-warning-bg)] border-[var(--color-warning)]" },
   cancelled: { label: "Cancelled", icon: XCircle, colorClass: "text-[var(--color-error)]", bgClass: "bg-[var(--color-alert-error-bg)] border-[var(--color-error)]" },
   completed: { label: "Completed", icon: CheckCircle, colorClass: "text-[var(--color-success)]", bgClass: "bg-[var(--color-alert-success-bg)] border-[var(--color-success)]" },
 };
@@ -46,6 +46,19 @@ function StatusBadge({ status }: { status: string }) {
       <Icon className="h-3 w-3" />
       {meta.label}
     </span>
+  );
+}
+
+// --- Copy Pill ---
+function CopyPill({ text }: { text: string }) {
+  return (
+    <button
+      onClick={(e) => { e.stopPropagation(); navigator.clipboard.writeText(text); toast.success("Copied"); }}
+      className="inline-flex items-center gap-1 rounded-full border border-[var(--color-border-subtle)] bg-white px-2.5 py-0.5 text-[12px] font-semibold text-[var(--color-primary)] hover:border-[var(--color-primary)] transition-colors"
+    >
+      {text}
+      <Copy className="h-3 w-3 text-[var(--color-primary)]" />
+    </button>
   );
 }
 
@@ -67,11 +80,6 @@ function isOngoing(s: string) { return ONGOING_STATUSES.includes(s); }
 function isCompleted(s: string) { return s === "completed"; }
 function needsAttention(s: string) { return NEEDS_ATTENTION_STATUSES.includes(s); }
 
-function copyToClipboard(text: string) {
-  navigator.clipboard.writeText(text);
-  toast.success("Copied to clipboard");
-}
-
 function formatDate(d: string | null) {
   if (!d) return "—";
   return format(new Date(d), "dd/MM/yyyy");
@@ -83,9 +91,9 @@ function formatCurrency(n: number) {
 
 // --- Order Card (list view) ---
 function OrderCard({
-  order, lineItems, onClick, warning,
+  order, lineItems, onClick, warning, onReorder,
 }: {
-  order: OrderRow; lineItems: LineItemRow[]; onClick: () => void; warning?: boolean;
+  order: OrderRow; lineItems: LineItemRow[]; onClick: () => void; warning?: boolean; onReorder?: () => void;
 }) {
   const orderLineItems = lineItems.filter((li) => li.order_id === order.id);
   const displayItems = orderLineItems.slice(0, 3);
@@ -102,17 +110,20 @@ function OrderCard({
     >
       <div className="flex items-start justify-between gap-2 mb-2">
         <div className="flex items-center gap-2">
-          <span className="text-[13px] font-semibold text-[var(--color-text-primary)]">{order.order_number}</span>
-          <button
-            onClick={(e) => { e.stopPropagation(); copyToClipboard(order.order_number); }}
-            className="inline-flex items-center gap-1 rounded-full border border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-01)] px-2 py-0.5 text-[12px] text-[var(--color-text-secondary)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-colors"
-            title="Copy order number"
-          >
-            <Copy className="h-3 w-3" />
-            Copy
-          </button>
+          <CopyPill text={order.order_number} />
         </div>
-        <StatusBadge status={order.status} />
+        <div className="flex items-center gap-2">
+          {onReorder && (
+            <button
+              onClick={(e) => { e.stopPropagation(); onReorder(); }}
+              className="opacity-0 group-hover:opacity-100 inline-flex items-center gap-1 rounded-[var(--border-radius-sm)] bg-[var(--color-primary)] text-white px-2.5 py-1 text-[12px] font-semibold hover:bg-[var(--color-primary-hover)] transition-all"
+              title="Reorder all items"
+            >
+              <ShoppingCart className="h-3 w-3" /> Reorder
+            </button>
+          )}
+          <StatusBadge status={order.status} />
+        </div>
       </div>
 
       <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[12px] text-[var(--color-text-secondary)] mb-2">
@@ -124,7 +135,6 @@ function OrderCard({
 
       <div className="flex items-center gap-3 text-[12px] text-[var(--color-text-helper)] mb-3">
         {order.po_number && <span>PO: {order.po_number}</span>}
-        <span>{order.order_type}</span>
       </div>
 
       <div className="flex items-center gap-2">
@@ -295,6 +305,11 @@ export default function OrderHistory() {
     }
   };
 
+  const handleReorderAll = (order: OrderRow) => {
+    const items = lineItems.filter((li) => li.order_id === order.id);
+    toast.success(`${items.length} item(s) added to cart`, { description: `From order ${order.order_number}` });
+  };
+
   const exportCSV = (rows?: OrderRow[]) => {
     const data = rows ?? filtered;
     const csvRows = data.map((o) => ({
@@ -366,8 +381,8 @@ export default function OrderHistory() {
         ))}
       </div>
 
-      {/* Filter bar */}
-      <div className="space-y-3">
+      {/* Filter bar — sticky */}
+      <div className="space-y-3 sticky top-[57px] z-30 bg-[var(--color-bg-page)] pb-3 -mb-3 pt-1 -mt-1">
         <div className="flex items-center gap-3">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--color-text-placeholder)]" />
@@ -622,7 +637,7 @@ export default function OrderHistory() {
                           <DropdownMenuItem>
                             <FileText className="h-4 w-4 mr-2" /> Download invoice
                           </DropdownMenuItem>
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleReorderAll(order)}>
                             <RefreshCw className="h-4 w-4 mr-2" /> Reorder all
                           </DropdownMenuItem>
                           <DropdownMenuItem>
@@ -690,7 +705,7 @@ export default function OrderHistory() {
               </div>
               <div className="grid gap-3 md:grid-cols-2">
                 {needsAttentionOrders.map((o) => (
-                  <OrderCard key={o.id} order={o} lineItems={lineItems} onClick={() => setSidePanelOrder(o.order_number)} warning />
+                  <OrderCard key={o.id} order={o} lineItems={lineItems} onClick={() => setSidePanelOrder(o.order_number)} warning onReorder={() => handleReorderAll(o)} />
                 ))}
               </div>
             </div>
@@ -703,7 +718,7 @@ export default function OrderHistory() {
               )}
               <div className="grid gap-3 md:grid-cols-2">
                 {ongoingOrders.slice(0, visibleCount).map((o) => (
-                  <OrderCard key={o.id} order={o} lineItems={lineItems} onClick={() => setSidePanelOrder(o.order_number)} />
+                  <OrderCard key={o.id} order={o} lineItems={lineItems} onClick={() => setSidePanelOrder(o.order_number)} onReorder={() => handleReorderAll(o)} />
                 ))}
               </div>
             </div>
@@ -712,7 +727,7 @@ export default function OrderHistory() {
           {activeTab !== "ongoing" && ongoingOrders.length > 0 && (
             <div className="grid gap-3 md:grid-cols-2">
               {ongoingOrders.slice(0, visibleCount).map((o) => (
-                <OrderCard key={o.id} order={o} lineItems={lineItems} onClick={() => setSidePanelOrder(o.order_number)} />
+                <OrderCard key={o.id} order={o} lineItems={lineItems} onClick={() => setSidePanelOrder(o.order_number)} onReorder={() => handleReorderAll(o)} />
               ))}
             </div>
           )}
