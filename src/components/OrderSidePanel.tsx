@@ -1,16 +1,21 @@
+import { useState } from "react";
 import {
   CheckCircle, Truck, Package, AlertTriangle, XCircle,
   ClipboardCheck, FileText, RotateCcw, ShoppingCart,
-  Phone, Mail, X, Copy,
+  Phone, Mail, X, Copy, Check,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Progress } from "@/components/ui/progress";
 import { useOrderWithDetails, type ShipmentRow, type LineItemRow } from "@/hooks/useOrders";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
+} from "@/components/ui/dialog";
 import { format } from "date-fns";
 import { toast } from "sonner";
-
 /* ── Product image helper ── */
 function productImageUrl(ref: string) {
   const hash = Array.from(ref).reduce((a, c) => a + c.charCodeAt(0), 0);
@@ -124,6 +129,139 @@ function ShipmentMini({ shipment, lineItems }: { shipment: ShipmentRow; lineItem
   );
 }
 
+/* ── Reception Dialog ── */
+function ReceptionDialog({ open, onOpenChange, lineItems }: { open: boolean; onOpenChange: (v: boolean) => void; lineItems: LineItemRow[] }) {
+  const [checked, setChecked] = useState<Record<string, boolean>>({});
+  const toggle = (id: string) => setChecked((p) => ({ ...p, [id]: !p[id] }));
+  const checkedCount = Object.values(checked).filter(Boolean).length;
+  const allChecked = lineItems.length > 0 && checkedCount === lineItems.length;
+  const confirmAll = () => {
+    const all: Record<string, boolean> = {};
+    lineItems.forEach((li) => { all[li.id] = true; });
+    setChecked(all);
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[480px] gap-0 p-0">
+        <DialogHeader className="px-5 pt-5 pb-3">
+          <DialogTitle className="text-[16px] font-bold text-[var(--color-text-primary)]">Confirm reception</DialogTitle>
+          <DialogDescription className="text-[13px] text-[var(--color-text-secondary)]">
+            Check each item received, then validate.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="px-5 pb-2 max-h-[50vh] overflow-y-auto space-y-2">
+          <div className="flex justify-end">
+            <button onClick={confirmAll} className="text-[12px] font-semibold text-[var(--color-primary)] hover:underline">
+              Check all
+            </button>
+          </div>
+          {lineItems.map((item) => (
+            <label key={item.id} className="flex items-start gap-3 cursor-pointer rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] p-3 hover:bg-[var(--color-bg-layer-01)] transition-colors">
+              <Checkbox checked={!!checked[item.id]} onCheckedChange={() => toggle(item.id)} className="mt-0.5" />
+              <div className="flex items-center gap-2 flex-1 min-w-0">
+                <img src={productImageUrl(item.product_reference)} alt={item.product_name} className="h-8 w-8 rounded border border-[var(--color-border-subtle)] object-cover shrink-0" />
+                <div className="min-w-0">
+                  <p className={cn("text-[13px] font-semibold text-[var(--color-text-primary)] truncate", checked[item.id] && "line-through text-[var(--color-text-secondary)]")}>{item.product_name}</p>
+                  <p className="text-[12px] text-[var(--color-text-secondary)]">Ref: {item.product_reference} — Qty: {item.quantity}</p>
+                </div>
+              </div>
+            </label>
+          ))}
+        </div>
+        <DialogFooter className="px-5 py-4 border-t border-[var(--color-border-subtle)] flex-row gap-3">
+          <button onClick={() => onOpenChange(false)} className="flex-1 h-10 rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] text-[13px] font-semibold text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-layer-01)] transition-colors">
+            Cancel
+          </button>
+          <button
+            disabled={!allChecked}
+            onClick={() => {
+              onOpenChange(false);
+              setChecked({});
+              toast.success("Reception confirmed", { description: `${lineItems.length} item(s) validated`, duration: 4000 });
+            }}
+            className={cn(
+              "flex-1 h-10 rounded-[var(--border-radius-sm)] text-[13px] font-semibold transition-colors",
+              allChecked
+                ? "bg-[var(--color-primary)] text-[var(--color-white)] hover:bg-[var(--color-primary-hover)]"
+                : "bg-[var(--color-bg-layer-01)] text-[var(--color-text-placeholder)] cursor-not-allowed"
+            )}
+          >
+            Validate ({checkedCount}/{lineItems.length})
+          </button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+/* ── Return Request Dialog ── */
+function ReturnDialog({ open, onOpenChange, lineItems }: { open: boolean; onOpenChange: (v: boolean) => void; lineItems: LineItemRow[] }) {
+  const [selected, setSelected] = useState<Record<string, boolean>>({});
+  const [reason, setReason] = useState("");
+  const toggle = (id: string) => setSelected((p) => ({ ...p, [id]: !p[id] }));
+  const selectedCount = Object.values(selected).filter(Boolean).length;
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[480px] gap-0 p-0">
+        <DialogHeader className="px-5 pt-5 pb-3">
+          <DialogTitle className="text-[16px] font-bold text-[var(--color-text-primary)]">Request a return</DialogTitle>
+          <DialogDescription className="text-[13px] text-[var(--color-text-secondary)]">
+            Select the items to return and describe the reason.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="px-5 pb-2 max-h-[40vh] overflow-y-auto space-y-2">
+          {lineItems.map((item) => (
+            <label key={item.id} className="flex items-start gap-3 cursor-pointer rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] p-3 hover:bg-[var(--color-bg-layer-01)] transition-colors">
+              <Checkbox checked={!!selected[item.id]} onCheckedChange={() => toggle(item.id)} className="mt-0.5" />
+              <div className="flex items-center gap-2 flex-1 min-w-0">
+                <img src={productImageUrl(item.product_reference)} alt={item.product_name} className="h-8 w-8 rounded border border-[var(--color-border-subtle)] object-cover shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-[13px] font-semibold text-[var(--color-text-primary)] truncate">{item.product_name}</p>
+                  <p className="text-[12px] text-[var(--color-text-secondary)]">Ref: {item.product_reference} — Qty: {item.quantity}</p>
+                </div>
+              </div>
+            </label>
+          ))}
+        </div>
+        <div className="px-5 py-3">
+          <label className="text-[12px] font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider mb-1.5 block">Reason</label>
+          <Textarea
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+            placeholder="Describe the issue (damaged, wrong product, etc.)…"
+            className="bg-[var(--color-bg-layer-01)] text-[13px]"
+            rows={3}
+          />
+        </div>
+        <DialogFooter className="px-5 py-4 border-t border-[var(--color-border-subtle)] flex-row gap-3">
+          <button onClick={() => onOpenChange(false)} className="flex-1 h-10 rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] text-[13px] font-semibold text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-layer-01)] transition-colors">
+            Cancel
+          </button>
+          <button
+            disabled={selectedCount === 0 || reason.trim().length === 0}
+            onClick={() => {
+              onOpenChange(false);
+              setSelected({});
+              setReason("");
+              toast.success("Return request submitted", { description: `${selectedCount} item(s) — our team will contact you`, duration: 5000 });
+            }}
+            className={cn(
+              "flex-1 h-10 rounded-[var(--border-radius-sm)] text-[13px] font-semibold transition-colors",
+              selectedCount > 0 && reason.trim().length > 0
+                ? "bg-[var(--color-error)] text-[var(--color-white)] hover:opacity-90"
+                : "bg-[var(--color-bg-layer-01)] text-[var(--color-text-placeholder)] cursor-not-allowed"
+            )}
+          >
+            Submit return ({selectedCount})
+          </button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 /* ── Side Panel ── */
 interface OrderSidePanelProps {
   orderNumber: string | null;
@@ -132,6 +270,8 @@ interface OrderSidePanelProps {
 
 export default function OrderSidePanel({ orderNumber, onClose }: OrderSidePanelProps) {
   const { data, isLoading } = useOrderWithDetails(orderNumber ?? undefined);
+  const [receptionOpen, setReceptionOpen] = useState(false);
+  const [returnOpen, setReturnOpen] = useState(false);
 
   const open = !!orderNumber;
 
@@ -268,7 +408,7 @@ export default function OrderSidePanel({ orderNumber, onClose }: OrderSidePanelP
             {/* Sticky footer */}
             <div className="border-t border-[var(--color-border-subtle)] bg-[var(--color-bg-page)] px-5 py-3 flex items-center gap-3">
               <button
-                onClick={() => toast.info("Confirm reception feature coming soon")}
+                onClick={() => setReceptionOpen(true)}
                 className="flex-1 inline-flex items-center justify-center gap-2 h-10 rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] text-[13px] font-semibold text-[var(--color-text-primary)] hover:bg-[var(--color-bg-layer-01)] transition-colors"
               >
                 <CheckCircle className="h-4 w-4" /> Confirm reception
@@ -282,7 +422,7 @@ export default function OrderSidePanel({ orderNumber, onClose }: OrderSidePanelP
             </div>
             <div className="border-t border-[var(--color-border-subtle)] bg-[var(--color-bg-page)] px-5 py-3 flex items-center gap-3">
               <button
-                onClick={() => toast.info("Return request feature coming soon")}
+                onClick={() => setReturnOpen(true)}
                 className="flex-1 inline-flex items-center justify-center gap-2 h-10 rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] text-[13px] font-semibold text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-layer-01)] transition-colors"
               >
                 <RotateCcw className="h-4 w-4" /> Request a return
@@ -294,6 +434,10 @@ export default function OrderSidePanel({ orderNumber, onClose }: OrderSidePanelP
                 <ShoppingCart className="h-4 w-4" /> Reorder
               </button>
             </div>
+
+            {/* Confirmation dialogs */}
+            <ReceptionDialog open={receptionOpen} onOpenChange={setReceptionOpen} lineItems={data.lineItems} />
+            <ReturnDialog open={returnOpen} onOpenChange={setReturnOpen} lineItems={data.lineItems} />
           </>
         )}
       </SheetContent>
