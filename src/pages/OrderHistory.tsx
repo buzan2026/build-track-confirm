@@ -29,8 +29,8 @@ const statusMeta: Record<string, { label: string; icon: typeof CheckCircle; colo
   on_track: { label: "On track", icon: CheckCircle, colorClass: "text-[var(--color-success)]", bgClass: "bg-[var(--color-alert-success-bg)] border-[var(--color-success)]" },
   being_prepared: { label: "Being prepared", icon: Package, colorClass: "text-[var(--color-info)]", bgClass: "bg-[var(--color-alert-info-bg)] border-[var(--color-info)]" },
   in_transit: { label: "In transit", icon: Truck, colorClass: "text-[var(--color-info)]", bgClass: "bg-[var(--color-alert-info-bg)] border-[var(--color-info)]" },
-  partially_delivered: { label: "Partially delivered", icon: Package, colorClass: "text-[var(--color-warning)]", bgClass: "bg-[var(--color-alert-warning-bg)] border-[var(--color-warning)]" },
-  delayed: { label: "Delayed", icon: AlertTriangle, colorClass: "text-[var(--color-warning)]", bgClass: "bg-[var(--color-alert-warning-bg)] border-[var(--color-warning)]" },
+  partially_delivered: { label: "Partially delivered", icon: Package, colorClass: "text-[#8A3800]", bgClass: "bg-[#FFF2E8] border-[#8A3800]" },
+  delayed: { label: "Delayed", icon: AlertTriangle, colorClass: "text-[#8A3800]", bgClass: "bg-[#FFF2E8] border-[#8A3800]" },
   cancelled: { label: "Cancelled", icon: XCircle, colorClass: "text-[var(--color-error)]", bgClass: "bg-[var(--color-alert-error-bg)] border-[var(--color-error)]" },
   completed: { label: "Completed", icon: CheckCircle, colorClass: "text-[var(--color-success)]", bgClass: "bg-[var(--color-alert-success-bg)] border-[var(--color-success)]" },
 };
@@ -102,31 +102,25 @@ function OrderCard({
       className={cn(
         "group cursor-pointer rounded-[var(--border-radius-sm)] border p-4 transition-all hover:shadow-[var(--shadow-2)]",
         "border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-02)]",
-        warning && "border-l-[3px] border-l-[var(--color-warning)]"
+        warning && "border-l-[3px] border-l-[#8A3800]"
       )}
     >
       <div className="flex items-start justify-between gap-2 mb-2">
         <div className="flex items-center gap-2">
           <CopyPill text={order.order_number} />
         </div>
-        <div className="flex items-center gap-2">
-          {onReorder && (
-            <button
-              onClick={(e) => { e.stopPropagation(); onReorder(); }}
-              className="inline-flex h-7 w-7 items-center justify-center rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] text-[var(--color-text-secondary)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-colors"
-              title="Reorder all items"
-            >
-              <ShoppingCart className="h-3.5 w-3.5" />
-            </button>
-          )}
-          <StatusBadge status={order.status} />
-        </div>
+        <StatusBadge status={order.status} />
       </div>
 
       <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[12px] text-[var(--color-text-secondary)] mb-2">
         <span>{formatDate(order.order_date)}</span>
         <span className="font-semibold text-[var(--color-text-primary)]">{formatCurrency(order.total_amount)}</span>
-        {order.expected_delivery && <span>Exp. {formatDate(order.expected_delivery)}</span>}
+        {order.expected_delivery && (
+          <span className="font-semibold text-[var(--color-primary)]">
+            <Truck className="inline h-3 w-3 mr-0.5" />
+            Exp. {formatDate(order.expected_delivery)}
+          </span>
+        )}
         {order.items_remaining > 0 && <span>{order.items_remaining} items remaining</span>}
       </div>
 
@@ -139,20 +133,32 @@ function OrderCard({
         )}
       </div>
 
-      <div className="flex items-center gap-2">
-        {displayItems.map((li) => (
-          <img
-            key={li.id}
-            src={productImageUrl(li.product_reference)}
-            alt={li.product_name}
-            className="h-8 w-8 rounded border border-[var(--color-border-subtle)] object-cover"
-          />
-        ))}
-        {moreCount > 0 && <span className="text-[12px] text-[var(--color-text-secondary)]">+{moreCount} more</span>}
+      {/* Product images + reorder button aligned right */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          {displayItems.map((li) => (
+            <img
+              key={li.id}
+              src={productImageUrl(li.product_reference)}
+              alt={li.product_name}
+              className="h-8 w-8 rounded border border-[var(--color-border-subtle)] object-cover"
+            />
+          ))}
+          {moreCount > 0 && <span className="text-[12px] text-[var(--color-text-secondary)]">+{moreCount} more</span>}
+        </div>
+        {onReorder && (
+          <button
+            onClick={(e) => { e.stopPropagation(); onReorder(); }}
+            className="inline-flex h-9 w-9 items-center justify-center rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] text-[var(--color-text-secondary)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-colors"
+            title="Reorder all items"
+          >
+            <ShoppingCart className="h-4 w-4" />
+          </button>
+        )}
       </div>
 
       {order.status === "delayed" && order.previous_expected_delivery && (
-        <div className="mt-3 rounded border border-[var(--color-warning)] bg-[var(--color-alert-warning-bg)] p-2 text-[12px] text-[var(--color-alert-warning-text)]">
+        <div className="mt-3 rounded border border-[#8A3800] bg-[#FFF2E8] p-2 text-[12px] text-[#8A3800]">
           <AlertTriangle className="inline h-3 w-3 mr-1" />
           New delivery date: {formatDate(order.expected_delivery)} instead of{" "}
           <span className="line-through">{formatDate(order.previous_expected_delivery)}</span>
@@ -623,7 +629,9 @@ export default function OrderHistory() {
                     <td className="px-4 py-3 text-[13px] text-[var(--color-text-secondary)]">{formatDate(order.order_date)}</td>
                     <td className="px-4 py-3"><StatusBadge status={order.status} /></td>
                     <td className="px-4 py-3 text-[13px] text-right font-semibold text-[var(--color-text-primary)]">{formatCurrency(order.total_amount)}</td>
-                    <td className="px-4 py-3 text-[13px] text-[var(--color-text-secondary)]">{formatDate(order.expected_delivery)}</td>
+                    <td className="px-4 py-3 text-[13px] font-semibold text-[var(--color-primary)]">
+                      {formatDate(order.expected_delivery)}
+                    </td>
                     <td className="px-4 py-3 text-[13px] text-[var(--color-text-secondary)]">{order.items_remaining}</td>
                     <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
                       <button
@@ -686,10 +694,10 @@ export default function OrderHistory() {
         <>
           {/* Needs Attention section */}
           {needsAttentionOrders.length > 0 && (
-            <div className="rounded-[var(--border-radius-sm)] border border-[var(--color-warning)] bg-[var(--color-alert-warning-bg)] p-4 space-y-3">
+            <div className="space-y-3">
               <div className="flex items-center gap-2">
-                <AlertTriangle className="h-4 w-4 text-[var(--color-warning)]" />
-                <h2 className="text-[13px] font-semibold text-[var(--color-alert-warning-text)]">Needs attention ({needsAttentionOrders.length})</h2>
+                <AlertTriangle className="h-5 w-5 text-[#8A3800]" />
+                <h2 className="text-[18px] font-bold font-[var(--font-heading)] text-[#8A3800]">Needs attention ({needsAttentionOrders.length})</h2>
               </div>
               <div className="grid gap-3 md:grid-cols-2">
                 {needsAttentionOrders.map((o) => (
@@ -706,7 +714,7 @@ export default function OrderHistory() {
 
           {activeTab === "ongoing" && ongoingOrders.length > 0 && (
             <div className="space-y-3">
-              <h2 className="text-[13px] font-semibold text-[var(--color-text-primary)]">Ongoing ({ongoingOrders.length})</h2>
+              <h2 className="text-[18px] font-bold font-[var(--font-heading)] text-[var(--color-text-primary)]">Ongoing ({ongoingOrders.length})</h2>
               <div className="grid gap-3 md:grid-cols-2">
                 {ongoingOrders.slice(0, visibleCount).map((o) => (
                   <OrderCard key={o.id} order={o} lineItems={lineItems} onClick={() => setSidePanelOrder(o.order_number)} onReorder={() => handleReorderAll(o)} />
