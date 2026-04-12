@@ -218,7 +218,7 @@ export default function DeliveryToday() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <KpiCard label={t("delivery.kpiTotal")} value={kpis.total} icon={Package} color="bg-[var(--color-alert-info-bg)] text-[var(--color-info)]" />
         <KpiCard label={t("delivery.kpiDelivered")} value={kpis.delivered} icon={CheckCircle} color="bg-[var(--color-alert-success-bg)] text-[var(--color-success)]" />
-        <KpiCard label={t("delivery.kpiTransit")} value={kpis.inTransit} icon={Truck} color="bg-[var(--color-alert-critical-bg)] text-[var(--color-warning)]" />
+        <KpiCard label={t("delivery.kpiTransit")} value={kpis.inTransit} icon={Truck} color="bg-[var(--color-alert-error-bg)] text-[var(--color-warning)]" />
         <KpiCard label={t("delivery.kpiItems")} value={kpis.totalItems} icon={Clock} color="bg-[var(--color-bg-layer-01)] text-[var(--color-text-secondary)]" />
       </div>
 

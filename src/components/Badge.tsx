@@ -41,7 +41,7 @@ const stylesByType: Record<BadgeType, string> = {
   criteria: "bg-[var(--color-bg-layer-01)] border-transparent text-[var(--color-text-secondary)] gap-[2px]",
   habituallyInStock: "bg-[var(--color-alert-success-bg)] border-[var(--color-success)] text-[var(--color-success)]",
   inStock: "bg-[var(--color-alert-success-bg)] border-[var(--color-success)] text-[var(--color-success)]",
-  availableJX: "bg-[var(--color-alert-critical-bg)] border-[var(--color-warning)] text-[var(--color-warning)]",
+  availableJX: "bg-[var(--color-alert-error-bg)] border-[var(--color-warning)] text-[var(--color-warning)]",
   notInStock: "bg-[var(--color-bg-layer-01)] border-[var(--color-text-secondary)] text-[var(--color-text-secondary)]",
 };
 
