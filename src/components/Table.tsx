@@ -25,12 +25,7 @@ function Table({ title, columns = 2, className, children, ...props }: TableProps
         {...props}
       >
         {title != null && title !== "" && (
-          <h2
-            className={cn(
-              "m-0 w-full font-[var(--font-heading)] font-[var(--font-weight-semibold)] leading-[var(--line-height-l)]",
-              "text-[var(--font-size-l)] tracking-normal text-[var(--color-text-primary)]",
-            )}
-          >
+          <h2 className="m-0 w-full font-[var(--font-heading)] font-[var(--font-weight-semibold)] leading-[var(--line-height-l)] text-[var(--font-size-l)] text-[var(--color-text-primary)]">
             {title}
           </h2>
         )}

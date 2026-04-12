@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   CheckCircle, Truck, Package, AlertTriangle, XCircle,
   ClipboardCheck, FileText, ShoppingCart,
@@ -10,33 +10,38 @@ import { Progress } from "@/components/ui/progress";
 import { useOrderWithDetails, type ShipmentRow, type LineItemRow } from "@/hooks/useOrders";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Checkbox } from "@/components/ui/checkbox";
-import { format } from "date-fns";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useI18n } from "@/i18n/useI18n";
 
-/* ── Product image helper ── */
 function productImageUrl(ref: string) {
   const hash = Array.from(ref).reduce((a, c) => a + c.charCodeAt(0), 0);
   const id = (hash % 200) + 10;
   return `https://picsum.photos/seed/${id}/64/64`;
 }
 
-/* ── Status config ── */
-const statusMeta: Record<string, { label: string; icon: typeof CheckCircle; colorClass: string; bgClass: string }> = {
-  on_track: { label: "On track", icon: CheckCircle, colorClass: "text-[var(--color-success)]", bgClass: "bg-[var(--color-alert-success-bg)] border-[var(--color-success)]" },
-  being_prepared: { label: "Being prepared", icon: Package, colorClass: "text-[var(--color-info)]", bgClass: "bg-[var(--color-alert-info-bg)] border-[var(--color-info)]" },
-  in_transit: { label: "In transit", icon: Truck, colorClass: "text-[var(--color-info)]", bgClass: "bg-[var(--color-alert-info-bg)] border-[var(--color-info)]" },
-  partially_delivered: { label: "Partially delivered", icon: Package, colorClass: "text-[#8A3800]", bgClass: "bg-[#FFF2E8] border-[#8A3800]" },
-  delayed: { label: "Delayed", icon: AlertTriangle, colorClass: "text-[#8A3800]", bgClass: "bg-[#FFF2E8] border-[#8A3800]" },
-  cancelled: { label: "Cancelled", icon: XCircle, colorClass: "text-[var(--color-error)]", bgClass: "bg-[var(--color-alert-error-bg)] border-[var(--color-error)]" },
-  completed: { label: "Completed", icon: CheckCircle, colorClass: "text-[var(--color-success)]", bgClass: "bg-[var(--color-alert-success-bg)] border-[var(--color-success)]" },
+const statusVisual: Record<string, { icon: typeof CheckCircle; colorClass: string; bgClass: string }> = {
+  on_track: { icon: CheckCircle, colorClass: "text-[var(--color-success)]", bgClass: "bg-[var(--color-alert-success-bg)] border-[var(--color-success)]" },
+  being_prepared: { icon: Package, colorClass: "text-[var(--color-info)]", bgClass: "bg-[var(--color-alert-info-bg)] border-[var(--color-info)]" },
+  in_transit: { icon: Truck, colorClass: "text-[var(--color-info)]", bgClass: "bg-[var(--color-alert-info-bg)] border-[var(--color-info)]" },
+  partially_delivered: {
+    icon: Package,
+    colorClass: "text-[var(--color-alert-critical-text)]",
+    bgClass: "bg-[var(--color-alert-critical-bg)] border-[var(--color-alert-error-border)]",
+  },
+  delayed: {
+    icon: AlertTriangle,
+    colorClass: "text-[var(--color-alert-critical-text)]",
+    bgClass: "bg-[var(--color-alert-critical-bg)] border-[var(--color-alert-error-border)]",
+  },
+  cancelled: { icon: XCircle, colorClass: "text-[var(--color-error)]", bgClass: "bg-[var(--color-alert-error-bg)] border-[var(--color-error)]" },
+  completed: { icon: CheckCircle, colorClass: "text-[var(--color-success)]", bgClass: "bg-[var(--color-alert-success-bg)] border-[var(--color-success)]" },
 };
 
-/* ── Shipment tracking ── */
 const trackingSteps = [
-  { key: "confirmed", label: "Confirmed", icon: ClipboardCheck },
-  { key: "in_transit", label: "In transit", icon: Truck },
-  { key: "delivered", label: "Delivered", icon: Package },
+  { key: "confirmed", track: "confirmed" as const, icon: ClipboardCheck },
+  { key: "in_transit", track: "in_transit" as const, icon: Truck },
+  { key: "delivered", track: "delivered" as const, icon: Package },
 ];
 
 function stepIndex(status: string) {
@@ -45,21 +50,17 @@ function stepIndex(status: string) {
   return 0;
 }
 
-/* ── Helpers ── */
-function fmtDate(d: string | null) {
-  if (!d) return "—";
-  return format(new Date(d), "dd/MM/yyyy");
-}
-function fmtCurrency(n: number) {
-  return new Intl.NumberFormat("en-GB", { style: "currency", currency: "EUR" }).format(n);
-}
-
-/* ── Copy pill button ── */
 function CopyPill({ text }: { text: string }) {
+  const { t } = useI18n();
   return (
     <button
-      onClick={(e) => { e.stopPropagation(); navigator.clipboard.writeText(text); toast.success("Copied"); }}
-      className="inline-flex items-center gap-1 rounded-full border border-[var(--color-border-subtle)] bg-white px-2.5 py-0.5 text-[12px] font-semibold text-[var(--color-primary)] hover:border-[var(--color-primary)] transition-colors"
+      type="button"
+      onClick={(e) => {
+        e.stopPropagation();
+        navigator.clipboard.writeText(text);
+        toast.success(t("common.copied"));
+      }}
+      className="inline-flex h-8 items-center gap-1 rounded-full border border-[var(--color-border-subtle)] bg-white px-3 text-[12px] font-semibold text-[var(--color-primary)] hover:border-[var(--color-primary)] transition-colors"
     >
       {text}
       <Copy className="h-3 w-3 text-[var(--color-primary)]" />
@@ -67,28 +68,31 @@ function CopyPill({ text }: { text: string }) {
   );
 }
 
-/* ── Shipment mini tracker ── */
 function ShipmentMini({ shipment, lineItems }: { shipment: ShipmentRow; lineItems: LineItemRow[] }) {
+  const { t, formatDate } = useI18n();
   const current = stepIndex(shipment.status);
   const items = lineItems.filter((li) => li.shipment_id === shipment.id);
 
   return (
     <div className="rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] p-4">
       <div className="flex items-center justify-between mb-3">
-        <span className="text-[13px] font-semibold text-[var(--color-text-primary)]">Shipment {shipment.shipment_index}</span>
+        <span className="text-[13px] font-semibold text-[var(--color-text-primary)]">
+          {t("delivery.shipmentN")} {shipment.shipment_index}
+        </span>
         <span className="text-[12px] text-[var(--color-text-secondary)]">{shipment.carrier ?? ""}</span>
       </div>
 
-      {/* Mini stepper */}
       <div className="flex items-center gap-1 mb-3">
         {trackingSteps.map((step, i) => {
           const done = i <= current;
           return (
-            <div key={i} className="flex items-center gap-1 flex-1">
-              <div className={cn(
-                "flex h-6 w-6 items-center justify-center rounded-full",
-                done ? "bg-[var(--color-primary)] text-[var(--color-white)]" : "bg-[var(--color-bg-layer-01)] text-[var(--color-text-placeholder)]",
-              )}>
+            <div key={step.key} className="flex items-center gap-1 flex-1">
+              <div
+                className={cn(
+                  "flex h-6 w-6 items-center justify-center rounded-full",
+                  done ? "bg-[var(--color-primary)] text-[var(--color-white)]" : "bg-[var(--color-bg-layer-01)] text-[var(--color-text-placeholder)]"
+                )}
+              >
                 <step.icon className="h-3 w-3" />
               </div>
               {i < trackingSteps.length - 1 && (
@@ -101,8 +105,10 @@ function ShipmentMini({ shipment, lineItems }: { shipment: ShipmentRow; lineItem
 
       <p className="text-[12px] text-[var(--color-text-secondary)] mb-3">
         {shipment.status === "delivered"
-          ? `Delivered ${fmtDate(shipment.delivered_at)}${shipment.delivered_signed_by ? ` — Signed by ${shipment.delivered_signed_by}` : ""}`
-          : `Expected ${fmtDate(shipment.expected_delivery)}`}
+          ? `${t("side.miniDelivered")} ${formatDate(shipment.delivered_at, "dd/MM/yyyy")}${
+              shipment.delivered_signed_by ? ` — ${t("side.miniSigned")} ${shipment.delivered_signed_by}` : ""
+            }`
+          : `${t("side.miniExpected")} ${formatDate(shipment.expected_delivery, "dd/MM/yyyy")}`}
       </p>
 
       {items.length > 0 && (
@@ -116,7 +122,9 @@ function ShipmentMini({ shipment, lineItems }: { shipment: ShipmentRow; lineItem
                 <span className="truncate text-[var(--color-text-primary)]">{item.product_name}</span>
                 <div className="flex items-center gap-1.5 shrink-0 ml-auto">
                   <Progress value={pct} className="h-1 w-10" />
-                  <span className="text-[var(--color-text-secondary)]">{delivered}/{item.quantity}</span>
+                  <span className="text-[var(--color-text-secondary)]">
+                    {delivered}/{item.quantity}
+                  </span>
                 </div>
               </div>
             );
@@ -127,7 +135,6 @@ function ShipmentMini({ shipment, lineItems }: { shipment: ShipmentRow; lineItem
   );
 }
 
-/* ── Mock documents grouped by type ── */
 const MOCK_DOCUMENTS = [
   { name: "Invoice INV-2024-0847", type: "Invoice", date: "2024-12-15", icon: FileText },
   { name: "Invoice INV-2024-0612", type: "Invoice", date: "2024-12-01", icon: FileText },
@@ -150,7 +157,6 @@ function groupDocsByType(docs: typeof MOCK_DOCUMENTS) {
   return groups;
 }
 
-/* ── Side Panel ── */
 interface OrderSidePanelProps {
   orderNumber: string | null;
   onClose: () => void;
@@ -159,19 +165,21 @@ interface OrderSidePanelProps {
 type TabKey = "detail" | "documents" | "reception";
 
 export default function OrderSidePanel({ orderNumber, onClose }: OrderSidePanelProps) {
+  const { t, formatDate, formatCurrency } = useI18n();
   const { data, isLoading, refetch } = useOrderWithDetails(orderNumber ?? undefined);
-  
+
   const [activeTab, setActiveTab] = useState<TabKey>("detail");
   const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({});
 
   const open = !!orderNumber;
   const isCompletedOrder = data?.order.status === "completed";
 
-  // Auto-check all items when order is completed
   useEffect(() => {
     if (data && isCompletedOrder) {
       const all: Record<string, boolean> = {};
-      data.lineItems.forEach((li) => { all[li.id] = true; });
+      data.lineItems.forEach((li) => {
+        all[li.id] = true;
+      });
       setCheckedItems(all);
     }
   }, [data, isCompletedOrder]);
@@ -186,7 +194,9 @@ export default function OrderSidePanel({ orderNumber, onClose }: OrderSidePanelP
   const checkAll = () => {
     if (!data || isCompletedOrder) return;
     const all: Record<string, boolean> = {};
-    data.lineItems.forEach((li) => { all[li.id] = true; });
+    data.lineItems.forEach((li) => {
+      all[li.id] = true;
+    });
     setCheckedItems(all);
   };
 
@@ -201,16 +211,18 @@ export default function OrderSidePanel({ orderNumber, onClose }: OrderSidePanelP
     }
     setCheckedItems({});
     refetch();
-    toast.success("Reception confirmed", { description: `${data.lineItems.length} item(s) validated — order marked as completed` });
+    toast.success(t("side.toastReceptionOk"), {
+      description: `${data.lineItems.length} ${t("side.toastReceptionDesc")}`,
+    });
   };
 
   const handleReorderItem = (item: LineItemRow) => {
-    toast.success(`${item.product_name} added to cart`, { description: `Qty: ${item.quantity}` });
+    toast.success(`${item.product_name} ${t("side.toastCart")}`, { description: `${t("side.toastCartDesc")} ${item.quantity}` });
   };
 
   const handleReorderAll = () => {
     if (!data) return;
-    toast.success(`${data.lineItems.length} item(s) added to cart`, { description: `From order ${data.order.order_number}` });
+    toast.success(`${data.lineItems.length} ${t("side.toastReorderAll")}`, { description: `${t("orders.fromOrder")} ${data.order.order_number}` });
   };
 
   const handleOpenChange = (v: boolean) => {
@@ -221,20 +233,21 @@ export default function OrderSidePanel({ orderNumber, onClose }: OrderSidePanelP
     }
   };
 
-  const tabs: { key: TabKey; label: string; icon: typeof FileText }[] = [
-    { key: "detail", label: "Detail", icon: Package },
-    { key: "documents", label: "Documents", icon: FileText },
-    { key: "reception", label: "Reception", icon: ClipboardCheck },
-  ];
+  const tabs = useMemo(
+    () =>
+      [
+        { key: "detail" as const, label: t("side.tabDetail"), icon: Package },
+        { key: "documents" as const, label: t("side.tabDocuments"), icon: FileText },
+        { key: "reception" as const, label: t("side.tabReception"), icon: ClipboardCheck },
+      ] as const,
+    [t]
+  );
 
   const docGroups = groupDocsByType(MOCK_DOCUMENTS);
 
   return (
     <Sheet open={open} onOpenChange={handleOpenChange}>
-      <SheetContent
-        side="right"
-        className="w-full sm:max-w-[50vw] sm:min-w-[480px] p-0 flex flex-col [&>button]:hidden"
-      >
+      <SheetContent side="right" className="w-full sm:max-w-[50vw] sm:min-w-[480px] p-0 flex flex-col [&>button]:hidden">
         {isLoading ? (
           <div className="p-6 space-y-4">
             <Skeleton className="h-6 w-48" />
@@ -243,49 +256,54 @@ export default function OrderSidePanel({ orderNumber, onClose }: OrderSidePanelP
             <Skeleton className="h-48 w-full" />
           </div>
         ) : !data ? (
-          <div className="p-6 text-center text-[var(--color-text-secondary)]">Order not found</div>
+          <div className="p-6 text-center text-[var(--color-text-secondary)]">{t("side.notFound")}</div>
         ) : (
           <>
-            {/* Scrollable body */}
             <div className="flex-1 overflow-y-auto">
-              {/* Header */}
               <div className="sticky top-0 z-10 bg-[var(--color-bg-page)] border-b border-[var(--color-border-subtle)]">
                 <div className="px-6 py-5">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <CopyPill text={data.order.order_number} />
                       {(() => {
-                        const meta = statusMeta[data.order.status] ?? statusMeta.on_track;
+                        const meta = statusVisual[data.order.status] ?? statusVisual.on_track;
                         const Icon = meta.icon;
                         return (
-                          <span className={cn("inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[12px] font-semibold", meta.bgClass, meta.colorClass)}>
-                            <Icon className="h-3 w-3" />{meta.label}
+                          <span className={cn("inline-flex h-8 items-center gap-1 rounded-full border px-3 text-[12px] font-semibold", meta.bgClass, meta.colorClass)}>
+                            <Icon className="h-3 w-3 shrink-0" />
+                            {t(`orderStatus.${data.order.status}`)}
                           </span>
                         );
                       })()}
                     </div>
-                    <button onClick={onClose} className="text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]">
+                    <button type="button" onClick={onClose} className="text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]">
                       <X className="h-5 w-5" />
                     </button>
                   </div>
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2">
                     <p className="text-[13px] text-[var(--color-text-secondary)]">
-                      Ordered <span className="font-semibold text-[var(--color-text-primary)]">{fmtDate(data.order.order_date)}</span>
-                      {data.order.po_number && <> · PO: {data.order.po_number}</>}
+                      {t("side.ordered")}{" "}
+                      <span className="font-semibold text-[var(--color-text-primary)]">{formatDate(data.order.order_date, "dd/MM/yyyy")}</span>
+                      {data.order.po_number && (
+                        <>
+                          {" "}
+                          · {t("common.po")}: {data.order.po_number}
+                        </>
+                      )}
                     </p>
                   </div>
                   {data.order.project_name && (
-                    <span className="inline-flex items-center gap-1 mt-2 rounded-full bg-[var(--color-bg-layer-01)] px-2 py-0.5 text-[11px] font-semibold text-[var(--color-text-secondary)]">
+                    <span className="inline-flex h-8 items-center gap-1 mt-2 rounded-full bg-[var(--color-bg-layer-01)] px-3 text-[12px] font-semibold text-[var(--color-text-secondary)]">
                       {data.order.project_name}
                     </span>
                   )}
                 </div>
 
-                {/* Tabs — more breathing room */}
                 <div className="flex px-6">
                   {tabs.map((tab) => (
                     <button
                       key={tab.key}
+                      type="button"
                       onClick={() => setActiveTab(tab.key)}
                       className={cn(
                         "flex items-center gap-1.5 px-4 py-3 text-[13px] font-semibold border-b-2 -mb-px transition-colors",
@@ -301,44 +319,49 @@ export default function OrderSidePanel({ orderNumber, onClose }: OrderSidePanelP
                 </div>
               </div>
 
-              {/* ===== Detail Tab ===== */}
               {activeTab === "detail" && (
                 <div className="px-6 py-5 space-y-5">
-                  {/* Summary row */}
                   <div className="flex items-center gap-3 flex-wrap">
                     <div className="flex items-center gap-2 rounded-[var(--border-radius-sm)] bg-[var(--color-bg-layer-01)] px-3 py-2">
-                      <span className="text-[14px] font-bold text-[var(--color-text-primary)]">{fmtCurrency(data.order.total_amount)}</span>
-                      <span className="text-[11px] text-[var(--color-text-secondary)] uppercase">excl. tax</span>
+                      <span className="text-[14px] font-bold text-[var(--color-text-primary)]">{formatCurrency(data.order.total_amount)}</span>
+                      <span className="text-[11px] text-[var(--color-text-secondary)] uppercase">{t("side.exclTax")}</span>
                     </div>
                     <div className="flex items-center gap-2 rounded-[var(--border-radius-sm)] bg-[var(--color-bg-layer-01)] px-3 py-2">
                       <span className="text-[14px] font-bold text-[var(--color-text-primary)]">{data.lineItems.length}</span>
-                      <span className="text-[11px] text-[var(--color-text-secondary)] uppercase">items</span>
+                      <span className="text-[11px] text-[var(--color-text-secondary)] uppercase">{t("side.items")}</span>
                     </div>
                     <div className="flex items-center gap-2 rounded-[var(--border-radius-sm)] bg-[var(--color-bg-layer-01)] px-3 py-2">
                       <span className="text-[14px] font-bold text-[var(--color-text-primary)]">{data.shipments.length}</span>
-                      <span className="text-[11px] text-[var(--color-text-secondary)] uppercase">shipments</span>
+                      <span className="text-[11px] text-[var(--color-text-secondary)] uppercase">{t("side.shipments")}</span>
                     </div>
                   </div>
 
-                  {/* Delivery date — contextual inline message */}
                   {data.order.expected_delivery && data.order.status !== "completed" && data.order.status !== "cancelled" && (() => {
                     const isDelayed = data.order.status === "delayed";
                     const isPartial = data.order.status === "partially_delivered";
                     const isWarning = isDelayed || isPartial;
-                    const bgColor = isWarning ? "bg-[#FFF2E8]" : "bg-[var(--color-alert-info-bg)]";
-                    const borderColor = isWarning ? "border-[#8A3800]" : "border-[var(--color-info)]";
-                    const textColor = isWarning ? "text-[#8A3800]" : "text-[var(--color-info)]";
+                    const bgColor = isWarning ? "bg-[var(--color-alert-critical-bg)]" : "bg-[var(--color-alert-info-bg)]";
+                    const borderColor = isWarning ? "border-[var(--color-alert-error-border)]" : "border-[var(--color-info)]";
+                    const textColor = isWarning ? "text-[var(--color-alert-critical-text)]" : "text-[var(--color-info)]";
                     const Icon = isDelayed ? AlertTriangle : Truck;
                     return (
                       <div className={cn("flex items-center gap-2 rounded-[var(--border-radius-sm)] border px-3 py-2 text-[13px] font-semibold", bgColor, borderColor, textColor)}>
                         <Icon className="h-3.5 w-3.5 shrink-0" />
                         <span>
-                          {isDelayed ? "Delayed — " : "Expected delivery: "}
-                          {fmtDate(data.order.expected_delivery)}
+                          {isDelayed ? t("side.delayedPrefix") : `${t("side.expectedDelivery")} `}
+                          {formatDate(data.order.expected_delivery, "dd/MM/yyyy")}
                           {isDelayed && data.order.previous_expected_delivery && (
-                            <> (was <span className="line-through">{fmtDate(data.order.previous_expected_delivery)}</span>)</>
+                            <>
+                              {" "}
+                              ({t("side.was")} <span className="line-through">{formatDate(data.order.previous_expected_delivery, "dd/MM/yyyy")}</span>)
+                            </>
                           )}
-                          {isPartial && data.order.items_remaining > 0 && <> — {data.order.items_remaining} item(s) remaining</>}
+                          {isPartial && data.order.items_remaining > 0 && (
+                            <>
+                              {" "}
+                              — {data.order.items_remaining} {t("side.itemsLeft")}
+                            </>
+                          )}
                         </span>
                       </div>
                     );
@@ -347,28 +370,25 @@ export default function OrderSidePanel({ orderNumber, onClose }: OrderSidePanelP
                   {data.order.status === "completed" && (
                     <div className="flex items-center gap-2 rounded-[var(--border-radius-sm)] border border-[var(--color-success)] bg-[var(--color-alert-success-bg)] px-3 py-2 text-[13px] font-semibold text-[var(--color-success)]">
                       <CheckCircle className="h-3.5 w-3.5 shrink-0" />
-                      Delivered — Order completed
+                      {t("side.deliveredCompleted")}
                     </div>
                   )}
 
-
-                  {/* Shipments */}
                   {data.shipments.length > 0 && (
                     <div className="space-y-3">
-                      <h3 className="text-[13px] font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider">Shipments</h3>
+                      <h3 className="text-[13px] font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider">{t("side.shipmentsH")}</h3>
                       {data.shipments.map((s) => (
                         <ShipmentMini key={s.id} shipment={s} lineItems={data.lineItems} />
                       ))}
                     </div>
                   )}
 
-                  {/* Items not in any shipment */}
                   {(() => {
                     const unassigned = data.lineItems.filter((li) => !li.shipment_id);
                     if (unassigned.length === 0) return null;
                     return (
                       <div className="space-y-3">
-                        <h3 className="text-[13px] font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider">Awaiting shipment</h3>
+                        <h3 className="text-[13px] font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider">{t("side.awaiting")}</h3>
                         {unassigned.map((item) => (
                           <div key={item.id} className="flex items-center justify-between text-[13px] rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] p-3">
                             <div className="flex items-center gap-3 min-w-0">
@@ -381,12 +401,13 @@ export default function OrderSidePanel({ orderNumber, onClose }: OrderSidePanelP
                             <div className="flex items-center gap-3 shrink-0 ml-3">
                               <div className="text-right">
                                 <p className="text-[var(--color-text-primary)]">×{item.quantity}</p>
-                                <p className="text-[12px] text-[var(--color-text-secondary)]">{fmtCurrency(item.unit_price)}</p>
+                                <p className="text-[12px] text-[var(--color-text-secondary)]">{formatCurrency(item.unit_price)}</p>
                               </div>
                               <button
+                                type="button"
                                 onClick={() => handleReorderItem(item)}
-                                 className="h-8 w-8 flex items-center justify-center rounded-[var(--border-radius-sm)] border border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-rexel-primary-10)] transition-colors"
-                                title="Reorder this item"
+                                className="h-8 w-8 flex items-center justify-center rounded-[var(--border-radius-sm)] border border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-rexel-primary-10)] transition-colors"
+                                title={t("side.reorderItem")}
                               >
                                 <ShoppingCart className="h-3.5 w-3.5" />
                               </button>
@@ -397,66 +418,71 @@ export default function OrderSidePanel({ orderNumber, onClose }: OrderSidePanelP
                     );
                   })()}
 
-                  {/* All line items with reorder */}
                   {data.lineItems.filter((li) => li.shipment_id).length > 0 && (
                     <div className="space-y-3">
-                      <h3 className="text-[13px] font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider">All items</h3>
-                      {data.lineItems.filter((li) => li.shipment_id).map((item) => (
-                        <div key={item.id} className="flex items-center justify-between text-[13px] rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] p-3">
-                          <div className="flex items-center gap-3 min-w-0">
-                            <img src={productImageUrl(item.product_reference)} alt={item.product_name} className="h-10 w-10 rounded border border-[var(--color-border-subtle)] object-cover shrink-0" />
-                            <div className="min-w-0">
-                              <p className="font-semibold text-[var(--color-text-primary)] truncate">{item.product_name}</p>
-                              <CopyPill text={item.product_reference} />
+                      <h3 className="text-[13px] font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider">{t("side.allItems")}</h3>
+                      {data.lineItems
+                        .filter((li) => li.shipment_id)
+                        .map((item) => (
+                          <div key={item.id} className="flex items-center justify-between text-[13px] rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] p-3">
+                            <div className="flex items-center gap-3 min-w-0">
+                              <img src={productImageUrl(item.product_reference)} alt={item.product_name} className="h-10 w-10 rounded border border-[var(--color-border-subtle)] object-cover shrink-0" />
+                              <div className="min-w-0">
+                                <p className="font-semibold text-[var(--color-text-primary)] truncate">{item.product_name}</p>
+                                <CopyPill text={item.product_reference} />
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-3 shrink-0 ml-3">
+                              <div className="text-right">
+                                <p className="text-[var(--color-text-primary)]">×{item.quantity}</p>
+                                <p className="text-[12px] text-[var(--color-text-secondary)]">{formatCurrency(item.unit_price)}</p>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => handleReorderItem(item)}
+                                className="h-8 w-8 flex items-center justify-center rounded-[var(--border-radius-sm)] border border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-rexel-primary-10)] transition-colors"
+                                title={t("side.reorderItem")}
+                              >
+                                <ShoppingCart className="h-3.5 w-3.5" />
+                              </button>
                             </div>
                           </div>
-                          <div className="flex items-center gap-3 shrink-0 ml-3">
-                            <div className="text-right">
-                              <p className="text-[var(--color-text-primary)]">×{item.quantity}</p>
-                              <p className="text-[12px] text-[var(--color-text-secondary)]">{fmtCurrency(item.unit_price)}</p>
-                            </div>
-                            <button
-                              onClick={() => handleReorderItem(item)}
-                              className="h-8 w-8 flex items-center justify-center rounded-[var(--border-radius-sm)] border border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-rexel-primary-10)] transition-colors"
-                              title="Reorder this item"
-                            >
-                              <ShoppingCart className="h-3.5 w-3.5" />
-                            </button>
-                          </div>
-                        </div>
-                      ))}
+                        ))}
                     </div>
                   )}
 
-                  {/* Contact block */}
                   <div className="rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] p-4">
-                    <p className="text-[12px] font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider mb-2">Your sales rep</p>
+                    <p className="text-[12px] font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider mb-2">{t("side.salesRep")}</p>
                     <p className="text-[13px] font-semibold text-[var(--color-text-primary)]">Gisèle Michu — Agence Paris-Est</p>
                     <p className="text-[12px] text-[var(--color-text-secondary)] mt-1">
-                      <Phone className="inline h-3 w-3 mr-1" />01 23 45 67 89
+                      <Phone className="inline h-3 w-3 mr-1" />
+                      01 23 45 67 89
                       <span className="mx-1.5">·</span>
-                      <Mail className="inline h-3 w-3 mr-1" />gisele.michu@rexel.fr
+                      <Mail className="inline h-3 w-3 mr-1" />
+                      gisele.michu@rexel.fr
                     </p>
                   </div>
                 </div>
               )}
 
-              {/* ===== Documents Tab ===== */}
               {activeTab === "documents" && (
                 <div className="px-6 py-5 space-y-5">
                   <p className="text-[12px] text-[var(--color-text-secondary)]">
-                    {MOCK_DOCUMENTS.length} document(s) associated with this order
+                    {MOCK_DOCUMENTS.length} {t("side.docsCount")}
                   </p>
                   {Object.entries(docGroups).map(([type, docs]) => (
                     <div key={type} className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <h3 className="text-[13px] font-semibold text-[var(--color-text-primary)]">{type} ({docs.length})</h3>
+                        <h3 className="text-[13px] font-semibold text-[var(--color-text-primary)]">
+                          {type} ({docs.length})
+                        </h3>
                         <button
-                          onClick={() => toast.success(`Downloading ${docs.length} ${type.toLowerCase()}(s)`)}
+                          type="button"
+                          onClick={() => toast.success(`${t("side.downloading")} ${docs.length} ${type}`)}
                           className="inline-flex items-center gap-1 text-[12px] font-semibold text-[var(--color-primary)] hover:underline"
                         >
                           <Download className="h-3 w-3" />
-                          Download all
+                          {t("side.downloadAll")}
                         </button>
                       </div>
                       {docs.map((doc, i) => (
@@ -466,9 +492,9 @@ export default function OrderSidePanel({ orderNumber, onClose }: OrderSidePanelP
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="text-[13px] font-semibold text-[var(--color-text-primary)] truncate">{doc.name}</p>
-                            <p className="text-[12px] text-[var(--color-text-secondary)]">{fmtDate(doc.date)}</p>
+                            <p className="text-[12px] text-[var(--color-text-secondary)]">{formatDate(doc.date, "dd/MM/yyyy")}</p>
                           </div>
-                          <button className="opacity-0 group-hover:opacity-100 h-8 w-8 flex items-center justify-center rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] transition-all">
+                          <button type="button" className="opacity-0 group-hover:opacity-100 h-8 w-8 flex items-center justify-center rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] text-[var(--color-text-secondary)] hover:text-[var(--color-primary)] transition-all">
                             <Download className="h-4 w-4" />
                           </button>
                         </div>
@@ -478,22 +504,21 @@ export default function OrderSidePanel({ orderNumber, onClose }: OrderSidePanelP
                 </div>
               )}
 
-              {/* ===== Reception Tab ===== */}
               {activeTab === "reception" && (
                 <div className="px-6 py-5 space-y-4">
                   {isCompletedOrder && (
                     <div className="rounded-[var(--border-radius-sm)] border border-[var(--color-success)] bg-[var(--color-alert-success-bg)] p-3 text-[13px] text-[var(--color-success)] flex items-center gap-2">
                       <CheckCircle className="h-4 w-4 shrink-0" />
-                      This order has been fully received and validated.
+                      {t("side.receptionDone")}
                     </div>
                   )}
                   <div className="flex items-center justify-between">
                     <p className="text-[12px] text-[var(--color-text-secondary)]">
-                      {isCompletedOrder ? "All items received." : "Check each item received, then validate."}
+                      {isCompletedOrder ? t("side.allReceived") : t("side.checkReceived")}
                     </p>
                     {!isCompletedOrder && (
-                      <button onClick={checkAll} className="text-[12px] font-semibold text-[var(--color-primary)] hover:underline">
-                        Check all
+                      <button type="button" onClick={checkAll} className="text-[12px] font-semibold text-[var(--color-primary)] hover:underline">
+                        {t("side.checkAll")}
                       </button>
                     )}
                   </div>
@@ -515,14 +540,16 @@ export default function OrderSidePanel({ orderNumber, onClose }: OrderSidePanelP
                       <div className="flex items-center gap-3 flex-1 min-w-0">
                         <img src={productImageUrl(item.product_reference)} alt={item.product_name} className="h-10 w-10 rounded border border-[var(--color-border-subtle)] object-cover shrink-0" />
                         <div className="min-w-0">
-                          <p className={cn(
-                            "text-[13px] font-semibold text-[var(--color-text-primary)] truncate",
-                            checkedItems[item.id] && "line-through text-[var(--color-text-secondary)]"
-                          )}>
+                          <p
+                            className={cn(
+                              "text-[13px] font-semibold text-[var(--color-text-primary)] truncate",
+                              checkedItems[item.id] && "line-through text-[var(--color-text-secondary)]"
+                            )}
+                          >
                             {item.product_name}
                           </p>
                           <p className="text-[12px] text-[var(--color-text-secondary)]">
-                            <CopyPill text={item.product_reference} /> — Qty: {item.quantity}
+                            <CopyPill text={item.product_reference} /> — {t("common.qty")}: {item.quantity}
                           </p>
                         </div>
                       </div>
@@ -530,16 +557,16 @@ export default function OrderSidePanel({ orderNumber, onClose }: OrderSidePanelP
                   ))}
 
                   <div className="pt-1 text-center text-[12px] text-[var(--color-text-secondary)]">
-                    {checkedCount}/{data.lineItems.length} item(s) checked
+                    {checkedCount}/{data.lineItems.length} {t("side.checked")}
                   </div>
                 </div>
               )}
             </div>
 
-            {/* Sticky footer */}
             <div className="border-t border-[var(--color-border-subtle)] bg-[var(--color-bg-page)] px-6 py-4 flex items-center gap-3">
               {activeTab === "reception" ? (
                 <button
+                  type="button"
                   disabled={!allChecked || isCompletedOrder}
                   onClick={handleValidateReception}
                   className={cn(
@@ -549,14 +576,18 @@ export default function OrderSidePanel({ orderNumber, onClose }: OrderSidePanelP
                       : "bg-[var(--color-bg-layer-01)] text-[var(--color-text-placeholder)] cursor-not-allowed"
                   )}
                 >
-                  <Check className="h-4 w-4" /> {isCompletedOrder ? "Already validated" : `Validate reception (${checkedCount}/${data.lineItems.length})`}
+                  <Check className="h-4 w-4" />{" "}
+                  {isCompletedOrder
+                    ? t("side.alreadyValidated")
+                    : `${t("side.validateReception")} (${checkedCount}/${data.lineItems.length})`}
                 </button>
               ) : (
                 <button
+                  type="button"
                   onClick={handleReorderAll}
                   className="flex-1 inline-flex items-center justify-center gap-2 h-10 rounded-[var(--border-radius-sm)] bg-[var(--color-primary)] text-[var(--color-white)] text-[13px] font-semibold hover:bg-[var(--color-primary-hover)] transition-colors"
                 >
-                  <ShoppingCart className="h-4 w-4" /> Reorder all
+                  <ShoppingCart className="h-4 w-4" /> {t("side.reorderAll")}
                 </button>
               )}
             </div>

@@ -32,7 +32,7 @@ export default function OrderList() {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="font-semibold text-sm text-[var(--color-text-primary)]">{order.orderNumber}</span>
-                  <Badge type={cfg.type} label={cfg.label} className="text-[length:var(--font-size-xs)] px-2 py-0" />
+                  <Badge type={cfg.type} label={cfg.label} className="min-h-8 px-3 py-0 text-[length:var(--font-size-xs)]" />
                 </div>
                 <p className="text-xs text-[var(--color-text-secondary)]">{order.supplier}</p>
                 <p className="text-xs text-[var(--color-text-secondary)]">{new Date(order.date).toLocaleDateString("fr-FR")}</p>

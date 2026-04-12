@@ -1,0 +1,584 @@
+# Rexel Elektra Design System — Cursor Rules
+
+> Source: Figma Design System Library (Elektra)
+> Default theme: Rexel Group
+> Multi-brand: supports 11 brands via token aliasing
+
+---
+
+## Fonts
+
+- **Headings & Display**: Montserrat (SemiBold)
+- **Body, Labels, Links, Prices**: Open Sans (Regular, SemiBold, Bold)
+- **Icons**: Font Awesome 5 Free (Solid & Regular)
+
+Import from Google Fonts:
+```html
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+```
+
+---
+
+## Typography Scale (V2 — current)
+
+### Display
+| Token | Font | Weight | Size | Line-height |
+|---|---|---|---|---|
+| Display-01 | Montserrat | SemiBold | 54px | 65px |
+| Display-02 | Montserrat | SemiBold | 42px | 50px |
+| Display-03 | Montserrat | SemiBold | 32px | 40px |
+
+### Headings
+| Token | Font | Weight | Size | Line-height |
+|---|---|---|---|---|
+| H1 | Montserrat | SemiBold | 28px | 38px |
+| H2 | Montserrat | SemiBold | 20px | 27px |
+| H3 | Montserrat | SemiBold | 16px | 24px |
+| H4 | Montserrat | SemiBold | 14px | 20px |
+
+### Headline (sous-titres)
+| Token | Font | Weight | Size | Line-height |
+|---|---|---|---|---|
+| Extra Large | Open Sans | SemiBold | 18px | 26px |
+| Large | Open Sans | SemiBold | 16px | 24px |
+| Medium | Open Sans | SemiBold | 14px | 20px |
+
+### Body
+| Token | Font | Weight | Size | Line-height |
+|---|---|---|---|---|
+| Large | Open Sans | Regular | 16px | 24px |
+| Medium | Open Sans | Regular | 14px | 20px |
+| Small | Open Sans | Regular | 12px | 16px |
+
+### Paragraph
+| Token | Font | Weight | Size | Line-height |
+|---|---|---|---|---|
+| Large | Open Sans | Regular | 16px | 24px |
+| Medium | Open Sans | Regular | 14px | 20px |
+| SEO | Open Sans | Regular | 14px | 20px |
+| Legal | Open Sans | Regular | 12px | 20px |
+
+### Components
+| Token | Font | Weight | Size | Line-height |
+|---|---|---|---|---|
+| Label/Medium | Open Sans | SemiBold | 14px | 18px |
+| Link/Large | Open Sans | SemiBold | 16px | 24px |
+| Link/Medium | Open Sans | SemiBold | 14px | 18px |
+| Button | Open Sans | SemiBold | 14px | 20px |
+| Input Label | Open Sans | Regular | 12px | 18px |
+
+### Price
+| Token | Font | Weight | Size | Line-height |
+|---|---|---|---|---|
+| Extra Large | Open Sans | SemiBold | 18px | 26px |
+| Large | Open Sans | SemiBold | 16px | 24px |
+| Medium | Open Sans | SemiBold | 14px | 20px |
+| Small | Open Sans | SemiBold | 12px | 16px |
+| Superscript | Open Sans | SemiBold | 10px | 16px |
+
+---
+
+## Spacing Scale
+
+| Token | Value |
+|---|---|
+| spacing-01 | 4px |
+| spacing-02 | 8px |
+| spacing-03 | 16px |
+| spacing-04 | 24px |
+| spacing-05 | 32px |
+| spacing-06 | 40px |
+| spacing-07 | 48px |
+| spacing-08 | 56px |
+| spacing-09 | 64px |
+| spacing-10 | 72px |
+| spacing-11 | 80px |
+
+---
+
+## Color Primitives
+
+### Neutral
+| Token | Hex |
+|---|---|
+| White | #FFFFFF |
+| Neutral/10 | #F4F4F4 |
+| Neutral/20 | #E0E0E0 |
+| Neutral/30 | #C6C6C6 |
+| Neutral/40 | #A8A8A8 |
+| Neutral/50 | #8D8D8D |
+| Neutral/60 | #6F6F6F |
+| Neutral/70 | #525252 |
+| Neutral/80 | #393939 |
+| Neutral/90 | #262626 |
+| Neutral/100 | #161616 |
+| Black | #000000 |
+
+### Rexel Group — Primary (Brand blue)
+| Token | Hex |
+|---|---|
+| Primary/10 | #ECEFFD |
+| Primary/20 | #C7D1FA |
+| Primary/30 | #9DAFF5 |
+| Primary/40 | #7089F0 |
+| Primary/50 | #4261EA |
+| Primary/60 | #2F4DCC |
+| Primary/70 | #2E4EAA ← main brand color |
+| Primary/80 | #223C80 |
+| Primary/90 | #192955 |
+| Primary/100 | #0C1429 |
+
+### Rexel Group — Grey
+| Token | Hex |
+|---|---|
+| Grey/10 | #F3F3FA |
+| Grey/20 | #D7D9E4 |
+| Grey/30 | #BBBFCE |
+| Grey/40 | #9FA4B7 |
+| Grey/50 | #838AA1 |
+| Grey/60 | #666F8A |
+| Grey/70 | #596179 |
+
+### Blue (System)
+| Token | Hex |
+|---|---|
+| Blue/10 | #EDF5FF |
+| Blue/20 | #D0E2FF |
+| Blue/30 | #A6C8FF |
+| Blue/40 | #78A9FF |
+| Blue/50 | #4589FF |
+| Blue/60 | #0F62FE |
+| Blue/70 | #0043CE |
+| Blue/80 | #002D9C |
+| Blue/90 | #001D6C |
+| Blue/100 | #001141 |
+
+### Red (Danger/Error)
+| Token | Hex |
+|---|---|
+| Red/10 | #FFF1F1 |
+| Red/20 | #FFD7D9 |
+| Red/30 | #FFB3B8 |
+| Red/40 | #FF8389 |
+| Red/50 | #FA4D56 |
+| Red/60 | #DA1E28 |
+| Red/70 | #A2191F |
+| Red/80 | #750E13 |
+| Red/90 | #520408 |
+| Red/100 | #2D0709 |
+
+### Green (Success)
+| Token | Hex |
+|---|---|
+| Green/10 | #DEFBE6 |
+| Green/20 | #A7F0BA |
+| Green/30 | #6FDC8C |
+| Green/40 | #42BE65 |
+| Green/50 | #24A148 |
+| Green/60 | #198038 |
+| Green/70 | #0E6027 |
+| Green/80 | #044317 |
+
+### Orange (Warning)
+| Token | Hex |
+|---|---|
+| Orange/10 | #FFF2E8 |
+| Orange/20 | #FFD9BE |
+| Orange/30 | #FFB784 |
+| Orange/40 | #FF832B |
+| Orange/50 | #EB6200 |
+| Orange/60 | #BA4E00 |
+| Orange/70 | #8A3800 |
+
+### Yellow (Info)
+| Token | Hex |
+|---|---|
+| Yellow/10 | #FCF4D6 |
+| Yellow/20 | #FDDC69 |
+| Yellow/30 | #F1C21B |
+| Yellow/40 | #D2A106 |
+| Yellow/50 | #B28600 |
+| Yellow/60 | #8E6A00 |
+
+---
+
+## Semantic Tokens (Theme: Rexel Group)
+
+### Background
+| Token | Alias | Resolved Hex |
+|---|---|---|
+| background | Neutral/White | #FFFFFF |
+| layer-01 | RexelGroup/Grey/10 | #F3F3FA |
+| layer-02 | Neutral/White | #FFFFFF |
+| layer-03 | RexelGroup/Grey/10 | #F3F3FA |
+| background-neutral | Neutral/20 | #E0E0E0 |
+| background-brand | RexelGroup/Primary/70 | #2E4EAA |
+| background-inverse | Neutral/90 | #262626 |
+| background-disabled | Neutral/10 | #F4F4F4 |
+
+### Border
+| Token | Alias | Resolved Hex |
+|---|---|---|
+| border-subtle | RexelGroup/Grey/20 | #D7D9E4 |
+| border-strong | RexelGroup/Grey/40 | #9FA4B7 |
+| border-disabled | RexelGroup/Grey/30 | #BBBFCE |
+| border-brand | RexelGroup/Primary/70 | #2E4EAA |
+| border-active | RexelGroup/Primary/70 | #2E4EAA |
+| border-focus | RexelGroup/Primary/70 | #2E4EAA |
+
+### Text
+| Token | Alias | Usage |
+|---|---|---|
+| text-primary | RexelGroup/Grey/100 | Main text content |
+| text-secondary | RexelGroup/Grey/90 | Secondary text |
+| text-helper | RexelGroup/Grey/70 (#596179) | Helper/caption text |
+| text-placeholder | Neutral/40 (#A8A8A8) | Input placeholders |
+| text-on-color | Neutral/White (#FFFFFF) | Text on colored backgrounds |
+| text-disabled | Neutral/60 (#6F6F6F) | Disabled text |
+| text-brand | RexelGroup/Primary/70 (#2E4EAA) | Brand-colored text |
+| text-interactive | RexelGroup/Primary/70 (#2E4EAA) | Interactive/link text |
+
+### Button
+| Token | Alias | Resolved Hex |
+|---|---|---|
+| button-primary | RexelGroup/Primary/70 | #2E4EAA |
+| button-secondary | Neutral/White | #FFFFFF |
+| button-tertiary | Transparent | transparent |
+| button-onsurface | Neutral/White | #FFFFFF |
+| button-danger-primary | Red/60 | #DA1E28 |
+| button-separator | Neutral/20 | #E0E0E0 |
+| button-disabled | Neutral/20 | #E0E0E0 |
+
+---
+
+## Components — Detailed Specs
+
+---
+
+### Button
+- **Types**: Primary, Secondary, Tertiary, Danger, OnSurface
+- **Sizes**: Small, Medium, Large
+- **States**: Default, Hover, Focus, Disabled, Loading, Success
+- **Icons**: No icon, Leading icon, Trailing icon
+- **Text**: Open Sans SemiBold 14px/20px
+- **Border-radius**: 4px
+- **Padding**: 8px 16px (Medium)
+
+| Variant | Background | Text color | Border |
+|---|---|---|---|
+| Primary | #2E4EAA | #FFFFFF | none |
+| Secondary | #FFFFFF | #2E4EAA | 1px solid #2E4EAA |
+| Tertiary | transparent | #2E4EAA | none |
+| Danger | #DA1E28 | #FFFFFF | none |
+| OnSurface | #FFFFFF | text-primary | 1px solid border-subtle |
+| Disabled | #E0E0E0 | #6F6F6F | none |
+
+Loading state: replace label with spinner animation.
+Success state: replace label with checkmark icon.
+
+---
+
+### Button Icon (icon-only)
+- **Types**: Primary, Secondary, Tertiary, OnSurface
+- **Sizes**: Small (30px), Medium (36px), Large (43px)
+- **Forms**: Square (border-radius 4px), Circle (border-radius 50%)
+- **States**: Default, Hover, Active, Disabled
+- Same color logic as Button
+
+---
+
+### Round Button
+- **Sizes**: Small (30px), Normal (36px), Large (43px)
+- **States**: Default, Hover, Focus, Disabled
+- Circular shape, used for add-to-cart and icon actions
+
+---
+
+### Button Add to Cart (animated)
+- **Types**: Primary, Secondary
+- **States**: Default, Hover, Focus, Disabled, Loading, Loading-anim, Success, Fail
+- Icon: cart icon (Font Awesome)
+- Animated transition: Default → Loading spinner → Success checkmark (or Fail warning)
+
+---
+
+### Inline Alerts
+- **Types**: Global alert (full width, top of page), Content alert (inline in content)
+- **Styles**: Default (with description + link), Compact (single line)
+- **Messages**: Default (blue), Information (blue), Success (green), Warning (orange), Critical (red)
+
+| Message | Background | Border-left | Icon color | Text color |
+|---|---|---|---|---|
+| Information | Blue/10 #EDF5FF | 3px solid Blue/60 #0F62FE | Blue/60 | text-primary |
+| Success | Green/10 #DEFBE6 | 3px solid Green/60 #198038 | Green/60 | text-primary |
+| Warning | Orange/10 #FFF2E8 | 3px solid Orange/60 #BA4E00 | Orange/60 | text-primary |
+| Critical | Red/10 #FFF1F1 | 3px solid Red/60 #DA1E28 | Red/60 | text-primary |
+
+Structure: Icon (left) + Title (Open Sans SemiBold 14px) + Description (Open Sans Regular 14px) + Optional link + Close button (×)
+Compact variant: Icon + single line message, no description
+Border-radius: 0 (sharp edges)
+Padding: 16px
+
+---
+
+### Field (wrapper component)
+- **Types**: Text, Dropdown, Multi Select, Text Area, Date Picker, Search, Password, Phone, Slot (custom)
+- Wraps input components with: Label (top) + Input + Helper text (bottom) + Error message
+- Label: Open Sans Regular 12px/18px, color text-secondary
+- Helper text: Open Sans Regular 12px, color text-helper (#596179)
+- Error text: Open Sans Regular 12px, color Red/60 (#DA1E28)
+
+---
+
+### Input Text
+- **States**: Default, Hover, Focus, Active, Disabled, Read Only, Error, Success
+- **Filled**: Yes / No (empty placeholder)
+- Border default: 1px solid border-subtle (#D7D9E4)
+- Border hover: 1px solid border-strong (#9FA4B7)
+- Border focus: 2px solid border-brand (#2E4EAA)
+- Border error: 1px solid Red/60 (#DA1E28)
+- Border success: 1px solid Green/60 (#198038)
+- Background: #FFFFFF (default), #F4F4F4 (disabled/read only)
+- Text: Open Sans Regular 14px/20px, color text-primary
+- Placeholder: Open Sans Regular 14px/20px, color text-placeholder (#A8A8A8)
+- Border-radius: 4px
+- Height: 40px
+- Padding: 0 16px
+
+---
+
+### Input Password
+- Same as Input Text + visibility toggle icon (eye/eye-off)
+- States: Default, Hover, Focus, Active, Read Only, Error, Success
+- Toggle: show/hide password (Font Awesome eye icon)
+
+---
+
+### Input Phone
+- Same as Input Text + country prefix dropdown on the left
+- States: Default, Read Only, Error, Success, Hover, Focus Prefix, Focus Field, Focus Dropdown, Active
+
+---
+
+### Text Area
+- **States**: Default, Hover, Focus, Active, Disabled, Read Only, Error
+- Same styling as Input Text but multi-line
+- Resizable vertically
+- Min-height: 80px
+
+---
+
+### Dropdown / Select
+- **States**: Default, Hover, Focus, Active, Disabled, Error, Read Only
+- **Filled**: Yes / No
+- Same border/styling as Input Text
+- Chevron icon (Font Awesome) on the right side
+- Dropdown menu: white background, 1px solid border-subtle, box-shadow: 0 4px 8px rgba(0,0,0,0.1)
+- Menu items: Open Sans Regular 14px/20px, hover background layer-01 (#F3F3FA)
+
+---
+
+### Multi Select
+- Dropdown with checkboxes
+- Selected items shown as pills/chips inside the field
+- Same container styling as Dropdown
+
+---
+
+### Date Picker
+- **States**: Default, Focus, Active, Disabled, Error, Read Only, Value in, Error value in
+- **Calendar types**: Single date, Period (range selection)
+- Input field: same styling as Input Text + calendar icon
+- Calendar popup: white background, border-subtle, days in grid
+- Day states: Not selected, Hover, Selected (background brand), Period selected (background Primary/10), Disabled
+
+---
+
+### Checkbox
+- **States**: Enabled, Selected, Partially selected, Disabled, Error
+- **Focus**: Yes / No (focus ring: 2px solid border-brand)
+- Checked: fill Primary/70 (#2E4EAA), white checkmark
+- Partially selected: fill Primary/70, white dash
+- Size: 18×18px
+- Label: Open Sans Regular 14px/20px, gap 8px from checkbox
+
+---
+
+### Accordion
+- **Open state**: Yes / No
+- **UI variants**: Transparent (no background), On Color (grey background), Brand (brand background)
+- **States**: Default, Hover
+- Header: Open Sans SemiBold 14px/20px + chevron icon (rotates on open)
+- Content area: padding 16px
+- Border-bottom: 1px solid border-subtle
+
+---
+
+### Breadcrumb
+- **Display**: Full, Overflow (truncated with "..."), Loading (skeleton)
+- Items: Open Sans Regular 14px, color text-interactive (#2E4EAA)
+- Current page: Open Sans Regular 14px, color text-primary (not clickable)
+- Separator: "/" or chevron icon, color text-helper
+- Item states: Default, Hover (underline), Focus
+
+---
+
+### Link
+- **Types**: Primary (brand color), Secondary (grey), OnColor (white for dark backgrounds)
+- **States**: Default, Hover, Focus, Visited
+- Font: Open Sans SemiBold 14px (or 12px small, 16px large)
+- Primary color: text-interactive (#2E4EAA)
+- Underline: on hover
+- Optional trailing icon (external link, arrow, etc.)
+
+---
+
+### Badge
+- **Types**: Default, Already bought, Refurbished, Offer, Price flag, Loyalty, Criteria, Stock status (in stock / available J+X / not in stock)
+- **Sizes**: Small, Medium, Large
+- Small text labels, rounded pill shape
+- Each type has its own color (green for stock, orange for offer, etc.)
+
+---
+
+### Product Card (PERSE)
+- **Breakpoints**: XXL Grid (327px wide), Medium Grid (240px), Small/X-small (375px full width), List view (980px)
+- **Status**: Default, Unavailable product
+- **User status**: Logged-in (shows price + add to cart), Anonymous (no price)
+- Structure: Product image (top) + Badge(s) + Product name (H4) + Reference + Price (Open Sans SemiBold) + Incremental Counter + Add to cart button
+- Overlay variant: Product detail quick view, Mobile add to cart
+- Border: 1px solid border-subtle, border-radius 8px
+
+---
+
+### Product Mini Card
+- **States**: Default, 3 Ref vertical, My price, Was price, Anonymous
+- Compact horizontal layout: thumbnail (left) + product info (right)
+- Width: ~386px, Height: ~117px
+
+---
+
+### Product Recommendation Card
+- **Types**: NBO (Next Best Offer), Recommendation, Recommendation-Special
+- **Styles**: Light (white background), Dark (dark background)
+- **Overlay**: None, Stocks (stock details overlay)
+- Size: ~298×400px
+
+---
+
+### Option Cards
+- **Types**: Radio button, Checkbox
+- **Selection state**: Selected, Not selected
+- **States**: Default, Hover, Focus, Disabled
+- Selected: border 2px solid border-brand (#2E4EAA), subtle brand background
+- Not selected: border 1px solid border-subtle (#D7D9E4)
+- Size: ~232×146px
+
+---
+
+### Classic Card
+- **Types**: Regular (vertical), Horizontal, Collapsable (open/closed)
+- Structure: Image slot + Title (H3) + Description + CTA buttons
+- Border: 1px solid border-subtle, border-radius 8px
+- Background: white, padding 16px
+
+---
+
+### Incremental Counter (Quantity)
+- **Sizes**: Small, Medium, Large
+- **States**: Disabled, Filled, Focus Input, Focus Minus, Focus Plus, Read Only
+- Structure: Minus button [-] + Number input + Plus button [+]
+- Buttons: same styling as Button Icon Secondary
+- Input: centered number, Open Sans SemiBold 14px
+
+---
+
+### Price
+- **Versions**: MVP, To be dev later
+- Font: Open Sans SemiBold
+- Sizes: Extra Large (18px), Large (16px), Medium (14px), Small (12px), Superscript (10px)
+- Structure: main price + optional unit (e.g. "/m") + optional crossed-out old price
+- Superscript: used for decimal digits, smaller and raised
+
+---
+
+### Pagination
+- Page numbers + Previous/Next arrows
+- Active page: background brand (#2E4EAA), white text
+- Inactive: no background, text-primary
+- Hover: background layer-01
+- Size: 36×36px per page button
+
+---
+
+### Pills / Chips
+- Selectable filter tags
+- States: Selected (brand background or brand border), Not selected (border-subtle)
+- Border-radius: 16px (pill shape)
+- Text: Open Sans Regular 14px
+- Optional close icon (×)
+
+---
+
+### Tag
+- Non-interactive labels
+- Small: Open Sans Regular 12px
+- Colors: various depending on type (status, category, etc.)
+- Border-radius: 4px
+
+---
+
+### Carousel
+- Image/content slider with navigation dots
+- Controls: Previous/Next arrow buttons (Round Button)
+- Position indicator: dots or numeric (e.g. "2/5")
+- Play/Pause toggle for auto-scroll
+
+---
+
+### Loaders
+- **Skeleton loader**: Rectangle or Rounded placeholder, animated shimmer, background Neutral/20
+- **Spinner oval**: 48×48px, animated rotation
+- **Spinner tail chasing**: 48×48px, alternative spinner style
+
+---
+
+### Stepper / Track & Trace (Post-Order)
+- Progress indicator for multi-step flows (order tracking)
+- Steps connected by line
+- Completed step: brand color, checkmark icon
+- Current step: brand color, filled circle
+- Upcoming step: grey, empty circle
+
+---
+
+### Notification (animated)
+- Small pulsing dot: 18×18px
+- 4-step animation cycle
+- Used on icons (cart, bell) to indicate new content
+
+---
+
+## Multi-Brand Support
+
+The Design System supports 11 brands through token aliasing:
+Rexel Group, Rexel France, Regro, Schaecke, LearSmith, JohnTurk, Ideal, Nedco, Westburne, Atlantic, Sofinther
+
+Each brand overrides the Primary and Grey color scales while keeping the same token names. When building prototypes, use the **Rexel Group** theme as default.
+
+---
+
+## Design Principles
+
+1. Always use semantic tokens (e.g., `button-primary`, `text-secondary`) rather than raw hex values
+2. Spacing follows the 4-8-16-24-32 scale — never use arbitrary values
+3. Typography uses only Montserrat (headings) and Open Sans (everything else)
+4. Icons are Font Awesome 5 — use the same icon set across all prototypes
+5. Border-radius: 4px for interactive elements (buttons, inputs), 8px for containers (cards, modals)
+6. Always provide visual feedback for interactive states (hover, focus, active, disabled)
+
+---
+
+## Figma Source
+
+Design System Library: https://www.figma.com/design/4LSjUAqIMHbMECYX4UBsTJ/Design-System-Library

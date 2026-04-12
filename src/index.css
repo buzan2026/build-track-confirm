@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&family=Open+Sans:wght@400;600&display=swap');
 
 :root {
   /* === SPACING === */
@@ -16,10 +16,15 @@
   --spacing-11: 96px;
   --spacing-12: 120px;
 
+  /* Hauteur du header bleu sticky — mise à jour par RexelHeaderBlueBar (ResizeObserver) */
+  --flow-sticky-header-height: 0px;
+  /* Suivi commande : header Rexel complet — RexelSiteHeader met à jour via ResizeObserver */
+  --flow-sticky-site-header-height: 140px;
+
   /* === BORDER RADIUS === */
   --border-radius-sm: 4px;
 
-  /* === COLORS: PALETTE — NEUTRAL (Figma 6358:4826) === */
+  /* === COLORS: PALETTE — NEUTRAL === */
   --color-neutral-10: #f4f4f4;
   --color-neutral-20: #e0e0e0;
   --color-neutral-30: #c6c6c6;
@@ -34,7 +39,7 @@
   --color-neutral-black: #000000;
   --color-neutral-transparent: #ffffff00;
 
-  /* === COLORS: PALETTE — BLUE (Figma 6355:17428) === */
+  /* === COLORS: PALETTE — BLUE === */
   --color-blue-10: #edf5ff;
   --color-blue-20: #d0e2ff;
   --color-blue-30: #a6c8ff;
@@ -46,7 +51,7 @@
   --color-blue-90: #001d6c;
   --color-blue-100: #001141;
 
-  /* === COLORS: PALETTE — RED (Figma 6355:17613) === */
+  /* === COLORS: PALETTE — RED === */
   --color-red-10: #fff1f1;
   --color-red-20: #ffd7d9;
   --color-red-30: #ffb3b8;
@@ -58,7 +63,7 @@
   --color-red-90: #520408;
   --color-red-100: #2d0709;
 
-  /* === COLORS: PALETTE — GREEN (Figma 6357:4239) === */
+  /* === COLORS: PALETTE — GREEN === */
   --color-green-10: #defbe6;
   --color-green-20: #a7f0ba;
   --color-green-30: #6fdc8c;
@@ -70,7 +75,7 @@
   --color-green-90: #022d0d;
   --color-green-100: #071908;
 
-  /* === COLORS: PALETTE — ORANGE (Figma 6357:4427) === */
+  /* === COLORS: PALETTE — ORANGE === */
   --color-orange-10: #fff2e8;
   --color-orange-20: #ffd9be;
   --color-orange-30: #ffb784;
@@ -82,7 +87,7 @@
   --color-orange-90: #3e1a00;
   --color-orange-100: #231000;
 
-  /* === COLORS: PALETTE — YELLOW (Figma 6357:4328) === */
+  /* === COLORS: PALETTE — YELLOW === */
   --color-yellow-10: #fcf4d6;
   --color-yellow-20: #fddc69;
   --color-yellow-30: #f1c21b;
@@ -94,7 +99,7 @@
   --color-yellow-90: #302400;
   --color-yellow-100: #1c1500;
 
-  /* === COLORS: PALETTE — REXEL PRIMARY (Figma 6358:5809) === */
+  /* === COLORS: PALETTE — REXEL PRIMARY === */
   --color-rexel-primary-10: #eceffd;
   --color-rexel-primary-20: #c7d1fa;
   --color-rexel-primary-30: #9daff5;
@@ -106,7 +111,7 @@
   --color-rexel-primary-90: #192955;
   --color-rexel-primary-100: #0c1429;
 
-  /* === COLORS: PALETTE — REXEL SECONDARY / TEAL (Figma 6483:7464) === */
+  /* === COLORS: PALETTE — REXEL SECONDARY / TEAL === */
   --color-rexel-secondary-10: #eaf2f9;
   --color-rexel-secondary-20: #c7ddf0;
   --color-rexel-secondary-30: #9ac2e3;
@@ -118,7 +123,7 @@
   --color-rexel-secondary-90: #163347;
   --color-rexel-secondary-100: #0b1a25;
 
-  /* === COLORS: PALETTE — REXEL GREY (Figma 6381:8396) === */
+  /* === COLORS: PALETTE — REXEL GREY === */
   --color-rexel-grey-10: #f3f3fa;
   --color-rexel-grey-20: #d7d9e4;
   --color-rexel-grey-30: #bbbfce;
@@ -130,7 +135,7 @@
   --color-rexel-grey-90: #3e4457;
   --color-rexel-grey-100: #303545;
 
-  /* === COLORS: BRAND (aliases → Rexel / Orange scale; Figma text/background/border tokens) === */
+  /* === COLORS: BRAND === */
   --color-primary: var(--color-rexel-primary-70);
   --color-primary-hover: var(--color-rexel-primary-60);
   --color-text-brand: var(--color-rexel-primary-70);
@@ -157,7 +162,7 @@
   --color-warning: var(--color-orange-70);
   --color-info: var(--color-blue-70);
 
-  /* === COLORS: ALERTS (aligned to Blue / Green / Orange / Red scales) === */
+  /* === COLORS: ALERTS === */
   --color-alert-info-text: var(--color-blue-70);
   --color-alert-info-bg: var(--color-blue-10);
   --color-alert-info-border: var(--color-blue-70);
@@ -170,6 +175,25 @@
   --color-alert-error-text: var(--color-red-70);
   --color-alert-error-bg: var(--color-red-10);
   --color-alert-error-border: var(--color-red-70);
+
+  /* === ALIASES — Design System naming === */
+  --text-primary: var(--color-text-primary);
+  --text-secondary: var(--color-text-secondary);
+  --text-helper: var(--color-text-helper);
+  --text-placeholder: var(--color-text-placeholder);
+  --text-brand: var(--color-text-brand);
+  --text-interactive: var(--color-text-brand);
+  --text-on-color: var(--color-neutral-white);
+  --text-disabled: var(--color-neutral-60);
+
+  --status-success-bg: var(--color-green-10);
+  --status-success-text: var(--color-green-70);
+  --status-warning-bg: var(--color-orange-10);
+  --status-warning-text: var(--color-orange-70);
+  --status-error-bg: var(--color-red-10);
+  --status-error-text: var(--color-red-70);
+  --status-info-bg: var(--color-blue-10);
+  --status-info-text: var(--color-blue-70);
 
   /* === ELEVATIONS === */
   --shadow-1: 0 2px 4px 0 rgba(0,0,0,0.10);
@@ -189,7 +213,7 @@
   --font-size-xxl: 32px;
   --font-weight-regular: 400;
   --font-weight-semibold: 600;
-  --font-weight-bold: 700;
+  --font-weight-bold: 600;
   --line-height-xs: 16px;
   --line-height-s: 20px;
   --line-height-m: 24px;
@@ -220,20 +244,28 @@
   --shadow-logo-react: drop-shadow(0 0 2em #61dafbaa);
 }
 
-
-@tailwind base;
-
 /* Sonner toast fade-out animation */
 [data-sonner-toast][data-removed="true"] {
   opacity: 0 !important;
   transition: opacity 0.3s ease-out !important;
 }
+
+@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
   :root {
-    /* === COLORS: BACKGROUND === */
     --background: 0 0% 100%;
     --foreground: 227 18% 23%;
 
@@ -243,33 +275,8 @@
     --popover: 0 0% 100%;
     --popover-foreground: 227 18% 23%;
 
-    /* === COLORS: BRAND (references top-level :root Figma palettes) === */
     --primary: 225 57% 42%;
     --primary-foreground: 0 0% 100%;
-    --color-primary: var(--color-rexel-primary-70);
-    --color-primary-hover: var(--color-rexel-primary-60);
-    --color-text-brand: var(--color-rexel-primary-70);
-    --color-white: var(--color-neutral-white);
-    --color-gray: var(--color-rexel-grey-60);
-    --color-gray-dark: var(--color-rexel-grey-100);
-    --color-favorited: #ffc107;
-    --color-bundle: var(--color-rexel-secondary-60);
-    --color-indigo: #6610f2;
-    --color-purple: #9b26b6;
-    --color-pink: #bb29bb;
-    --color-orange: var(--color-orange-40);
-    --color-teal: var(--color-rexel-secondary-60);
-    --color-text-primary: var(--color-rexel-grey-100);
-    --color-text-secondary: var(--color-rexel-grey-90);
-    --color-text-helper: var(--color-rexel-grey-70);
-    --color-text-placeholder: var(--color-neutral-40);
-    --color-text-link: var(--color-rexel-primary-60);
-    --color-bg-page: var(--color-neutral-white);
-    --color-bg-layer-01: var(--color-rexel-grey-10);
-    --color-bg-layer-02: var(--color-neutral-white);
-    --color-bg-layer-03: var(--color-rexel-grey-10);
-    --color-border-subtle: var(--color-rexel-grey-20);
-    --color-border-strong: var(--color-rexel-grey-40);
 
     --secondary: 240 17% 97%;
     --secondary-foreground: 227 18% 23%;
@@ -280,112 +287,23 @@
     --accent: 192 52% 91%;
     --accent-foreground: 192 45% 30%;
 
-    /* === COLORS: SEMANTIC === */
     --destructive: 357 73% 37%;
     --destructive-foreground: 0 0% 100%;
-    --color-error: var(--color-red-70);
 
     --success: 126 74% 22%;
     --success-foreground: 0 0% 100%;
-    --color-success: var(--color-green-70);
 
     --warning: 25 95% 27%;
     --warning-foreground: 30 90% 15%;
-    --color-warning: var(--color-orange-70);
-
-    --color-info: var(--color-blue-70);
 
     --favorited: 45 100% 51%;
 
-    /* === COLORS: ALERTS === */
-    --color-alert-info-text: var(--color-blue-70);
-    --color-alert-info-bg: var(--color-blue-10);
-    --color-alert-info-border: var(--color-blue-70);
-    --color-alert-success-text: var(--color-green-70);
-    --color-alert-success-bg: var(--color-green-10);
-    --color-alert-success-border: var(--color-green-70);
-    --color-alert-warning-text: var(--color-orange-70);
-    --color-alert-warning-bg: var(--color-orange-10);
-    --color-alert-warning-border: var(--color-orange-70);
-    --color-alert-error-text: var(--color-red-70);
-    --color-alert-error-bg: var(--color-red-10);
-    --color-alert-error-border: var(--color-red-70);
-
-    /* === COLORS: SEGMENTS === */
-    --color-segment-1: #1971c2;
-    --color-segment-2: #e8590c;
-    --color-segment-3: #9c36b5;
-    --color-segment-4: #2f9e44;
-    --color-segment-5: #7b6469;
-
-    /* === COLORS: STATISTICS === */
-    --color-stat-basic: #0072ce;
-    --color-stat-gain: #16704a;
-    --color-stat-loss: #c8102e;
-
-    /* === COLORS: ILLUSTRATIONS === */
-    --color-illu-1: #38bfc7;
-    --color-illu-2: #e281e2;
-    --color-illu-3: #52a7e0;
-    --color-illu-4: #f49432;
-    --color-illu-5: #18d083;
-    --color-illu-6: #ffc107;
-
-    /* === COLORS: ACTIONS === */
-    --color-already-bought: #16704a;
-    --color-new: #ee7900;
-
-    /* === BORDERS === */
     --border: 229 24% 89%;
     --input: 228 17% 69%;
     --ring: 225 57% 42%;
 
-    /* === BORDER RADIUS === */
     --radius: 0.375rem;
-    --border-radius-sm: 4px;
 
-    /* === ELEVATIONS === */
-    --shadow-1: 0 2px 4px 0 rgba(0, 0, 0, 0.10);
-    --shadow-2: 0 4px 8px 0 rgba(0, 0, 0, 0.10);
-    --shadow-3: 0 10px 20px 0 rgba(0, 0, 0, 0.10);
-    --shadow-4: 0 20px 30px 0 rgba(0, 0, 0, 0.10);
-    --shadow-5: 0 30px 30px 0 rgba(0, 0, 0, 0.10);
-
-    /* === SPACING === */
-    --spacing-none: 0px;
-    --spacing-1: 4px;
-    --spacing-2: 8px;
-    --spacing-3: 16px;
-    --spacing-4: 24px;
-    --spacing-5: 32px;
-    --spacing-6: 40px;
-    --spacing-7: 48px;
-    --spacing-8: 56px;
-    --spacing-9: 64px;
-    --spacing-10: 80px;
-    --spacing-11: 96px;
-    --spacing-12: 120px;
-
-    /* === TYPOGRAPHY === */
-    --font-heading: "Montserrat", sans-serif;
-    --font-body: "Open Sans", sans-serif;
-    --font-size-xs: 12px;
-    --font-size-s: 14px;
-    --font-size-m: 16px;
-    --font-size-l: 20px;
-    --font-size-xl: 28px;
-    --font-size-xxl: 32px;
-    --font-weight-regular: 400;
-    --font-weight-semibold: 600;
-    --font-weight-bold: 700;
-    --line-height-xs: 16px;
-    --line-height-s: 20px;
-    --line-height-m: 24px;
-    --line-height-l: 27px;
-    --line-height-xl: 38px;
-    --line-height-xxl: 40px;
-
-    /* Sidebar */
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
     --sidebar-primary: 208 100% 40%;
@@ -405,18 +323,82 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-family: var(--font-body);
-    font-size: var(--font-size-s);
+    font-size: var(--font-size-m);
     font-weight: var(--font-weight-regular);
-    line-height: var(--line-height-s);
+    line-height: var(--line-height-m);
   }
 
-  h1, h2 {
-    font-family: var(--font-heading);
-    font-weight: var(--font-weight-bold);
+  h1 {
+    font-family: "Montserrat", sans-serif;
+    font-weight: 600;
+    font-size: 28px;
+    line-height: 38px;
+  }
+
+  h2 {
+    font-family: "Montserrat", sans-serif;
+    font-weight: 600;
+    font-size: 20px;
+    line-height: 27px;
   }
 
   h3, h4, h5, h6 {
     font-family: var(--font-body);
     font-weight: var(--font-weight-semibold);
+  }
+}
+
+@layer components {
+  /* Headlines — Open Sans SemiBold */
+  .headline-xl { font-family: "Open Sans", sans-serif; font-weight: 600; font-size: 18px; line-height: 26px; }
+  .headline-l  { font-family: "Open Sans", sans-serif; font-weight: 600; font-size: 16px; line-height: 24px; }
+  .headline-m  { font-family: "Open Sans", sans-serif; font-weight: 600; font-size: 14px; line-height: 20px; }
+
+  /* Body — Open Sans Regular/SemiBold */
+  .body-lg { font-family: "Open Sans", sans-serif; font-size: 16px; line-height: 24px; }
+  .body-md { font-family: "Open Sans", sans-serif; font-size: 14px; line-height: 20px; }
+  .body-sm { font-family: "Open Sans", sans-serif; font-size: 12px; line-height: 16px; }
+
+  /* Paragraphs — Open Sans Regular */
+  .paragraph-lg    { font-family: "Open Sans", sans-serif; font-weight: 400; font-size: 16px; line-height: 28px; }
+  .paragraph-md    { font-family: "Open Sans", sans-serif; font-weight: 400; font-size: 14px; line-height: 24px; }
+  .paragraph-legal { font-family: "Open Sans", sans-serif; font-weight: 400; font-size: 12px; line-height: 20px; }
+
+  /* Utility */
+  .label  { font-family: "Open Sans", sans-serif; font-weight: 600; font-size: 14px; line-height: 18px; }
+  .link-l { font-family: "Open Sans", sans-serif; font-weight: 600; font-size: 16px; line-height: 24px; text-decoration: underline; }
+  .link-m { font-family: "Open Sans", sans-serif; font-weight: 600; font-size: 14px; line-height: 18px; text-decoration: underline; }
+
+  /* Prices — Open Sans SemiBold */
+  .price-xl { font-family: "Open Sans", sans-serif; font-weight: 600; font-size: 18px; line-height: 26px; }
+  .price-l  { font-family: "Open Sans", sans-serif; font-weight: 600; font-size: 16px; line-height: 24px; }
+  .price-m  { font-family: "Open Sans", sans-serif; font-weight: 600; font-size: 14px; line-height: 20px; }
+  .price-s  { font-family: "Open Sans", sans-serif; font-weight: 600; font-size: 12px; line-height: 16px; }
+
+  /* Pills / Tags sizes (S, M, L) */
+  .pill-s,
+  .pill-m,
+  .pill-l {
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+    border-radius: 9999px;
+    border-width: 1px;
+    font-family: "Open Sans", sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 16px;
+    min-height: 32px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+  }
+
+  .pill-s { gap: 6px; padding-left: 12px; padding-right: 12px; }
+  .pill-m { gap: 6px; padding-left: 12px; padding-right: 12px; }
+  .pill-l { gap: 8px; padding-left: 14px; padding-right: 14px; }
+
+  /* Récap / order summary sticky : évite le recouvrement par le header bleu */
+  .flow-sticky-summary-top {
+    top: calc(var(--flow-sticky-header-height) + var(--spacing-3));
   }
 }

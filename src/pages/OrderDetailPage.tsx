@@ -1,62 +1,48 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, Copy, CheckCircle, Truck, Package, AlertTriangle, XCircle, ClipboardCheck, FileText, RotateCcw, Phone, Download } from "lucide-react";
+import { ArrowLeft, Copy, CheckCircle, Truck, Package, AlertTriangle, XCircle, ClipboardCheck, FileText, RotateCcw, Phone } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useOrderWithDetails, type ShipmentRow, type LineItemRow } from "@/hooks/useOrders";
 import { toast } from "sonner";
-import { format } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Progress } from "@/components/ui/progress";
+import { useI18n } from "@/i18n/useI18n";
 
-/* ── Status config ── */
-const statusMeta: Record<string, { label: string; icon: typeof CheckCircle; colorClass: string; bgClass: string }> = {
-  on_track: { label: "On track", icon: CheckCircle, colorClass: "text-[var(--color-success)]", bgClass: "bg-[var(--color-alert-success-bg)] border-[var(--color-success)]" },
-  being_prepared: { label: "Being prepared", icon: Package, colorClass: "text-[var(--color-info)]", bgClass: "bg-[var(--color-alert-info-bg)] border-[var(--color-info)]" },
-  in_transit: { label: "In transit", icon: Truck, colorClass: "text-[var(--color-info)]", bgClass: "bg-[var(--color-alert-info-bg)] border-[var(--color-info)]" },
-  partially_delivered: { label: "Partially delivered", icon: Package, colorClass: "text-[var(--color-warning)]", bgClass: "bg-[var(--color-alert-warning-bg)] border-[var(--color-warning)]" },
-  delayed: { label: "Delayed", icon: AlertTriangle, colorClass: "text-[var(--color-error)]", bgClass: "bg-[var(--color-alert-error-bg)] border-[var(--color-error)]" },
-  cancelled: { label: "Cancelled", icon: XCircle, colorClass: "text-[var(--color-error)]", bgClass: "bg-[var(--color-alert-error-bg)] border-[var(--color-error)]" },
-  completed: { label: "Completed", icon: CheckCircle, colorClass: "text-[var(--color-success)]", bgClass: "bg-[var(--color-alert-success-bg)] border-[var(--color-success)]" },
+const statusVisual: Record<string, { icon: typeof CheckCircle; colorClass: string; bgClass: string }> = {
+  on_track: { icon: CheckCircle, colorClass: "text-[var(--color-success)]", bgClass: "bg-[var(--color-alert-success-bg)] border-[var(--color-success)]" },
+  being_prepared: { icon: Package, colorClass: "text-[var(--color-info)]", bgClass: "bg-[var(--color-alert-info-bg)] border-[var(--color-info)]" },
+  in_transit: { icon: Truck, colorClass: "text-[var(--color-info)]", bgClass: "bg-[var(--color-alert-info-bg)] border-[var(--color-info)]" },
+  partially_delivered: { icon: Package, colorClass: "text-[var(--color-warning)]", bgClass: "bg-[var(--color-alert-critical-bg)] border-[var(--color-warning)]" },
+  delayed: { icon: AlertTriangle, colorClass: "text-[var(--color-error)]", bgClass: "bg-[var(--color-alert-error-bg)] border-[var(--color-error)]" },
+  cancelled: { icon: XCircle, colorClass: "text-[var(--color-error)]", bgClass: "bg-[var(--color-alert-error-bg)] border-[var(--color-error)]" },
+  completed: { icon: CheckCircle, colorClass: "text-[var(--color-success)]", bgClass: "bg-[var(--color-alert-success-bg)] border-[var(--color-success)]" },
 };
 
 function StatusBadge({ status }: { status: string }) {
-  const meta = statusMeta[status] ?? statusMeta.on_track;
+  const { t } = useI18n();
+  const meta = statusVisual[status] ?? statusVisual.on_track;
   const Icon = meta.icon;
   return (
-    <span className={cn("inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium", meta.bgClass, meta.colorClass)}>
-      <Icon className="h-3 w-3" />
-      {meta.label}
+    <span className={cn("inline-flex h-8 items-center gap-1 rounded-full border px-3 text-[12px] font-semibold", meta.bgClass, meta.colorClass)}>
+      <Icon className="h-3 w-3 shrink-0" />
+      {t(`orderStatus.${status}`)}
     </span>
   );
 }
 
-/* ── Shipment tracking steps ── */
-const shipmentStepsMeta = [
-  { key: "confirmed", label: "Confirmed", icon: ClipboardCheck },
-  { key: "in_transit", label: "In transit", icon: Truck },
-  { key: "delivered", label: "Delivered", icon: Package },
+const shipmentStepsIcons = [
+  { key: "confirmed", step: "confirmed" as const, icon: ClipboardCheck },
+  { key: "in_transit", step: "in_transit" as const, icon: Truck },
+  { key: "delivered", step: "delivered" as const, icon: Package },
 ];
 
 function shipmentStepIndex(status: string) {
   if (status === "delivered") return 2;
   if (status === "in_transit") return 1;
-  return 0; // confirmed, being_prepared
+  return 0;
 }
 
-/* ── Helpers ── */
-function fmtDate(d: string | null) {
-  if (!d) return "—";
-  return format(new Date(d), "dd/MM/yyyy");
-}
-function fmtCurrency(n: number) {
-  return new Intl.NumberFormat("en-GB", { style: "currency", currency: "EUR" }).format(n);
-}
-function copyToClipboard(text: string) {
-  navigator.clipboard.writeText(text);
-  toast.success("Copied to clipboard");
-}
-
-/* ── Shipment Card ── */
 function ShipmentCard({ shipment, lineItems }: { shipment: ShipmentRow; lineItems: LineItemRow[] }) {
+  const { t, formatDate, formatCurrency } = useI18n();
   const currentStep = shipmentStepIndex(shipment.status);
   const shipmentItems = lineItems.filter((li) => li.shipment_id === shipment.id);
 
@@ -64,35 +50,40 @@ function ShipmentCard({ shipment, lineItems }: { shipment: ShipmentRow; lineItem
     <div className="rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-02)] p-5">
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-[var(--font-heading)] font-semibold text-[var(--color-text-primary)]">
-          Shipment {shipment.shipment_index}
+          {t("detail.shipmentTitle")} {shipment.shipment_index}
         </h3>
         <div className="flex items-center gap-3 text-xs text-[var(--color-text-secondary)]">
           {shipment.carrier && <span>{shipment.carrier}</span>}
-          {shipment.expected_delivery && <span>Exp. {fmtDate(shipment.expected_delivery)}</span>}
+          {shipment.expected_delivery && (
+            <span>
+              {t("common.expShort")} {formatDate(shipment.expected_delivery, "dd/MM/yyyy")}
+            </span>
+          )}
         </div>
       </div>
 
-      {/* Tracking stepper */}
       <div className="flex items-start justify-between relative mb-5">
         <div className="absolute top-[18px] left-[36px] right-[36px] flex">
           {[0, 1].map((i) => (
             <div key={i} className={cn("h-0.5 flex-1", i < currentStep ? "bg-[var(--color-primary)]" : "bg-[var(--color-border-subtle)]")} />
           ))}
         </div>
-        {shipmentStepsMeta.map((step, i) => {
+        {shipmentStepsIcons.map((step, i) => {
           const done = i <= currentStep;
           const current = i === currentStep;
           return (
-            <div key={i} className="relative z-10 flex flex-col items-center gap-1.5 flex-1">
-              <div className={cn(
-                "flex h-9 w-9 items-center justify-center rounded-full transition-colors",
-                done ? "bg-[var(--color-primary)] text-[var(--color-white)]" : "bg-[var(--color-bg-layer-01)] text-[var(--color-text-placeholder)]",
-                current && "ring-2 ring-[var(--color-primary)] ring-offset-2 ring-offset-[var(--color-bg-layer-02)]"
-              )}>
+            <div key={step.key} className="relative z-10 flex flex-col items-center gap-1.5 flex-1">
+              <div
+                className={cn(
+                  "flex h-9 w-9 items-center justify-center rounded-full transition-colors",
+                  done ? "bg-[var(--color-primary)] text-[var(--color-white)]" : "bg-[var(--color-bg-layer-01)] text-[var(--color-text-placeholder)]",
+                  current && "ring-2 ring-[var(--color-primary)] ring-offset-2 ring-offset-[var(--color-bg-layer-02)]"
+                )}
+              >
                 <step.icon className="h-4 w-4" />
               </div>
               <span className={cn("text-xs text-center", done ? "text-[var(--color-text-primary)] font-medium" : "text-[var(--color-text-placeholder)]")}>
-                {step.label}
+                {t(`track.${step.step}`)}
               </span>
             </div>
           );
@@ -101,14 +92,16 @@ function ShipmentCard({ shipment, lineItems }: { shipment: ShipmentRow; lineItem
 
       {shipment.delivered_at && (
         <p className="text-xs text-[var(--color-text-secondary)] mb-3">
-          Delivered {fmtDate(shipment.delivered_at)}{shipment.delivered_signed_by && ` — Signed by ${shipment.delivered_signed_by}`}
+          {t("detail.deliveredOn")} {formatDate(shipment.delivered_at, "dd/MM/yyyy")}
+          {shipment.delivered_signed_by && ` — ${t("detail.signedBy")} ${shipment.delivered_signed_by}`}
         </p>
       )}
 
-      {/* Items in this shipment */}
       {shipmentItems.length > 0 && (
         <div className="border-t border-[var(--color-border-subtle)] pt-3 mt-2">
-          <p className="text-xs font-medium text-[var(--color-text-secondary)] mb-2">{shipmentItems.length} item(s)</p>
+          <p className="text-xs font-medium text-[var(--color-text-secondary)] mb-2">
+            {shipmentItems.length} {t("detail.itemsInShipment")}
+          </p>
           <div className="space-y-2">
             {shipmentItems.map((item) => (
               <div key={item.id} className="flex items-center justify-between text-sm">
@@ -123,7 +116,7 @@ function ShipmentCard({ shipment, lineItems }: { shipment: ShipmentRow; lineItem
                 </div>
                 <div className="text-right shrink-0 ml-4">
                   <p className="text-[var(--color-text-primary)]">×{item.quantity}</p>
-                  <p className="text-xs text-[var(--color-text-secondary)]">{fmtCurrency(item.unit_price)}</p>
+                  <p className="text-xs text-[var(--color-text-secondary)]">{formatCurrency(item.unit_price)}</p>
                 </div>
               </div>
             ))}
@@ -134,11 +127,16 @@ function ShipmentCard({ shipment, lineItems }: { shipment: ShipmentRow; lineItem
   );
 }
 
-/* ── Main Page ── */
 export default function OrderDetailPage() {
   const { orderNumber } = useParams();
   const navigate = useNavigate();
+  const { t, formatDate, formatCurrency } = useI18n();
   const { data, isLoading, error } = useOrderWithDetails(orderNumber);
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success(t("detail.copyOk"));
+  };
 
   if (isLoading) {
     return (
@@ -154,48 +152,48 @@ export default function OrderDetailPage() {
   if (error || !data) {
     return (
       <div className="p-6 max-w-4xl mx-auto text-center py-16">
-        <p className="text-[var(--color-text-secondary)] mb-4">Order not found</p>
-        <button onClick={() => navigate("/")} className="text-[var(--color-text-link)] text-sm hover:underline">
-          ← Back to orders
+        <p className="text-[var(--color-text-secondary)] mb-4">{t("detail.notFound")}</p>
+        <button type="button" onClick={() => navigate("/")} className="text-[var(--color-text-link)] text-sm hover:underline">
+          ← {t("detail.back")}
         </button>
       </div>
     );
   }
 
   const { order, shipments, lineItems } = data;
-  const meta = statusMeta[order.status] ?? statusMeta.on_track;
-
-  // Items not assigned to any shipment
   const unassignedItems = lineItems.filter((li) => !li.shipment_id);
-
-  // Compute totals
   const computedTotal = lineItems.reduce((sum, li) => sum + li.quantity * li.unit_price, 0);
   const totalQty = lineItems.reduce((sum, li) => sum + li.quantity, 0);
   const totalDelivered = lineItems.reduce((sum, li) => sum + (li.quantity - li.remaining), 0);
   const deliveryPct = totalQty > 0 ? Math.round((totalDelivered / totalQty) * 100) : 0;
 
   return (
-    <div className="p-6 max-w-4xl mx-auto space-y-6">
-      {/* Back link */}
-      <Link to="/" className="inline-flex items-center gap-1 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors">
-        <ArrowLeft className="h-4 w-4" /> Back to orders
+    <div className="w-full max-w-4xl space-y-6">
+      <Link
+        to="/"
+        className="inline-flex items-center gap-1 font-[var(--font-body)] text-[14px] leading-[20px] text-[var(--color-text-secondary)] transition-colors hover:text-[var(--color-text-primary)]"
+      >
+        <ArrowLeft className="h-4 w-4" /> {t("detail.back")}
       </Link>
 
-      {/* ── Header ── */}
-      <div className="flex items-start justify-between flex-wrap gap-4">
+      <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <div className="flex items-center gap-3 mb-1">
-            <h1 className="font-[var(--font-heading)] text-[var(--font-size-xl)] font-bold text-[var(--color-text-primary)]">
-              {order.order_number}
-            </h1>
-            <button onClick={() => copyToClipboard(order.order_number)} className="text-[var(--color-text-secondary)] hover:text-[var(--color-primary)]">
+          <div className="mb-1 flex items-center gap-3">
+            <h1 className="headline-xl font-[var(--font-heading)] text-[var(--color-text-primary)]">{order.order_number}</h1>
+            <button type="button" onClick={() => copyToClipboard(order.order_number)} className="text-[var(--color-text-secondary)] hover:text-[var(--color-primary)]">
               <Copy className="h-4 w-4" />
             </button>
             <StatusBadge status={order.status} />
           </div>
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-[var(--color-text-secondary)]">
-            <span>Ordered {fmtDate(order.order_date)}</span>
-            {order.po_number && <span>PO: {order.po_number}</span>}
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 font-[var(--font-body)] text-[14px] leading-[20px] text-[var(--color-text-secondary)]">
+            <span>
+              {t("detail.ordered")} {formatDate(order.order_date, "dd/MM/yyyy")}
+            </span>
+            {order.po_number && (
+              <span>
+                {t("common.po")}: {order.po_number}
+              </span>
+            )}
             <span>{order.order_type}</span>
             {order.project_name && (
               <span className="bg-[var(--color-bg-layer-01)] px-2 py-0.5 rounded text-xs">{order.project_name}</span>
@@ -203,62 +201,69 @@ export default function OrderDetailPage() {
           </div>
         </div>
         <div className="text-right">
-          <p className="font-[var(--font-heading)] text-[var(--font-size-xl)] font-bold text-[var(--color-text-primary)]">
-            {fmtCurrency(order.total_amount)}
+          <p className="font-[var(--font-heading)] text-[20px] font-bold leading-[27px] text-[var(--color-text-primary)]">
+            {formatCurrency(order.total_amount)}
           </p>
-          <p className="text-xs text-[var(--color-text-secondary)]">excl. tax</p>
+          <p className="font-[var(--font-body)] text-[12px] leading-[16px] text-[var(--color-text-secondary)]">{t("detail.exclTax")}</p>
         </div>
       </div>
 
-      {/* ── Delivery summary ── */}
       {order.status !== "cancelled" && (
         <div className="rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-02)] p-5">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-semibold text-[var(--color-text-primary)]">Delivery summary</h2>
-            <span className="text-xs text-[var(--color-text-secondary)]">{deliveryPct}% delivered</span>
+            <h2 className="headline-l text-[#161616]">{t("detail.deliverySummary")}</h2>
+            <span className="text-xs text-[var(--color-text-secondary)]">
+              {deliveryPct}% {t("detail.pctDelivered")}
+            </span>
           </div>
           <Progress value={deliveryPct} className="h-2 mb-3" />
           <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-[var(--color-text-secondary)]">
-            <span>Expected: <strong className="text-[var(--color-text-primary)]">{fmtDate(order.expected_delivery)}</strong></span>
+            <span>
+              {t("detail.expected")}: <strong className="text-[var(--color-text-primary)]">{formatDate(order.expected_delivery, "dd/MM/yyyy")}</strong>
+            </span>
             {order.previous_expected_delivery && order.status === "delayed" && (
               <span>
-                Originally: <span className="line-through">{fmtDate(order.previous_expected_delivery)}</span>
+                {t("detail.originally")}: <span className="line-through">{formatDate(order.previous_expected_delivery, "dd/MM/yyyy")}</span>
               </span>
             )}
-            <span>{shipments.length} shipment(s)</span>
-            <span>{order.items_remaining} item(s) remaining</span>
+            <span>
+              {shipments.length} {t("detail.shipmentCount")}
+            </span>
+            <span>
+              {order.items_remaining} {t("detail.itemsRemaining")}
+            </span>
           </div>
         </div>
       )}
 
-      {/* ── Shipments ── */}
       {shipments.length > 0 && (
         <div className="space-y-4">
-          <h2 className="text-sm font-semibold text-[var(--color-text-primary)]">Shipments ({shipments.length})</h2>
+          <h2 className="headline-l text-[#161616]">
+            {t("detail.shipments")} ({shipments.length})
+          </h2>
           {shipments.map((s) => (
             <ShipmentCard key={s.id} shipment={s} lineItems={lineItems} />
           ))}
         </div>
       )}
 
-      {/* ── Unassigned items ── */}
       {unassignedItems.length > 0 && (
         <div className="rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-02)] overflow-hidden">
           <div className="px-5 py-3 border-b border-[var(--color-border-subtle)]">
-            <h2 className="text-sm font-semibold text-[var(--color-text-primary)]">
-              Items awaiting shipment ({unassignedItems.length})
+            <h2 className="headline-l text-[#161616]">
+              {t("detail.awaitingShipment")} ({unassignedItems.length})
             </h2>
           </div>
           <table className="w-full">
             <thead>
               <tr className="border-b border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-01)]">
-                <th className="px-5 py-2.5 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">Product</th>
-                <th className="px-5 py-2.5 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">Reference</th>
-                <th className="px-5 py-2.5 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">Supplier</th>
-                <th className="px-5 py-2.5 text-right text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">Qty</th>
-                <th className="px-5 py-2.5 text-right text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">Remaining</th>
-                <th className="px-5 py-2.5 text-right text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">Unit price</th>
-                <th className="px-5 py-2.5 text-right text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">Total</th>
+                <th className="px-5 py-2.5 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">{t("detail.product")}</th>
+                <th className="px-5 py-2.5 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">{t("detail.reference")}</th>
+                <th className="px-5 py-2.5 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">{t("detail.supplier")}</th>
+                <th className="px-5 py-2.5 text-right text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">{t("detail.qty")}</th>
+                <th className="px-5 py-2.5 text-right text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">{t("detail.remaining")}</th>
+                <th className="px-5 py-2.5 text-right text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">{t("detail.unitPrice")}</th>
+                <th className="px-5 py-2.5 text-right text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">{t("orders.colTotal")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[var(--color-border-subtle)]">
@@ -275,16 +280,18 @@ export default function OrderDetailPage() {
                       <span className="text-[var(--color-success)]">0</span>
                     )}
                   </td>
-                  <td className="px-5 py-3 text-sm text-right text-[var(--color-text-secondary)]">{fmtCurrency(item.unit_price)}</td>
-                  <td className="px-5 py-3 text-sm text-right font-semibold text-[var(--color-text-primary)]">{fmtCurrency(item.quantity * item.unit_price)}</td>
+                  <td className="px-5 py-3 text-sm text-right text-[var(--color-text-secondary)]">{formatCurrency(item.unit_price)}</td>
+                  <td className="px-5 py-3 text-sm text-right font-semibold text-[var(--color-text-primary)]">{formatCurrency(item.quantity * item.unit_price)}</td>
                 </tr>
               ))}
             </tbody>
             <tfoot>
               <tr className="border-t-2 border-[var(--color-border-subtle)]">
-                <td colSpan={6} className="px-5 py-3 text-sm font-semibold text-[var(--color-text-primary)] text-right">Total excl. tax</td>
+                <td colSpan={6} className="px-5 py-3 text-sm font-semibold text-[var(--color-text-primary)] text-right">
+                  {t("detail.totalExcl")}
+                </td>
                 <td className="px-5 py-3 text-right font-[var(--font-heading)] text-lg font-bold text-[var(--color-text-primary)]">
-                  {fmtCurrency(computedTotal)}
+                  {formatCurrency(computedTotal)}
                 </td>
               </tr>
             </tfoot>
@@ -292,21 +299,22 @@ export default function OrderDetailPage() {
         </div>
       )}
 
-      {/* ── All items summary ── */}
       <div className="rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-02)] overflow-hidden">
         <div className="px-5 py-3 border-b border-[var(--color-border-subtle)]">
-          <h2 className="text-sm font-semibold text-[var(--color-text-primary)]">All items ({lineItems.length})</h2>
+          <h2 className="headline-l text-[#161616]">
+            {t("detail.allItems")} ({lineItems.length})
+          </h2>
         </div>
         <table className="w-full">
           <thead>
             <tr className="border-b border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-01)]">
-              <th className="px-5 py-2.5 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">Product</th>
-              <th className="px-5 py-2.5 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">Reference</th>
-              <th className="px-5 py-2.5 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">Supplier</th>
-              <th className="px-5 py-2.5 text-right text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">Qty</th>
-              <th className="px-5 py-2.5 text-right text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">Delivered</th>
-              <th className="px-5 py-2.5 text-right text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">Unit price</th>
-              <th className="px-5 py-2.5 text-right text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">Total</th>
+              <th className="px-5 py-2.5 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">{t("detail.product")}</th>
+              <th className="px-5 py-2.5 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">{t("detail.reference")}</th>
+              <th className="px-5 py-2.5 text-left text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">{t("detail.supplier")}</th>
+              <th className="px-5 py-2.5 text-right text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">{t("detail.qty")}</th>
+              <th className="px-5 py-2.5 text-right text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">{t("detail.deliveredCol")}</th>
+              <th className="px-5 py-2.5 text-right text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">{t("detail.unitPrice")}</th>
+              <th className="px-5 py-2.5 text-right text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">{t("orders.colTotal")}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-[var(--color-border-subtle)]">
@@ -322,54 +330,61 @@ export default function OrderDetailPage() {
                   <td className="px-5 py-3 text-sm text-right">
                     <div className="flex items-center justify-end gap-2">
                       <Progress value={pct} className="h-1.5 w-16" />
-                      <span className="text-xs text-[var(--color-text-secondary)]">{delivered}/{item.quantity}</span>
+                      <span className="text-xs text-[var(--color-text-secondary)]">
+                        {delivered}/{item.quantity}
+                      </span>
                     </div>
                   </td>
-                  <td className="px-5 py-3 text-sm text-right text-[var(--color-text-secondary)]">{fmtCurrency(item.unit_price)}</td>
-                  <td className="px-5 py-3 text-sm text-right font-semibold text-[var(--color-text-primary)]">{fmtCurrency(item.quantity * item.unit_price)}</td>
+                  <td className="px-5 py-3 text-sm text-right text-[var(--color-text-secondary)]">{formatCurrency(item.unit_price)}</td>
+                  <td className="px-5 py-3 text-sm text-right font-semibold text-[var(--color-text-primary)]">{formatCurrency(item.quantity * item.unit_price)}</td>
                 </tr>
               );
             })}
           </tbody>
           <tfoot>
             <tr className="border-t-2 border-[var(--color-border-subtle)]">
-              <td colSpan={6} className="px-5 py-3 text-sm font-semibold text-[var(--color-text-primary)] text-right">Total excl. tax</td>
+              <td colSpan={6} className="px-5 py-3 text-sm font-semibold text-[var(--color-text-primary)] text-right">
+                {t("detail.totalExcl")}
+              </td>
               <td className="px-5 py-3 text-right font-[var(--font-heading)] text-lg font-bold text-[var(--color-text-primary)]">
-                {fmtCurrency(computedTotal)}
+                {formatCurrency(computedTotal)}
               </td>
             </tr>
           </tfoot>
         </table>
       </div>
 
-      {/* ── Action bar ── */}
       <div className="sticky bottom-0 bg-[var(--color-bg-page)] border-t border-[var(--color-border-subtle)] -mx-6 px-6 py-4 flex items-center justify-between gap-3 flex-wrap">
         <div className="flex items-center gap-3">
           <button
+            type="button"
             onClick={() => navigate(`/orders/${orderNumber}/reception`)}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-[var(--border-radius-sm)] bg-[var(--color-primary)] text-[var(--color-white)] text-sm font-medium hover:bg-[var(--color-primary-hover)] transition-colors"
           >
-            <CheckCircle className="h-4 w-4" /> Confirm reception
+            <CheckCircle className="h-4 w-4" /> {t("detail.confirmReception")}
           </button>
           <button
+            type="button"
             onClick={() => navigate(`/orders/${orderNumber}/documents`)}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-[var(--border-radius-sm)] border border-[var(--color-border-strong)] text-[var(--color-text-primary)] text-sm font-medium hover:bg-[var(--color-bg-layer-01)] transition-colors"
           >
-            <FileText className="h-4 w-4" /> Documents
+            <FileText className="h-4 w-4" /> {t("detail.documents")}
           </button>
         </div>
         <div className="flex items-center gap-3">
           <button
-            onClick={() => toast.info("Return request feature coming soon")}
+            type="button"
+            onClick={() => toast.info(t("detail.returnSoon"))}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] text-[var(--color-text-secondary)] text-sm hover:bg-[var(--color-bg-layer-01)] transition-colors"
           >
-            <RotateCcw className="h-4 w-4" /> Request a return
+            <RotateCcw className="h-4 w-4" /> {t("detail.requestReturn")}
           </button>
           <button
+            type="button"
             onClick={() => toast.info("Contact: Gisèle Michu — gisele.michu@rexel.fr")}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] text-[var(--color-text-secondary)] text-sm hover:bg-[var(--color-bg-layer-01)] transition-colors"
           >
-            <Phone className="h-4 w-4" /> Contact rep
+            <Phone className="h-4 w-4" /> {t("detail.contactRep")}
           </button>
         </div>
       </div>

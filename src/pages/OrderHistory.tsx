@@ -8,6 +8,7 @@ import {
 import { cn } from "@/lib/utils";
 import OrderSidePanel from "@/components/OrderSidePanel";
 import { useOrders, useLineItems, type OrderRow, type LineItemRow } from "@/hooks/useOrders";
+import { useI18n } from "@/i18n/useI18n";
 import { toast } from "sonner";
 import { format, subDays, subMonths, subYears, startOfDay, startOfYear } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
@@ -24,34 +25,45 @@ function productImageUrl(ref: string) {
   return `https://picsum.photos/seed/${id}/64/64`;
 }
 
-// --- Status config ---
-const statusMeta: Record<string, { label: string; icon: typeof CheckCircle; colorClass: string; bgClass: string }> = {
-  on_track: { label: "On track", icon: CheckCircle, colorClass: "text-[var(--color-success)]", bgClass: "bg-[var(--color-alert-success-bg)] border-[var(--color-success)]" },
-  being_prepared: { label: "Being prepared", icon: Package, colorClass: "text-[var(--color-info)]", bgClass: "bg-[var(--color-alert-info-bg)] border-[var(--color-info)]" },
-  in_transit: { label: "In transit", icon: Truck, colorClass: "text-[var(--color-info)]", bgClass: "bg-[var(--color-alert-info-bg)] border-[var(--color-info)]" },
-  partially_delivered: { label: "Partially delivered", icon: Package, colorClass: "text-[#8A3800]", bgClass: "bg-[#FFF2E8] border-[#8A3800]" },
-  delayed: { label: "Delayed", icon: AlertTriangle, colorClass: "text-[#8A3800]", bgClass: "bg-[#FFF2E8] border-[#8A3800]" },
-  cancelled: { label: "Cancelled", icon: XCircle, colorClass: "text-[var(--color-error)]", bgClass: "bg-[var(--color-alert-error-bg)] border-[var(--color-error)]" },
-  completed: { label: "Completed", icon: CheckCircle, colorClass: "text-[var(--color-success)]", bgClass: "bg-[var(--color-alert-success-bg)] border-[var(--color-success)]" },
+// --- Status config (labels via i18n) ---
+const statusVisual: Record<string, { icon: typeof CheckCircle; colorClass: string; bgClass: string }> = {
+  on_track: { icon: CheckCircle, colorClass: "text-[var(--color-success)]", bgClass: "bg-[var(--color-alert-success-bg)] border-[var(--color-success)]" },
+  being_prepared: { icon: Package, colorClass: "text-[var(--color-info)]", bgClass: "bg-[var(--color-alert-info-bg)] border-[var(--color-info)]" },
+  in_transit: { icon: Truck, colorClass: "text-[var(--color-info)]", bgClass: "bg-[var(--color-alert-info-bg)] border-[var(--color-info)]" },
+  partially_delivered: {
+    icon: Package,
+    colorClass: "text-[var(--color-alert-error-text)]",
+    bgClass: "bg-[var(--color-alert-error-bg)] border-[var(--color-alert-error-border)]",
+  },
+  delayed: {
+    icon: AlertTriangle,
+    colorClass: "text-[var(--color-alert-error-text)]",
+    bgClass: "bg-[var(--color-alert-error-bg)] border-[var(--color-alert-error-border)]",
+  },
+  cancelled: { icon: XCircle, colorClass: "text-[var(--color-error)]", bgClass: "bg-[var(--color-alert-error-bg)] border-[var(--color-error)]" },
+  completed: { icon: CheckCircle, colorClass: "text-[var(--color-success)]", bgClass: "bg-[var(--color-alert-success-bg)] border-[var(--color-success)]" },
 };
 
 function StatusBadge({ status }: { status: string }) {
-  const meta = statusMeta[status] ?? statusMeta.on_track;
+  const { t } = useI18n();
+  const meta = statusVisual[status] ?? statusVisual.on_track;
   const Icon = meta.icon;
+  const label = t(`orderStatus.${status}`);
   return (
-    <span className={cn("inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-semibold", meta.bgClass, meta.colorClass)}>
-      <Icon className="h-3 w-3" />
-      {meta.label}
+    <span className={cn("inline-flex h-8 items-center gap-1 rounded-full border px-3 text-[12px] font-semibold", meta.bgClass, meta.colorClass)}>
+      <Icon className="h-3 w-3 shrink-0" />
+      {label}
     </span>
   );
 }
 
 // --- Copy Pill ---
 function CopyPill({ text }: { text: string }) {
+  const { t } = useI18n();
   return (
     <button
-      onClick={(e) => { e.stopPropagation(); navigator.clipboard.writeText(text); toast.success("Copied"); }}
-      className="inline-flex items-center gap-1 rounded-full border border-[var(--color-border-subtle)] bg-white px-2.5 py-0.5 text-[12px] font-semibold text-[var(--color-primary)] hover:border-[var(--color-primary)] transition-colors"
+      onClick={(e) => { e.stopPropagation(); navigator.clipboard.writeText(text); toast.success(t("common.copied")); }}
+      className="inline-flex h-8 items-center gap-1 rounded-full border border-[var(--color-border-subtle)] bg-white px-3 text-[12px] font-semibold text-[var(--color-primary)] hover:border-[var(--color-primary)] transition-colors"
     >
       {text}
       <Copy className="h-3 w-3 text-[var(--color-primary)]" />
@@ -59,14 +71,14 @@ function CopyPill({ text }: { text: string }) {
   );
 }
 
-// --- Date presets ---
-type DatePreset = { label: string; getFrom: () => Date };
+// --- Date presets (stable ids for i18n) ---
+type DatePresetId = "30d" | "3m" | "6m" | "lastYear";
+type DatePreset = { id: DatePresetId; getFrom: () => Date };
 const datePresets: DatePreset[] = [
-  { label: "30 days", getFrom: () => subDays(new Date(), 30) },
-  { label: "3 months", getFrom: () => subMonths(new Date(), 3) },
-  { label: "6 months", getFrom: () => subMonths(new Date(), 6) },
-  { label: "This year", getFrom: () => startOfYear(new Date()) },
-  { label: "Last year", getFrom: () => startOfYear(subYears(new Date(), 1)) },
+  { id: "30d", getFrom: () => subDays(new Date(), 30) },
+  { id: "3m", getFrom: () => subMonths(new Date(), 3) },
+  { id: "6m", getFrom: () => subMonths(new Date(), 6) },
+  { id: "lastYear", getFrom: () => startOfYear(subYears(new Date(), 1)) },
 ];
 
 // --- Helpers ---
@@ -77,21 +89,13 @@ function isOngoing(s: string) { return ONGOING_STATUSES.includes(s); }
 function isCompleted(s: string) { return s === "completed"; }
 function needsAttention(s: string) { return NEEDS_ATTENTION_STATUSES.includes(s); }
 
-function formatDate(d: string | null) {
-  if (!d) return "—";
-  return format(new Date(d), "dd/MM/yyyy");
-}
-
-function formatCurrency(n: number) {
-  return new Intl.NumberFormat("en-GB", { style: "currency", currency: "EUR" }).format(n);
-}
-
 // --- Order Card (list view) ---
 function OrderCard({
   order, lineItems, onClick, warning, onReorder,
 }: {
   order: OrderRow; lineItems: LineItemRow[]; onClick: () => void; warning?: boolean; onReorder?: () => void;
 }) {
+  const { t, formatDate, formatCurrency } = useI18n();
   const orderLineItems = lineItems.filter((li) => li.order_id === order.id);
   const displayItems = orderLineItems.slice(0, 3);
   const moreCount = orderLineItems.length - 3;
@@ -102,7 +106,7 @@ function OrderCard({
       className={cn(
         "group cursor-pointer rounded-[var(--border-radius-sm)] border p-4 transition-all hover:shadow-[var(--shadow-2)]",
         "border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-02)]",
-        warning && "border-l-4 border-l-[#8A3800]"
+        warning && "border-l-4 border-l-[var(--color-alert-error-border)]"
       )}
     >
       <div className="flex items-start justify-between gap-2 mb-2">
@@ -113,21 +117,29 @@ function OrderCard({
       </div>
 
       <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[12px] text-[var(--color-text-secondary)] mb-2">
-        <span>{formatDate(order.order_date)}</span>
+        <span>{formatDate(order.order_date, "dd/MM/yyyy")}</span>
         <span className="font-semibold text-[var(--color-text-primary)]">{formatCurrency(order.total_amount)}</span>
         {order.expected_delivery && (
           <span className="font-semibold text-[var(--color-primary)]">
             <Truck className="inline h-3 w-3 mr-0.5" />
-            Exp. {formatDate(order.expected_delivery)}
+            {t("orders.expLabel")} {formatDate(order.expected_delivery, "dd/MM/yyyy")}
           </span>
         )}
-        {order.items_remaining > 0 && <span>{order.items_remaining} items remaining</span>}
+        {order.items_remaining > 0 && (
+          <span>
+            {order.items_remaining} {t("orders.itemsRemaining")}
+          </span>
+        )}
       </div>
 
       <div className="flex items-center gap-3 text-[12px] text-[var(--color-text-helper)] mb-3">
-        {order.po_number && <span>PO: {order.po_number}</span>}
+        {order.po_number && (
+          <span>
+            {t("common.po")}: {order.po_number}
+          </span>
+        )}
         {order.project_name && (
-          <span className="inline-flex items-center gap-1 rounded-full bg-[var(--color-bg-layer-01)] px-2 py-0.5 text-[11px] font-semibold text-[var(--color-text-secondary)]">
+          <span className="inline-flex h-8 items-center gap-1 rounded-full bg-[var(--color-bg-layer-01)] px-3 text-[12px] font-semibold text-[var(--color-text-secondary)]">
             {order.project_name}
           </span>
         )}
@@ -144,13 +156,17 @@ function OrderCard({
               className="h-8 w-8 rounded border border-[var(--color-border-subtle)] object-cover"
             />
           ))}
-          {moreCount > 0 && <span className="text-[12px] text-[var(--color-text-secondary)]">+{moreCount} more</span>}
+          {moreCount > 0 && (
+            <span className="text-[12px] text-[var(--color-text-secondary)]">
+              +{moreCount} {t("orders.more")}
+            </span>
+          )}
         </div>
         {onReorder && (
           <button
             onClick={(e) => { e.stopPropagation(); onReorder(); }}
             className="inline-flex h-9 w-9 items-center justify-center rounded-[var(--border-radius-sm)] border border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-rexel-primary-10)] transition-colors"
-            title="Reorder all items"
+            title={t("orders.reorderAllTitle")}
           >
             <ShoppingCart className="h-4 w-4" />
           </button>
@@ -158,17 +174,19 @@ function OrderCard({
       </div>
 
       {order.status === "delayed" && order.previous_expected_delivery && (
-        <div className="mt-3 rounded border border-[#8A3800] bg-[#FFF2E8] p-2 text-[12px] text-[#8A3800]">
+        <div className="mt-3 rounded border border-[var(--color-alert-error-border)] bg-[var(--color-alert-error-bg)] p-2 text-[12px] text-[var(--color-alert-error-text)]">
           <AlertTriangle className="inline h-3 w-3 mr-1" />
-          New delivery date: {formatDate(order.expected_delivery)} instead of{" "}
-          <span className="line-through">{formatDate(order.previous_expected_delivery)}</span>
-          {" — Delayed by carrier"}
+          {t("orders.newDeliveryDate")}: {formatDate(order.expected_delivery, "dd/MM/yyyy")} {t("orders.insteadOf")}{" "}
+          <span className="line-through">{formatDate(order.previous_expected_delivery, "dd/MM/yyyy")}</span>
+          {" — "}
+          {t("orders.delayedByCarrier")}
         </div>
       )}
 
       {order.status === "partially_delivered" && (
         <div className="mt-3 text-[12px] text-[var(--color-text-secondary)]">
-          Items remaining: {order.items_remaining} | Next expected delivery: {formatDate(order.expected_delivery)}
+          {order.items_remaining} {t("orders.itemsRemaining")} | {t("orders.nextExpected")}:{" "}
+          {formatDate(order.expected_delivery, "dd/MM/yyyy")}
         </div>
       )}
     </div>
@@ -180,13 +198,14 @@ type SortKey = "order_number" | "po_number" | "order_date" | "status" | "total_a
 
 // --- Main component ---
 export default function OrderHistory() {
+  const { t, formatDate, formatCurrency, df } = useI18n();
   const { data: orders = [], isLoading: ordersLoading } = useOrders();
   const { data: lineItems = [], isLoading: itemsLoading } = useLineItems();
   const isLoading = ordersLoading || itemsLoading;
 
   const [activeTab, setActiveTab] = useState<"ongoing" | "backorders" | "completed">("ongoing");
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeDatePreset, setActiveDatePreset] = useState<string | null>("3 months");
+  const [activeDatePreset, setActiveDatePreset] = useState<DatePresetId | null>("3m");
   const [dateFrom, setDateFrom] = useState<Date | undefined>(subMonths(new Date(), 3));
   const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
   const [projectFilter, setProjectFilter] = useState<string>("all");
@@ -282,13 +301,13 @@ export default function OrderHistory() {
     setActiveDatePreset(null);
   };
 
-  const applyPreset = (label: string, getFrom: () => Date) => {
-    if (activeDatePreset === label) {
+  const applyPreset = (id: DatePresetId, getFrom: () => Date) => {
+    if (activeDatePreset === id) {
       setActiveDatePreset(null); setDateFrom(undefined); setDateTo(undefined);
     } else {
-      setActiveDatePreset(label);
+      setActiveDatePreset(id);
       setDateFrom(startOfDay(getFrom()));
-      setDateTo(label === "Last year" ? new Date(new Date().getFullYear() - 1, 11, 31) : undefined);
+      setDateTo(id === "lastYear" ? new Date(new Date().getFullYear() - 1, 11, 31) : undefined);
     }
   };
 
@@ -300,7 +319,7 @@ export default function OrderHistory() {
 
   const handleReorderAll = (order: OrderRow) => {
     const items = lineItems.filter((li) => li.order_id === order.id);
-    toast.success(`${items.length} item(s) added to cart`, { description: `From order ${order.order_number}` });
+    toast.success(`${items.length} ${t("orders.itemsAdded")}`, { description: `${t("orders.fromOrder")} ${order.order_number}` });
   };
 
   const exportCSV = (rows?: OrderRow[]) => {
@@ -316,13 +335,13 @@ export default function OrderHistory() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a"); a.href = url; a.download = `orders-${format(new Date(), "yyyy-MM-dd")}.csv`; a.click();
     URL.revokeObjectURL(url);
-    toast.success("CSV exported");
+    toast.success(t("orders.csvExported"));
   };
 
   const tabs = [
-    { key: "ongoing" as const, label: `Ongoing (${ongoingCount})` },
-    { key: "backorders" as const, label: `Backorders (${backorderCount})` },
-    { key: "completed" as const, label: `Completed (${completedCount})` },
+    { key: "ongoing" as const, label: `${t("orders.tabOngoing")} (${ongoingCount})` },
+    { key: "backorders" as const, label: `${t("orders.tabBackorders")} (${backorderCount})` },
+    { key: "completed" as const, label: `${t("orders.tabCompleted")} (${completedCount})` },
   ];
 
   if (isLoading) {
@@ -358,8 +377,12 @@ export default function OrderHistory() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="font-[var(--font-heading)] text-[var(--font-size-xl)] font-bold text-[var(--color-text-primary)]">Order History</h1>
-        <p className="mt-1 text-[13px] text-[var(--color-text-secondary)]">Track and manage all your orders</p>
+        <h1 className="font-[var(--font-heading)] text-[var(--font-size-xl)] font-bold leading-[var(--line-height-xl)] text-[var(--color-text-primary)]">
+          {t("orders.title")}
+        </h1>
+        <p className="mt-1 font-[var(--font-body)] text-[12px] leading-[16px] text-[var(--color-text-secondary)]">
+          {t("orders.subtitle")}
+        </p>
       </div>
 
       {/* Tabs */}
@@ -375,13 +398,13 @@ export default function OrderHistory() {
       </div>
 
       {/* Filter bar — sticky */}
-      <div className="space-y-3 sticky top-[57px] z-30 bg-[var(--color-bg-page)] pb-3 -mb-3 pt-1 -mt-1">
+      <div className="sticky top-[var(--flow-sticky-site-header-height,140px)] z-30 mt-[var(--spacing-3)] space-y-3 border-b border-[var(--color-border-subtle)] bg-[var(--color-bg-page)] pb-[var(--spacing-4)] pt-[var(--spacing-3)] mb-[var(--spacing-4)]">
         <div className="flex items-center gap-3">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--color-text-placeholder)]" />
             <input
               type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by order number, reference, PO number, or supplier"
+              placeholder={t("orders.searchPlaceholder")}
               className="h-10 w-full rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-02)] pl-9 pr-9 text-[13px] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-placeholder)] focus:border-[var(--color-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-2"
             />
             {searchQuery && (
@@ -393,17 +416,17 @@ export default function OrderHistory() {
 
           <Select value={projectFilter} onValueChange={setProjectFilter}>
             <SelectTrigger className="w-[220px] h-10 border-[var(--color-border-subtle)] text-[13px]">
-              <SelectValue placeholder="All projects" />
+              <SelectValue placeholder={t("orders.allProjects")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All projects</SelectItem>
+              <SelectItem value="all">{t("orders.allProjects")}</SelectItem>
               {projects.map((p) => (<SelectItem key={p} value={p}>{p}</SelectItem>))}
             </SelectContent>
           </Select>
 
           <button onClick={() => exportCSV()} className="inline-flex h-10 items-center gap-1.5 rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-02)] px-4 text-[13px] font-semibold text-[var(--color-text-primary)] hover:bg-[var(--color-bg-layer-01)] transition-colors">
             <Download className="h-4 w-4" />
-            Export CSV
+            {t("orders.exportCsv")}
           </button>
 
           {/* View toggle */}
@@ -413,7 +436,7 @@ export default function OrderHistory() {
               className={cn("flex h-10 w-10 items-center justify-center transition-colors",
                 viewMode === "list" ? "bg-[var(--color-primary)] text-white" : "bg-[var(--color-bg-layer-02)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
               )}
-              title="Card view"
+              title={t("orders.cardView")}
             >
               <LayoutGrid className="h-4 w-4" />
             </button>
@@ -422,7 +445,7 @@ export default function OrderHistory() {
               className={cn("flex h-10 w-10 items-center justify-center transition-colors",
                 viewMode === "table" ? "bg-[var(--color-primary)] text-white" : "bg-[var(--color-bg-layer-02)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
               )}
-              title="Table view"
+              title={t("orders.tableView")}
             >
               <List className="h-4 w-4" />
             </button>
@@ -432,13 +455,13 @@ export default function OrderHistory() {
         {/* Date chips + range picker */}
         <div className="flex items-center gap-1.5 flex-wrap">
           {datePresets.map((p) => (
-            <button key={p.label} onClick={() => applyPreset(p.label, p.getFrom)} className={cn(
+            <button key={p.id} onClick={() => applyPreset(p.id, p.getFrom)} className={cn(
               "h-8 rounded-full border px-3 text-[12px] font-semibold transition-colors",
-              activeDatePreset === p.label
+              activeDatePreset === p.id
                 ? "border-[var(--color-primary)] bg-[var(--color-primary)] text-white"
                 : "border-[var(--color-border-subtle)] text-[var(--color-text-secondary)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)]"
             )}>
-              {p.label}
+              {t(`datePreset.${p.id}`)}
             </button>
           ))}
           <div className="h-4 w-px bg-[var(--color-border-subtle)] mx-1" />
@@ -451,8 +474,8 @@ export default function OrderHistory() {
               )}>
                 <CalendarIcon className="h-3 w-3" />
                 {dateFrom && !activeDatePreset
-                  ? `${format(dateFrom, "dd/MM/yy")}${dateTo ? ` – ${format(dateTo, "dd/MM/yy")}` : " – ..."}`
-                  : "Custom range"}
+                  ? `${format(dateFrom, "dd/MM/yy", { locale: df })}${dateTo ? ` – ${format(dateTo, "dd/MM/yy", { locale: df })}` : t("orders.rangeEllipsis")}`
+                  : t("orders.customRange")}
               </button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
@@ -480,7 +503,7 @@ export default function OrderHistory() {
                         d.setMonth(d.getMonth() - i);
                         return (
                           <SelectItem key={i} value={`${d.getFullYear()}-${d.getMonth()}`}>
-                            {format(d, "MMMM yyyy")}
+                            {format(d, "MMMM yyyy", { locale: df })}
                           </SelectItem>
                         );
                       })}
@@ -522,7 +545,7 @@ export default function OrderHistory() {
                 className="inline-flex h-8 items-center gap-1 rounded-full border border-[var(--color-border-subtle)] px-3 text-[12px] font-semibold text-[var(--color-text-secondary)] hover:border-[var(--color-error)] hover:text-[var(--color-error)] transition-colors"
               >
                 <X className="h-3 w-3" />
-                Clear filters
+                {t("orders.clearFilters")}
               </button>
             </>
           )}
@@ -530,8 +553,8 @@ export default function OrderHistory() {
 
         {searchQuery && (
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-rexel-primary-10)] px-3 py-1 text-[12px] font-semibold text-[var(--color-primary)]">
-              Search: "{searchQuery}"
+            <span className="inline-flex h-8 items-center gap-1.5 rounded-full bg-[var(--color-rexel-primary-10)] px-3 text-[12px] font-semibold text-[var(--color-primary)]">
+              {t("orders.searchChip")}: &quot;{searchQuery}&quot;
               <button onClick={() => setSearchQuery("")}><X className="h-3 w-3" /></button>
             </span>
           </div>
@@ -548,18 +571,17 @@ export default function OrderHistory() {
             const regularRows = activeTab === "ongoing" ? tableSorted.filter((o) => !needsAttention(o.status)) : tableSorted;
             const attentionPaginated = attentionRows; // show all attention rows (usually few)
 
-            const renderTableBlock = (rows: typeof tableSorted, title?: string, isAttention?: boolean) => {
+            const renderTableBlock = (rows: typeof tableSorted, title?: string, isAttention?: boolean, paginate?: boolean) => {
               if (rows.length === 0) return null;
-              // For ongoing tab with sections, no pagination per section — paginate only regular
-              const displayRows = title === "Ongoing" ? rows.slice((currentPage - 1) * ROWS_PER_PAGE, currentPage * ROWS_PER_PAGE) : rows;
-              const pageCount = title === "Ongoing" ? Math.ceil(rows.length / ROWS_PER_PAGE) : 0;
+              const displayRows = paginate ? rows.slice((currentPage - 1) * ROWS_PER_PAGE, currentPage * ROWS_PER_PAGE) : rows;
+              const pageCount = paginate ? Math.ceil(rows.length / ROWS_PER_PAGE) : 0;
 
               return (
                 <div className="space-y-3">
                   {title && (
               <div className="flex items-center gap-2">
                       {isAttention && <AlertTriangle className="h-4 w-4 text-[var(--color-text-primary)]" />}
-                      <h2 className="text-[16px] font-bold font-[var(--font-heading)] text-[var(--color-text-primary)]">
+                      <h2 className="headline-l text-[#161616]">
                         {title} ({rows.length})
                       </h2>
                     </div>
@@ -568,13 +590,13 @@ export default function OrderHistory() {
                     <table className="w-full">
                       <thead>
                         <tr className="border-b border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-01)]">
-                          <SortableHeader colKey="order_number" label="Order #" />
-                          <SortableHeader colKey="po_number" label="PO #" />
-                          <SortableHeader colKey="order_date" label="Date" />
-                          <SortableHeader colKey="status" label="Status" />
-                          <SortableHeader colKey="total_amount" label="Total" align="right" />
-                          <SortableHeader colKey="expected_delivery" label="Exp. delivery" />
-                          <SortableHeader colKey="items_remaining" label="Remaining" />
+                          <SortableHeader colKey="order_number" label={t("orders.colOrder")} />
+                          <SortableHeader colKey="po_number" label={t("orders.colPO")} />
+                          <SortableHeader colKey="order_date" label={t("orders.colDate")} />
+                          <SortableHeader colKey="status" label={t("orders.colStatus")} />
+                          <SortableHeader colKey="total_amount" label={t("orders.colTotal")} align="right" />
+                          <SortableHeader colKey="expected_delivery" label={t("orders.colExpDelivery")} />
+                          <SortableHeader colKey="items_remaining" label={t("orders.colRemaining")} />
                           <th className="px-4 py-3 w-10" />
                         </tr>
                       </thead>
@@ -592,16 +614,16 @@ export default function OrderHistory() {
                           >
                             <td className="px-4 py-3 text-[13px] font-semibold text-[var(--color-text-primary)]">{order.order_number}</td>
                             <td className="px-4 py-3 text-[13px] text-[var(--color-text-secondary)]">{order.po_number ?? "—"}</td>
-                            <td className="px-4 py-3 text-[13px] text-[var(--color-text-secondary)]">{formatDate(order.order_date)}</td>
+                            <td className="px-4 py-3 text-[13px] text-[var(--color-text-secondary)]">{formatDate(order.order_date, "dd/MM/yyyy")}</td>
                             <td className="px-4 py-3"><StatusBadge status={order.status} /></td>
                             <td className="px-4 py-3 text-[13px] text-right font-semibold text-[var(--color-text-primary)]">{formatCurrency(order.total_amount)}</td>
-                            <td className="px-4 py-3 text-[13px] font-semibold text-[var(--color-primary)]">{formatDate(order.expected_delivery)}</td>
+                            <td className="px-4 py-3 text-[13px] font-semibold text-[var(--color-primary)]">{formatDate(order.expected_delivery, "dd/MM/yyyy")}</td>
                             <td className="px-4 py-3 text-[13px] text-[var(--color-text-secondary)]">{order.items_remaining}</td>
                             <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
                               <button
                                 onClick={() => handleReorderAll(order)}
                                 className="flex h-8 w-8 items-center justify-center rounded-[var(--border-radius-sm)] border border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-rexel-primary-10)] transition-colors"
-                                title="Reorder all items"
+                                title={t("orders.reorderAllTitle")}
                               >
                                 <ShoppingCart className="h-3.5 w-3.5" />
                               </button>
@@ -616,7 +638,7 @@ export default function OrderHistory() {
                   {pageCount > 1 && (
                     <div className="flex items-center justify-between pt-2">
                       <span className="text-[12px] text-[var(--color-text-secondary)]">
-                        Showing {(currentPage - 1) * ROWS_PER_PAGE + 1}–{Math.min(currentPage * ROWS_PER_PAGE, rows.length)} of {rows.length}
+                        {t("orders.showing")} {(currentPage - 1) * ROWS_PER_PAGE + 1}–{Math.min(currentPage * ROWS_PER_PAGE, rows.length)} {t("orders.of")} {rows.length}
                       </span>
                       <div className="flex items-center gap-1">
                         <button onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1}
@@ -645,8 +667,8 @@ export default function OrderHistory() {
             if (activeTab === "ongoing") {
               return (
                 <>
-                  {renderTableBlock(attentionPaginated, "Needs attention", true)}
-                  {renderTableBlock(regularRows, "Ongoing")}
+                  {renderTableBlock(attentionPaginated, t("orders.needsAttention"), true, false)}
+                  {renderTableBlock(regularRows, t("orders.ongoing"), false, true)}
                 </>
               );
             }
@@ -658,13 +680,13 @@ export default function OrderHistory() {
                   <table className="w-full">
                     <thead>
                       <tr className="border-b border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-01)]">
-                        <SortableHeader colKey="order_number" label="Order #" />
-                        <SortableHeader colKey="po_number" label="PO #" />
-                        <SortableHeader colKey="order_date" label="Date" />
-                        <SortableHeader colKey="status" label="Status" />
-                        <SortableHeader colKey="total_amount" label="Total" align="right" />
-                        <SortableHeader colKey="expected_delivery" label="Exp. delivery" />
-                        <SortableHeader colKey="items_remaining" label="Remaining" />
+                        <SortableHeader colKey="order_number" label={t("orders.colOrder")} />
+                        <SortableHeader colKey="po_number" label={t("orders.colPO")} />
+                        <SortableHeader colKey="order_date" label={t("orders.colDate")} />
+                        <SortableHeader colKey="status" label={t("orders.colStatus")} />
+                        <SortableHeader colKey="total_amount" label={t("orders.colTotal")} align="right" />
+                        <SortableHeader colKey="expected_delivery" label={t("orders.colExpDelivery")} />
+                        <SortableHeader colKey="items_remaining" label={t("orders.colRemaining")} />
                         <th className="px-4 py-3 w-10" />
                       </tr>
                     </thead>
@@ -679,15 +701,15 @@ export default function OrderHistory() {
                         >
                           <td className="px-4 py-3 text-[13px] font-semibold text-[var(--color-text-primary)]">{order.order_number}</td>
                           <td className="px-4 py-3 text-[13px] text-[var(--color-text-secondary)]">{order.po_number ?? "—"}</td>
-                          <td className="px-4 py-3 text-[13px] text-[var(--color-text-secondary)]">{formatDate(order.order_date)}</td>
+                          <td className="px-4 py-3 text-[13px] text-[var(--color-text-secondary)]">{formatDate(order.order_date, "dd/MM/yyyy")}</td>
                           <td className="px-4 py-3"><StatusBadge status={order.status} /></td>
                           <td className="px-4 py-3 text-[13px] text-right font-semibold text-[var(--color-text-primary)]">{formatCurrency(order.total_amount)}</td>
-                          <td className="px-4 py-3 text-[13px] font-semibold text-[var(--color-primary)]">{formatDate(order.expected_delivery)}</td>
+                          <td className="px-4 py-3 text-[13px] font-semibold text-[var(--color-primary)]">{formatDate(order.expected_delivery, "dd/MM/yyyy")}</td>
                           <td className="px-4 py-3 text-[13px] text-[var(--color-text-secondary)]">{order.items_remaining}</td>
                           <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
                             <button onClick={() => handleReorderAll(order)}
                               className="flex h-8 w-8 items-center justify-center rounded-[var(--border-radius-sm)] border border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-rexel-primary-10)] transition-colors"
-                              title="Reorder all items">
+                              title={t("orders.reorderAllTitle")}>
                               <ShoppingCart className="h-3.5 w-3.5" />
                             </button>
                           </td>
@@ -701,7 +723,7 @@ export default function OrderHistory() {
                 {totalPages > 1 && (
                   <div className="flex items-center justify-between pt-4">
                     <span className="text-[12px] text-[var(--color-text-secondary)]">
-                      Showing {(currentPage - 1) * ROWS_PER_PAGE + 1}–{Math.min(currentPage * ROWS_PER_PAGE, tableSorted.length)} of {tableSorted.length}
+                      {t("orders.showing")} {(currentPage - 1) * ROWS_PER_PAGE + 1}–{Math.min(currentPage * ROWS_PER_PAGE, tableSorted.length)} {t("orders.of")} {tableSorted.length}
                     </span>
                     <div className="flex items-center gap-1">
                       <button onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1}
@@ -737,7 +759,9 @@ export default function OrderHistory() {
             <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <AlertTriangle className="h-5 w-5 text-[var(--color-text-primary)]" />
-                <h2 className="text-[18px] font-bold font-[var(--font-heading)] text-[var(--color-text-primary)]">Needs attention ({needsAttentionOrders.length})</h2>
+                <h2 className="headline-l text-[#161616]">
+                  {t("orders.needsAttention")} ({needsAttentionOrders.length})
+                </h2>
               </div>
               <div className="grid gap-3 grid-cols-1">
                 {needsAttentionOrders.map((o) => (
@@ -754,7 +778,9 @@ export default function OrderHistory() {
 
           {activeTab === "ongoing" && ongoingOrders.length > 0 && (
             <div className="space-y-3">
-              <h2 className="text-[18px] font-bold font-[var(--font-heading)] text-[var(--color-text-primary)]">Ongoing ({ongoingOrders.length})</h2>
+              <h2 className="headline-l text-[#161616]">
+                {t("orders.ongoing")} ({ongoingOrders.length})
+              </h2>
               <div className="grid gap-3 grid-cols-1">
                 {ongoingOrders.slice(0, visibleCount).map((o) => (
                   <OrderCard key={o.id} order={o} lineItems={lineItems} onClick={() => setSidePanelOrder(o.order_number)} onReorder={() => handleReorderAll(o)} />
@@ -776,19 +802,17 @@ export default function OrderHistory() {
             <div className="flex flex-col items-center justify-center py-16 text-center">
               <Package className="h-16 w-16 text-[var(--color-text-secondary)] mb-4" strokeWidth={1} />
               <h3 className="text-[16px] font-semibold text-[var(--color-text-primary)] mb-1">
-                {hasActiveFilters ? "No orders match your search" : "No orders yet"}
+                {hasActiveFilters ? t("orders.emptyFilteredTitle") : t("orders.emptyNoOrdersTitle")}
               </h3>
               <p className="text-[13px] text-[var(--color-text-secondary)] mb-4 max-w-sm">
-                {hasActiveFilters
-                  ? "Try a different reference, PO number, or clear your filters."
-                  : "Your orders will appear here once you place your first one."}
+                {hasActiveFilters ? t("orders.emptyFilteredHint") : t("orders.emptyNoOrdersHint")}
               </p>
               {hasActiveFilters && (
                 <button
                   onClick={clearAllFilters}
                   className="inline-flex h-10 items-center gap-1.5 rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] px-4 text-[13px] font-semibold text-[var(--color-text-primary)] hover:bg-[var(--color-bg-layer-01)] transition-colors"
                 >
-                  Clear all filters
+                  {t("orders.clearAllFilters")}
                 </button>
               )}
             </div>
@@ -801,7 +825,7 @@ export default function OrderHistory() {
                 onClick={() => setVisibleCount((v) => v + 10)}
                 className="inline-flex h-10 items-center gap-1.5 rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] px-6 text-[13px] font-semibold text-[var(--color-text-primary)] hover:bg-[var(--color-bg-layer-01)] transition-colors"
               >
-                Load more ({(activeTab === "ongoing" ? ongoingOrders : filtered).length - visibleCount} remaining)
+                {t("orders.loadMore")} ({(activeTab === "ongoing" ? ongoingOrders : filtered).length - visibleCount} {t("orders.remaining")})
               </button>
             </div>
           )}
@@ -812,13 +836,13 @@ export default function OrderHistory() {
       {viewMode === "table" && filtered.length === 0 && (
         <div className="flex flex-col items-center justify-center py-16 text-center">
           <Package className="h-16 w-16 text-[var(--color-text-secondary)] mb-4" strokeWidth={1} />
-          <h3 className="text-[16px] font-semibold text-[var(--color-text-primary)] mb-1">No orders match your search</h3>
-          <p className="text-[13px] text-[var(--color-text-secondary)] mb-4 max-w-sm">Try a different reference, PO number, or clear your filters.</p>
+          <h3 className="text-[16px] font-semibold text-[var(--color-text-primary)] mb-1">{t("orders.emptyFilteredTitle")}</h3>
+          <p className="text-[13px] text-[var(--color-text-secondary)] mb-4 max-w-sm">{t("orders.emptyFilteredHint")}</p>
           <button
             onClick={clearAllFilters}
             className="inline-flex h-10 items-center gap-1.5 rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] px-4 text-[13px] font-semibold text-[var(--color-text-primary)] hover:bg-[var(--color-bg-layer-01)] transition-colors"
           >
-            Clear all filters
+            {t("orders.clearAllFilters")}
           </button>
         </div>
       )}

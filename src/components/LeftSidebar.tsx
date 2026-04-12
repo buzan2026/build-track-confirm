@@ -27,7 +27,7 @@ export default function LeftSidebar() {
   const navigate = useNavigate();
 
   return (
-    <aside className="sticky top-14 flex h-[calc(100vh-3.5rem)] w-14 flex-col items-center border-r border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-02)] py-3 gap-1">
+    <aside className="sticky top-[var(--flow-sticky-site-header-height,140px)] z-20 flex h-[calc(100vh-var(--flow-sticky-site-header-height,140px))] w-14 flex-col items-center gap-1 border-r border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-02)] py-3">
       {navItems.map((item) => {
         const isActive =
           item.path === "/"

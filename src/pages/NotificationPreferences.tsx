@@ -1,34 +1,28 @@
+import { useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
-  Bell, Mail, Smartphone, CalendarClock,
-  CheckCircle, Truck, Package, AlertTriangle, FileText, Clock, RotateCcw,
+  Mail, Smartphone, CalendarClock,
+  CheckCircle, Truck, Package, AlertTriangle, FileText, RotateCcw,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
+import { useI18n } from "@/i18n/useI18n";
 
-/* ── Event type metadata ── */
-const eventMeta: Record<string, { label: string; description: string; icon: typeof Bell }> = {
-  order_confirmed: { label: "Order confirmed", description: "When a new order is confirmed by the supplier", icon: CheckCircle },
-  being_prepared: { label: "Being prepared", description: "When an order starts being prepared in the warehouse", icon: Package },
-  in_transit: { label: "In transit", description: "When a shipment is dispatched and on its way", icon: Truck },
-  delivered: { label: "Delivered", description: "When a shipment has been delivered to the site", icon: CheckCircle },
-  partially_delivered: { label: "Partially delivered", description: "When only some items from an order are delivered", icon: Package },
-  delayed: { label: "Delayed", description: "When a delivery date is pushed back", icon: AlertTriangle },
-  date_changed: { label: "Date changed", description: "When the expected delivery date is modified", icon: CalendarClock },
-  backorder_update: { label: "Backorder update", description: "When backordered items have availability updates", icon: RotateCcw },
-  invoice_available: { label: "Invoice available", description: "When a new invoice or credit note is ready", icon: FileText },
+const eventIcons: Record<string, typeof CheckCircle> = {
+  order_confirmed: CheckCircle,
+  being_prepared: Package,
+  in_transit: Truck,
+  delivered: CheckCircle,
+  partially_delivered: Package,
+  delayed: AlertTriangle,
+  date_changed: CalendarClock,
+  backorder_update: RotateCcw,
+  invoice_available: FileText,
 };
 
 type ChannelKey = "email" | "push" | "daily_digest";
-
-const channels: { key: ChannelKey; label: string; icon: typeof Mail }[] = [
-  { key: "email", label: "Email", icon: Mail },
-  { key: "push", label: "Push", icon: Smartphone },
-  { key: "daily_digest", label: "Daily digest", icon: CalendarClock },
-];
 
 interface NotifPref {
   id: string;
@@ -50,15 +44,26 @@ function useNotificationPreferences() {
 }
 
 export default function NotificationPreferences() {
+  const { t } = useI18n();
   const queryClient = useQueryClient();
   const { data: prefs, isLoading } = useNotificationPreferences();
+
+  const channels = useMemo(
+    () =>
+      [
+        { key: "email" as const, label: t("notif.email"), icon: Mail },
+        { key: "push" as const, label: t("notif.push"), icon: Smartphone },
+        { key: "daily_digest" as const, label: t("notif.digest"), icon: CalendarClock },
+      ] as const,
+    [t]
+  );
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, field, value }: { id: string; field: ChannelKey; value: boolean }) => {
       const update: Partial<Pick<NotifPref, "email" | "push" | "daily_digest">> = { [field]: value };
       const { error } = await supabase
         .from("notification_preferences")
-        .update(update as any)
+        .update(update as Record<string, boolean>)
         .eq("id", id);
       if (error) throw error;
     },
@@ -72,7 +77,7 @@ export default function NotificationPreferences() {
     },
     onError: (_err, _vars, ctx) => {
       if (ctx?.prev) queryClient.setQueryData(["notification_preferences"], ctx.prev);
-      toast.error("Failed to update preference");
+      toast.error(t("notif.updateError"));
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["notification_preferences"] });
@@ -102,19 +107,15 @@ export default function NotificationPreferences() {
   return (
     <div className="max-w-3xl space-y-6">
       <div>
-        <h1 className="font-[var(--font-heading)] text-[var(--font-size-xl)] font-bold text-[var(--color-text-primary)]">
-          Notification Preferences
-        </h1>
-        <p className="text-sm text-[var(--color-text-secondary)] mt-1">
-          Choose how you want to be notified for each event type
+        <h1 className="headline-xl font-[var(--font-heading)] text-[var(--color-text-primary)]">{t("notif.title")}</h1>
+        <p className="mt-1 font-[var(--font-body)] text-[12px] leading-[16px] text-[var(--color-text-secondary)]">
+          {t("notif.subtitle")}
         </p>
       </div>
 
-      {/* Table */}
       <div className="rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-02)] overflow-hidden shadow-[var(--shadow-1)]">
-        {/* Header */}
         <div className="grid grid-cols-[1fr_80px_80px_100px] items-center border-b border-[var(--color-border-subtle)] bg-[var(--color-bg-layer-01)] px-5 py-3">
-          <span className="text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">Event</span>
+          <span className="text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">{t("notif.event")}</span>
           {channels.map((ch) => (
             <div key={ch.key} className="flex flex-col items-center gap-1">
               <span className="text-xs font-medium text-[var(--color-text-secondary)] uppercase tracking-wider">{ch.label}</span>
@@ -127,12 +128,10 @@ export default function NotificationPreferences() {
           ))}
         </div>
 
-        {/* Rows */}
         <div className="divide-y divide-[var(--color-border-subtle)]">
           {prefs?.map((pref) => {
-            const meta = eventMeta[pref.event_type];
-            if (!meta) return null;
-            const Icon = meta.icon;
+            const Icon = eventIcons[pref.event_type];
+            if (!Icon) return null;
             return (
               <div
                 key={pref.id}
@@ -143,8 +142,8 @@ export default function NotificationPreferences() {
                     <Icon className="h-4 w-4" />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-[var(--color-text-primary)]">{meta.label}</p>
-                    <p className="text-xs text-[var(--color-text-helper)] truncate">{meta.description}</p>
+                    <p className="text-sm font-medium text-[var(--color-text-primary)]">{t(`notif.${pref.event_type}`)}</p>
+                    <p className="text-xs text-[var(--color-text-helper)] truncate">{t(`notif.${pref.event_type}.desc`)}</p>
                   </div>
                 </div>
                 {channels.map((ch) => (
@@ -161,9 +160,7 @@ export default function NotificationPreferences() {
         </div>
       </div>
 
-      <p className="text-xs text-[var(--color-text-helper)]">
-        Changes are saved automatically. Daily digest is sent at 07:00 CET every business day.
-      </p>
+      <p className="text-xs text-[var(--color-text-helper)]">{t("notif.footer")}</p>
     </div>
   );
 }
