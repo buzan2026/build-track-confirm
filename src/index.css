@@ -18,7 +18,6 @@
 
   /* Hauteur du header bleu sticky — mise à jour par RexelHeaderBlueBar (ResizeObserver) */
   --flow-sticky-header-height: 0px;
-  /* Suivi commande : header Rexel complet — RexelSiteHeader met à jour via ResizeObserver */
   --flow-sticky-site-header-height: 140px;
 
   /* === BORDER RADIUS === */

@@ -1,5 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  consumeCheckoutHandoffFromLocation,
+  getHandoffOrderDetail,
+  mergeHandoffLineItems,
+  mergeHandoffOrders,
+} from "@/lib/checkoutHandoff";
 
 export interface OrderRow {
   id: string;
@@ -47,12 +53,13 @@ export function useOrders() {
   return useQuery({
     queryKey: ["orders"],
     queryFn: async () => {
+      consumeCheckoutHandoffFromLocation();
       const { data, error } = await supabase
         .from("orders")
         .select("*")
         .order("order_date", { ascending: false });
       if (error) throw error;
-      return data as OrderRow[];
+      return mergeHandoffOrders((data ?? []) as OrderRow[]);
     },
   });
 }
@@ -61,9 +68,10 @@ export function useLineItems() {
   return useQuery({
     queryKey: ["line_items"],
     queryFn: async () => {
+      consumeCheckoutHandoffFromLocation();
       const { data, error } = await supabase.from("line_items").select("*");
       if (error) throw error;
-      return data as LineItemRow[];
+      return mergeHandoffLineItems((data ?? []) as LineItemRow[]);
     },
   });
 }
@@ -84,12 +92,20 @@ export function useOrderWithDetails(orderNumber: string | undefined) {
     queryKey: ["order-detail", orderNumber],
     enabled: !!orderNumber,
     queryFn: async () => {
+      consumeCheckoutHandoffFromLocation();
+      const handoff = orderNumber ? getHandoffOrderDetail(orderNumber) : null;
+      if (handoff) return handoff;
+
       const { data: order, error: orderErr } = await supabase
         .from("orders")
         .select("*")
         .eq("order_number", orderNumber!)
         .single();
-      if (orderErr) throw orderErr;
+      if (orderErr) {
+        const fallback = getHandoffOrderDetail(orderNumber!);
+        if (fallback) return fallback;
+        throw orderErr;
+      }
 
       const [{ data: shipments }, { data: lineItems }] = await Promise.all([
         supabase.from("shipments").select("*").eq("order_id", order.id).order("shipment_index"),

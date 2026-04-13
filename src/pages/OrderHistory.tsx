@@ -8,6 +8,7 @@ import {
 import { cn } from "@/lib/utils";
 import OrderSidePanel from "@/components/OrderSidePanel";
 import { useOrders, useLineItems, type OrderRow, type LineItemRow } from "@/hooks/useOrders";
+import { CHECKOUT_OPEN_PANEL_KEY } from "@/lib/checkoutHandoff";
 import { useI18n } from "@/i18n/useI18n";
 import { toast } from "sonner";
 import { format, subDays, subMonths, subYears, startOfDay, startOfYear } from "date-fns";
@@ -219,6 +220,18 @@ export default function OrderHistory() {
   const [currentPage, setCurrentPage] = useState(1);
   const [sidePanelOrder, setSidePanelOrder] = useState<string | null>(null);
   const ROWS_PER_PAGE = 10;
+
+  useEffect(() => {
+    try {
+      const pending = sessionStorage.getItem(CHECKOUT_OPEN_PANEL_KEY);
+      if (pending) {
+        sessionStorage.removeItem(CHECKOUT_OPEN_PANEL_KEY);
+        setSidePanelOrder(pending);
+      }
+    } catch {
+      /* ignore */
+    }
+  }, []);
 
   // Range picker state
   const [rangePickerOpen, setRangePickerOpen] = useState(false);

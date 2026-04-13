@@ -75,12 +75,12 @@ function ShipmentCard({ shipment, lineItems }: { shipment: ShipmentRow; lineItem
             <div key={step.key} className="relative z-10 flex flex-col items-center gap-1.5 flex-1">
               <div
                 className={cn(
-                  "flex h-9 w-9 items-center justify-center rounded-full transition-colors",
+                  "flex h-10 w-10 items-center justify-center rounded-full transition-colors",
                   done ? "bg-[var(--color-primary)] text-[var(--color-white)]" : "bg-[var(--color-bg-layer-01)] text-[var(--color-text-placeholder)]",
                   current && "ring-2 ring-[var(--color-primary)] ring-offset-2 ring-offset-[var(--color-bg-layer-02)]"
                 )}
               >
-                <step.icon className="h-4 w-4" />
+                <step.icon className="h-5 w-5" />
               </div>
               <span className={cn("text-xs text-center", done ? "text-[var(--color-text-primary)] font-medium" : "text-[var(--color-text-placeholder)]")}>
                 {t(`track.${step.step}`)}

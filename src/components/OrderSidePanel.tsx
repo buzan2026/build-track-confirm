@@ -13,6 +13,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/i18n/useI18n";
+import { isHandoffOrderId } from "@/lib/checkoutHandoff";
 
 function productImageUrl(ref: string) {
   const hash = Array.from(ref).reduce((a, c) => a + c.charCodeAt(0), 0);
@@ -82,22 +83,31 @@ function ShipmentMini({ shipment, lineItems }: { shipment: ShipmentRow; lineItem
         <span className="text-[12px] text-[var(--color-text-secondary)]">{shipment.carrier ?? ""}</span>
       </div>
 
-      <div className="flex items-center gap-1 mb-3">
+      <div className="relative mb-3 flex w-full items-center justify-between">
+        <div className="absolute left-3 right-3 top-1/2 -translate-y-1/2">
+          <div className="flex">
+            {[0, 1].map((i) => (
+              <div
+                key={i}
+                className={cn("h-0.5 flex-1", i < current ? "bg-[var(--color-primary)]" : "bg-[var(--color-border-subtle)]")}
+              />
+            ))}
+          </div>
+        </div>
         {trackingSteps.map((step, i) => {
           const done = i <= current;
           return (
-            <div key={step.key} className="flex items-center gap-1 flex-1">
+            <div key={step.key} className="relative z-10 flex flex-1 items-center justify-center">
               <div
                 className={cn(
-                  "flex h-6 w-6 items-center justify-center rounded-full",
-                  done ? "bg-[var(--color-primary)] text-[var(--color-white)]" : "bg-[var(--color-bg-layer-01)] text-[var(--color-text-placeholder)]"
+                  "flex h-7 w-7 items-center justify-center rounded-full",
+                  done
+                    ? "bg-[var(--color-primary)] text-[var(--color-white)]"
+                    : "bg-[var(--color-bg-layer-01)] text-[var(--color-text-placeholder)]"
                 )}
               >
-                <step.icon className="h-3 w-3" />
+                <step.icon className="h-4 w-4" />
               </div>
-              {i < trackingSteps.length - 1 && (
-                <div className={cn("h-0.5 flex-1", i < current ? "bg-[var(--color-primary)]" : "bg-[var(--color-border-subtle)]")} />
-              )}
             </div>
           );
         })}
@@ -202,6 +212,10 @@ export default function OrderSidePanel({ orderNumber, onClose }: OrderSidePanelP
 
   const handleValidateReception = async () => {
     if (!data) return;
+    if (isHandoffOrderId(data.order.id)) {
+      toast.info(t("side.handoffReceptionDemo"));
+      return;
+    }
     await supabase.from("orders").update({ status: "completed", items_remaining: 0 }).eq("id", data.order.id);
     for (const s of data.shipments) {
       await supabase.from("shipments").update({ status: "delivered", delivered_at: new Date().toISOString() }).eq("id", s.id);
@@ -223,6 +237,17 @@ export default function OrderSidePanel({ orderNumber, onClose }: OrderSidePanelP
   const handleReorderAll = () => {
     if (!data) return;
     toast.success(`${data.lineItems.length} ${t("side.toastReorderAll")}`, { description: `${t("orders.fromOrder")} ${data.order.order_number}` });
+  };
+
+  const handleRequestReturn = () => {
+    toast.info(t("detail.returnSoon"));
+  };
+
+  const handleContactSalesRep = () => {
+    const email = "gisele.michu@rexel.fr";
+    const subject = data?.order?.order_number ? `${t("detail.contactRep")} — ${data.order.order_number}` : t("detail.contactRep");
+    const href = `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject)}`;
+    window.location.href = href;
   };
 
   const handleOpenChange = (v: boolean) => {
@@ -563,14 +588,33 @@ export default function OrderSidePanel({ orderNumber, onClose }: OrderSidePanelP
               )}
             </div>
 
-            <div className="border-t border-[var(--color-border-subtle)] bg-[var(--color-bg-page)] px-6 py-4 flex items-center gap-3">
+            <div className="border-t border-[var(--color-border-subtle)] bg-[var(--color-bg-page)] px-6 py-4 flex flex-col items-stretch gap-3">
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={handleRequestReturn}
+                  className="inline-flex items-center justify-center gap-2 h-10 rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] bg-white text-[13px] font-semibold text-[var(--color-text-primary)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-colors"
+                >
+                  <FileText className="h-4 w-4" />
+                  {t("detail.requestReturn")}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleContactSalesRep}
+                  className="inline-flex items-center justify-center gap-2 h-10 rounded-[var(--border-radius-sm)] border border-[var(--color-border-subtle)] bg-white text-[13px] font-semibold text-[var(--color-text-primary)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] transition-colors"
+                >
+                  <Mail className="h-4 w-4" />
+                  {t("detail.contactRep")}
+                </button>
+              </div>
+
               {activeTab === "reception" ? (
                 <button
                   type="button"
                   disabled={!allChecked || isCompletedOrder}
                   onClick={handleValidateReception}
                   className={cn(
-                    "flex-1 inline-flex items-center justify-center gap-2 h-10 rounded-[var(--border-radius-sm)] text-[13px] font-semibold transition-colors",
+                    "w-full inline-flex items-center justify-center gap-2 h-10 rounded-[var(--border-radius-sm)] text-[13px] font-semibold transition-colors",
                     allChecked && !isCompletedOrder
                       ? "bg-[var(--color-success)] text-white hover:opacity-90"
                       : "bg-[var(--color-bg-layer-01)] text-[var(--color-text-placeholder)] cursor-not-allowed"
@@ -585,7 +629,7 @@ export default function OrderSidePanel({ orderNumber, onClose }: OrderSidePanelP
                 <button
                   type="button"
                   onClick={handleReorderAll}
-                  className="flex-1 inline-flex items-center justify-center gap-2 h-10 rounded-[var(--border-radius-sm)] bg-[var(--color-primary)] text-[var(--color-white)] text-[13px] font-semibold hover:bg-[var(--color-primary-hover)] transition-colors"
+                  className="w-full inline-flex items-center justify-center gap-2 h-10 rounded-[var(--border-radius-sm)] bg-[var(--color-primary)] text-[var(--color-white)] text-[13px] font-semibold hover:bg-[var(--color-primary-hover)] transition-colors"
                 >
                   <ShoppingCart className="h-4 w-4" /> {t("side.reorderAll")}
                 </button>
